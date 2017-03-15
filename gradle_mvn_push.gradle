@@ -1,4 +1,5 @@
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 group = GROUP
 version = VERSION_NAME
 
@@ -57,8 +58,8 @@ bintray {
         name = "${project.group}:${project.name}"
         userOrg = 'meituan'
         licenses = ['Apache-2.0']
-        websiteUrl = 'http://tech.meituan.com/android-apk-v2-signature-scheme.html'
-        vcsUrl = 'https://github.com/Meituan-Dianping/walle'
+        websiteUrl = 'http://tech.meituan.com/android_autopatch.html'
+        vcsUrl = 'https://github.com/Meituan-Dianping/Robust'
         publish = true
     }
 }
