@@ -18,7 +18,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 
 	```java
 	apply plugin: 'com.android.application'
-	//制作补丁时将这个打开，auto-patch-plugin紧跟着	com.android.application
+	//please uncomment fellow line before you build a patch
 	//apply plugin: 'auto-patch-plugin'
 	apply plugin: 'robust'
 	compile 'com.meituan.robust:robust:0.3.0'
@@ -32,7 +32,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	    }
 	    dependencies {
 	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
 	   }
 	}
 	```
@@ -124,7 +124,7 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
  
 8. Also you can use our sample dex in **app/robust/sample_patch.dex** ,this dex change text after you click **Jump_second_Activity** Button.
 
-9. Demo delete patch after used.
+9. Demo delete patch after used.You should copy patch everytimes.
 
 # Attentions
 
@@ -144,7 +144,7 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	}
 	```
 3. Not Support add fields,but you can add classes.
-4. Classes added in patch should be static nested classes ,and all fields and methods in added class should be public.
+4. Classes added in patch should  be static nested classes or non-inner classes,and all fields and methods in added class should be public.
 5. Not suport fix bugs in constructors.
 6. Not support methods which only use fields,without method call or new expression. 
 
