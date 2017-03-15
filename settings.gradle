@@ -1,0 +1,5 @@
+include ':app'
+include ':autopatchbase'
+include ':gradle-plugin'
+include ':patch'
+include ':auto-patch-plugin'

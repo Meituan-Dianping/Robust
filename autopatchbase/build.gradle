@@ -1,0 +1,5 @@
+apply plugin: 'java'
+project.archivesBaseName = 'autopatchbase'
+apply from: '../gradle_mvn_push.gradle'
+sourceCompatibility= 1.7
+targetCompatibility= 1.7

@@ -1,0 +1,45 @@
+<FindBugsFilter>
+    <!--http://findbugs.sourceforge.net/manual/filter.html-->
+    <Match>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+        <!-- 默认编码utf8，忽略无问题-->
+    </Match>
+    <Match>
+        <Class name="com.meituan.android.takeout.library.fingerprint.FingerprintConfig"/>
+        <Bug pattern="MS_MUTABLE_COLLECTION"/>
+        <!--写法不科学，使用无问题-->
+    </Match>
+    <Match>
+        <Class name="com.sankuai.meituan.fingerprint.FingerprintConfig"/>
+        <Bug pattern="MS_MUTABLE_COLLECTION"/>
+        <!--写法不科学，使用无问题-->
+    </Match>
+    <Match>
+        <Bug pattern="MS_MUTABLE_ARRAY"/>
+        <!-- 正确的做法是每次引用都clone一份-->
+    </Match>
+    <Match>
+        <Class name="com.meituan.android.apollo.ApolloApiConfig"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <!--dev模式中有修改-->
+    </Match>
+    <Match>
+        <Class name="com.meituan.android.base.BaseConfig"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <!-- Application 中初始化-->
+    </Match>
+    <Match>
+        <Class name="com.meituan.android.base.net.NetAsyncTask"/>
+        <Bug pattern="MS_SHOULD_BE_FINAL"/>
+        <!--使用动态注入-->
+    </Match>
+    <Match>
+        <Package name="~com\.meituan\.service\.platformapi\..*"/>
+        <!--Thrift 自动生成代码-->
+    </Match>
+    <Match>
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+        <!--设计如此，改起来太复杂，但不是好的设计-->
+    </Match>
+
+</FindBugsFilter>

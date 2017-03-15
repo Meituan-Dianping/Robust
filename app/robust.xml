@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <switch>
+        <!--true代表打开Robust，这个会比较耗时建议release包在打开-->
+        <turnOnRobust>true</turnOnRobust>
+        <!--<turnOnRobust>false</turnOnRobust>-->
+
+        <!--是否开启手动模式，手动模式会去寻找配置项patchPackname包名下的所有类，自动的处理混淆，然后把patchPackname包名下的所有类制作成补丁-->
+        <!--<manual>true</manual>-->
+        <manual>false</manual>
+
+        <!--是否强制插入插入代码，Robust默认在debug模式下是关闭的，开启这个选项为true会在debug下插入代码-->
+        <!--<forceInsert>true</forceInsert>-->
+        <forceInsert>false</forceInsert>
+
+        <!--是否捕获补丁中所有反射的异常，建议上线的时候这个开关的值为true，测试的时候为false-->
+        <catchReflectException>true</catchReflectException>
+        <!--<catchReflectException>false</catchReflectException>-->
+
+        <!--是否在补丁加上log，建议上线的时候这个开关的值为false，测试的时候为true-->
+        <!--<patchLog>true</patchLog>-->
+        <patchLog>false</patchLog>
+    </switch>
+
+    <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
+    <packname name="hotfixPackage">
+        <name>com.meituan</name>
+        <name>com.sankuai</name>
+        <name>com.dianping</name>
+    </packname>
+
+    <!--不需要热补的包名或者类名，可以在需要热补的包中剔除指定的类或者包-->
+    <exceptPackname name="exceptPackage">
+        <name>com.meituan.robust</name>
+    </exceptPackname>
+
+    <!--补丁的包名-->
+    <patchPackname name="patchPackname">
+        <name>com.meituan.robust.patch</name>
+    </patchPackname>
+
+    <!--自动化补丁中，不需要反射处理的类，这个配置项慎重选择-->
+    <noNeedReflectClass name="classes no need to reflect">
+
+    </noNeedReflectClass>
+</resources>

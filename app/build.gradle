@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: 'robust'
+apply plugin: 'auto-patch-plugin'
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+    defaultConfig {
+        applicationId "com.meituan.robust.sample"
+        minSdkVersion 14
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+    }
+    signingConfigs {
+        meituan {
+            storeFile file("keystore.jks")
+            storePassword "robust"
+            keyAlias "robust"
+            keyPassword "robust"
+        }
+    }
+    buildTypes {
+        release {
+//            minifyEnabled false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.meituan
+        }
+        debug {
+            minifyEnabled true
+//            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+    }
+    packagingOptions {
+        exclude 'META-INF/maven/com.google.guava/guava/pom.properties'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.xml'
+        exclude 'META-INF/maven/commons-cli/commons-cli/pom.properties'
+        exclude 'META-INF/maven/commons-cli/commons-cli/pom.xml'
+    }
+}
+configurations {
+    all*.exclude group: 'com.google.guava', module: 'guava'
+}
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+dependencies {
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.meituan.android.hydra:multidex:0.1.2'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'org.javassist:javassist:3.20.0-GA'
+    compile project(path: ':patch')
+}

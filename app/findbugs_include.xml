@@ -1,0 +1,10 @@
+<FindBugsFilter>
+    <Match>
+        <Package name="~com\.meituan\.robust\..*"/>
+    </Match>
+
+    <Match>
+        <Package name="~robust\.gradle\..*"/>
+    </Match>
+
+</FindBugsFilter>
