@@ -3,14 +3,12 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
-        maven { url 'http://depot.sankuai.com/nexus/content/groups/public' }
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
-        classpath 'com.meituan.gradle.mtsign:mtsign:0.0.1'
 //        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
@@ -24,9 +22,8 @@ configurations.all {
 }
 allprojects {
     repositories {
-
         mavenLocal()
-        maven { url 'http://depot.sankuai.com/nexus/content/groups/public' }
+        jcenter()
     }
     tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 }

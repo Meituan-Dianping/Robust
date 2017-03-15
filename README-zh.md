@@ -35,7 +35,7 @@
 	    }
 	    dependencies {
 	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
 	   }
 	}
 	```
