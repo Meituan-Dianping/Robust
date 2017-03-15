@@ -9,7 +9,7 @@
 # 环境
 
  * Mac or Linux 
- * Gradlew 2.10+ 
+ * Gradle 2.10+ 
  * Java 1.7 +
 
 # 使用方法
@@ -35,7 +35,7 @@
 	    }
 	    dependencies {
 	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
+	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
 	   }
 	}
 	```
