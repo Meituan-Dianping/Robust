@@ -19,7 +19,6 @@ public class SampleClass {
         Children pair=new Children();
         pair.setFirst("asdad");
         number= changeInputs(number);
-//        System.out.print("in synthetic method SampleClassl");
         System.out.print("hellow world 1");
         return times*number;
     }

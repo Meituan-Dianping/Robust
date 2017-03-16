@@ -1,6 +1,9 @@
 
 # Robust
- 
+ [![Release Version](https://api.bintray.com/packages/meituan/maven/com.meituan.robust:autopatchbase/images/download.svg)](https://github.com/Meituan-Dianping/Robust/releases)
+ [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
+ [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
+
 
  新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题作出反应，补丁修补成功率高达99.9%。
  
@@ -67,7 +70,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 将保存下来的mapping文件和methodsMap.robust文件放在app/robust/文件夹下。
 
-3. 修改代码，在改动的方法上面添加**@Modify**注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
+3. 修改代码，在改动的方法上面添加```@Modify```注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
 	
 	```java
 	   @Modify
@@ -99,6 +102,8 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	    }
 	```
 4. 运行和生成线上apk同样的命令，即可生成补丁，补丁目录app/build/outputs/robust/patch.jar
+5. 补丁制作成功后会停止构建apk，出现类似于如下的提示，表示补丁生成成功
+![补丁制作成功图片](images/patchsuccess_cn.png)
 
 # 样例使用：
 1. 生成样例apk，执行gradle命令：
@@ -114,20 +119,22 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
-6. 将补丁文件copy到手机上：
+5. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
+![补丁制作成功图片](images/patchsuccess_cn.png)
+7. 将补丁文件copy到手机上：
 
 	```java
 	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
-7. 打开App，点击Patch按钮就会加载补丁。
-8. 也可以加载app/robust的样例dex，修改了Jump_second_Activity跳转Activity的显示文字。
-9. 补丁加载之后每次都会删除，再次运行需要重新copy补丁。
+8. 打开App，点击Patch按钮就会加载补丁。
+9. 也可以加载app/robust的样例dex，修改了Jump_second_Activity跳转Activity的显示文字。
+10. 补丁加载之后每次都会删除，再次运行需要重新copy补丁。
 
 # 注意事项
 
-1. 内部类的构造方法是private（private会生成一个匿名的构造函数），这时需要在制作补丁过程中手动修改构造方法的访问域，修改为public就好，根据ProGuard力度有关系
-2. 对于方法的返回值是this的情况无法处理，对builder模式支持并不是太好，在代码编写需要注意，可以增加一个类来包装一下，
+1. 内部类的构造方法是private（private会生成一个匿名的构造函数）时，需要在制作补丁过程中手动修改构造方法的访问域为public
+2. 对于方法的返回值是this的情况现在支持不好，比如builder模式，但在制作补丁代码时，可以通过如下方式来解决，增加一个类来包装一下(如下面的B类)，
 
 	```java
 	method a(){
@@ -141,10 +148,11 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	  return new B().setThis(this).getThis();
 	}
 	```
-3. 暂时不支持增加字段，但是自动化补丁现在可以增加类
-4. 新增加的类不能是非静态内部类（静态的内部类可以），新增类中的方法和字段需要全部都是public的
-5. 对于只有字段的访问的函数无法修复
-6. 不支持构造方法的修复
+3. 字段增加能力内测中，不过暂时可以通过增加新类，把字段放到新类中的方式来实现字段增加能力
+4. 新增的类支持包括静态内部类和非内部类
+5. 对于只有字段访问的函数无法直接修复，可通过调用处间接修复
+6. 构造方法的修复内测中
+7. 资源和so的修复内测中
 
 ## License
 

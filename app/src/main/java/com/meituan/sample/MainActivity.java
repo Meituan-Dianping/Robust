@@ -108,22 +108,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private static View getChildView(View view) {
-        if (!(view instanceof ViewGroup) || ((ViewGroup) view).getChildCount() < 1) {
-            return view;
-        }
-        ViewGroup viewGroup = (ViewGroup) view;
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            View text = getChildView(viewGroup.getChildAt(i));
-            if (text instanceof TextView) {
-                if ("作品累计票房".equals(((TextView) text).getText())) {
-                    return text;
-                }
-            }
-        }
-        return null;
-
-    }
 
     public static Object invokeReflectConstruct(String className, Object[] parameter, Class[] args) {
         try {

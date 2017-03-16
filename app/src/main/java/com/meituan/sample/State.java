@@ -52,16 +52,6 @@ public class State<T> extends AsbtractInner implements Cloneable, Comparable {
         List<T> list = new ArrayList<>();
         Integer p = Integer.reverse(index);
         list.add((T) p);
-//        java.lang.StackTraceElement stackTraceElement1 = (new java.lang.Throwable()).getStackTrace()[0];
-//        String methodName1 = stackTraceElement1.getMethodName();
-//        String xxx = stackTraceElement1.getClassName();
-//        String classMethod1 = xxx + methodName1;
-//        android.util.Log.d("", methodName1 + classMethod1);
-//        Object[] arrayOfObject = new Object[1];
-//        arrayOfObject[0] = ((java.lang.Integer) arrayOfObject[1]).intValue();
-//        Log.d("", "" + arrayOfObject);
-
-
         return list;
     }
 
