@@ -104,7 +104,7 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 5. Generating patches always end like this,which means patches is done
 ![Success in generating patch](images/patchsuccess_en.png)
 
-# Demo Usage：
+# Demo Usage
 1. Excute fellow command to build apk：
 
 	```java
