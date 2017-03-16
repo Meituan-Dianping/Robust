@@ -64,7 +64,6 @@ public class SmaliUitils {
                 // 一次读入一行，直到读入null为文件结束
                 while ((line = reader.readLine()) != null) {
                     // 显示行号
-                    System.out.println("lineNo  " + lineNo + "   ");
                     fileContent.append(dealWithSmaliLine(line, JavaUtils.getFullClassNameFromFile(file.getPath())) + "\n");
                     lineNo++;
                 }

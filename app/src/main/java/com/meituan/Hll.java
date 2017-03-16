@@ -31,7 +31,6 @@ public class Hll implements CallBack {
     public int needP() {
         privateMethod(1,"asd");
         super.toString();
-//        Gll.log();
         getStrings(1,"meituan");
         return needToP ? 1 : 0;
     }
@@ -47,7 +46,6 @@ public class Hll implements CallBack {
     String packageMethod(int index, String name) {
         Log.d("robust", "in hll.packageMethod()  ");
         super.toString();
-//        Gll.log();
         if (needToP) {
             return index + " needToP ==true  " + name;
         }

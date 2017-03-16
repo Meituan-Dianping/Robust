@@ -1,6 +1,9 @@
 
 # Robust
  
+[![Release Version](https://api.bintray.com/packages/meituan/maven/com.meituan.robust:autopatchbase/images/download.svg)](https://github.com/Meituan-Dianping/Robust/releases)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 Robust is an Android HotFix solution with high compatibility and high stability.Robust can fix bugs immediately without publishing apk.
  
@@ -98,7 +101,8 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	    }
 	```
 4. After those steps,you need to run the same gradle command as you build the apk,then you will get patches in directory **app/build/outputs/robust/patch.jar**.
-
+5. Generating patches always end like this,which means patches is done
+![Success in generating patch](images/patchsuccess_en.png)
 
 # Demo Usage：
 1. Excute fellow command to build apk：
@@ -114,17 +118,19 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
-6. Copy patch to your phone：
+6. Generating patches always end like this,which means patches is done
+![Success in generating patch](images/patchsuccess_en.png)
+7. Copy patch to your phone：
 
 	```java
 	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
 	```
 	patch directory can be configured in ``PatchManipulateImp``.
-7. Open app,and click patch button,patch is used.
+8. Open app,and click patch button,patch is used.
  
-8. Also you can use our sample dex in **app/robust/sample_patch.dex** ,this dex change text after you click **Jump_second_Activity** Button.
+9. Also you can use our sample dex in **app/robust/sample_patch.dex** ,this dex change text after you click **Jump_second_Activity** Button.
 
-9. Demo delete patch after used.You should copy patch everytimes.
+10. Demo delete patch after used.You should copy patch everytimes.
 
 # Attentions
 
@@ -143,11 +149,11 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	  return new B().setThis(this).getThis();
 	}
 	```
-3. Not Support add fields,but you can add classes.
+3. Not Support add fields,but you can add classes currently, this feature is under testing.
 4. Classes added in patch should  be static nested classes or non-inner classes,and all fields and methods in added class should be public.
-5. Not suport fix bugs in constructors.
+5. Suppoort to  fix bugs in constructors currently is under testing.
 6. Not support methods which only use fields,without method call or new expression. 
-
+7. Suppoort to resources and so file is under test.
 ## License
 
     Copyright 2017 Meituan-Dianping
