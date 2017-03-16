@@ -117,7 +117,7 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 6. Copy patch to your phone：
 
 	```java
-	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
+	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
 	```
 	patch directory can be configured in ``PatchManipulateImp``.
 7. Open app,and click patch button,patch is used.
