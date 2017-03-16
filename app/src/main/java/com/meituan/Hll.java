@@ -62,7 +62,7 @@ public class Hll implements CallBack {
     }
 
     public int check() {
-        hllString="尔等插标卖首";
+        hllString="hllString checked";
         if (needToP) {
             hllString=index + " needToP ==true  " + name;
         }
