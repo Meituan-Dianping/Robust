@@ -44,9 +44,9 @@ public class ClassMapping {
         if (this == o) return true;
         if (!(o instanceof ClassMapping)) return false;
 
-        ClassMapping that = (ClassMapping) o;
+        ClassMapping classMapping = (ClassMapping) o;
 
-        return getClassName() != null ? getClassName().equals(that.getClassName()) : that.getClassName() == null;
+        return getClassName() != null ? getClassName().equals(classMapping.getClassName()) : classMapping.getClassName() == null;
 
     }
 

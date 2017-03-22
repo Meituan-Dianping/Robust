@@ -86,9 +86,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     @Modify
     //    public String getTextInfo(String baidu, People p) {
     public String getTextInfo(String baidu) {
-        Bundle bundle=new Bundle();
-        bundle.putInt("asd",1);
-        bundle.getFloat("asd");
+        Bundle baseBundle=new Bundle();
+        baseBundle.putInt("asd",1);
+        baseBundle.getFloat("asd");
         RobustModify.modify();
         People p = new People();
         p.setName("mivazhang");
