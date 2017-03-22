@@ -5,7 +5,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
-Robust is an Android HotFix solution with high compatibility and high stability.Robust can fix bugs immediately without publishing apk.
+Robust is an Android HotFix solution with high compatibility and high stability. Robust can fix bugs immediately without publishing apk.
  
  [中文说明](README-zh.md)
  
