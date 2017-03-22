@@ -29,7 +29,6 @@ class ConvertUtils {
 
             it.jarInputs.each {
                 classPool.insertClassPath(it.file.absolutePath)
-
                 def jarFile = new JarFile(it.file)
                 Enumeration<JarEntry> classes = jarFile.entries();
                 while (classes.hasMoreElements()) {
