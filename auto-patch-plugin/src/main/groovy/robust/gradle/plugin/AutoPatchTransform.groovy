@@ -135,7 +135,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         clearPatchPath(patchPath);
         ReadAnnotation.readAnnotation(box, logger);
 
-        ReadMapping.getInstance().initMappingInfo();
+        if(Config.supportProGuard)ReadMapping.getInstance().initMappingInfo();
         if (!Config.isManual) {
             if (Config.patchMethodSignureSet.size() < 1) {
                 throw new RuntimeException(" patch method is empty ,please check your Modify annotation or use RobustModify.modify() to mark modified methods")
@@ -249,11 +249,11 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         PatchesInfoFactory.createPatchesInfo().writeFile(patchPath);
     }
 
-    def static clearPatchPath(String patchPath) {
+    def  clearPatchPath(String patchPath) {
         new File(patchPath).deleteDir();
     }
 
-    def static packagePatchDex2Jar(File patchJarFile, String zipEntryName, File patchDexFile) throws IOException {
+    def  packagePatchDex2Jar(File patchJarFile, String zipEntryName, File patchDexFile) throws IOException {
         if (!patchDexFile.exists() || !patchDexFile.canRead()) {
             throw new RuntimeException("patch.dex is not exists or readable")
         }

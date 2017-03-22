@@ -40,7 +40,6 @@ public class ReadMapping {
      * @return
      */
     public void initMappingInfo() {
-        int count = 0;
         //查找mapping文件
         InputStream is = null;
         boolean needBacktrace = true;
@@ -64,9 +63,6 @@ public class ReadMapping {
                     ClassMapping classMapping = new ClassMapping();
                     classMapping.setClassName(line.substring(0, line.indexOf("->") - 1).trim());
                     classMapping.setValueName(line.split("->")[1].substring(0, line.split("->")[1].length() - 1).trim());
-//                    println "classname is " + classMapping.getClassName() + "   value name is   " + classMapping.getValueName()
-                    count++;
-//                    println("match the line is   " + line);
                     line = reader.readLine().trim();
                     while (line != null) {
                         if (line.endsWith(":")) {
@@ -110,7 +106,11 @@ public class ReadMapping {
     }
 
     public ClassMapping getClassMappingOrDefault(String classname) {
-        return usedInModifiedClassMappingInfo.getOrDefault(classname, new ClassMapping());
+        ClassMapping defaultClassMapping=new ClassMapping();
+        if(!Config.supportProGuard){
+            defaultClassMapping.setValueName(classname);
+        }
+        return usedInModifiedClassMappingInfo.getOrDefault(classname,defaultClassMapping);
     }
 
     /***

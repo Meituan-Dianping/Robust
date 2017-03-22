@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-//apply plugin: 'robust'
+apply plugin: 'robust'
 //apply plugin: 'auto-patch-plugin'
 android {
     compileSdkVersion 24
@@ -22,8 +22,8 @@ android {
     }
     buildTypes {
         release {
-//            minifyEnabled false
-            minifyEnabled true
+            minifyEnabled false
+//            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.meituan
         }

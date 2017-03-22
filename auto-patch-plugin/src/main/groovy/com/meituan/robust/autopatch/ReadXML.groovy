@@ -21,7 +21,7 @@ class ReadXML {
             Config.mappingFilePath = "${path}${Constants.DEFAULT_MAPPING_FILE}"
         }
 
-        if (Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists()) {
+        if (!Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
             throw new RuntimeException("Not found ${Config.mappingFilePath}, please put it on your project's robust dir or change your robust.xml !");
         }
 
@@ -50,6 +50,9 @@ class ReadXML {
         for (name in robust.noNeedReflectClass.name) {
             Config.noNeedReflectClassSet.add(name.text());
         }
+        if (robust.switch.proguard.text() != null && !"".equals(robust.switch.proguard.text()))
+            Config.supportProGuard = Boolean.valueOf(robust.switch.proguard.text()).booleanValue();
+
 
     }
 }

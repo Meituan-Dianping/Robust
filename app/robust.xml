@@ -21,6 +21,10 @@
         <!--是否在补丁加上log，建议上线的时候这个开关的值为false，测试的时候为true-->
         <!--<patchLog>true</patchLog>-->
         <patchLog>false</patchLog>
+
+        <!--项目是否支持progaurd-->
+        <!--<proguard>true</proguard>-->
+        <proguard>false</proguard>
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
