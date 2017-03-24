@@ -12,6 +12,14 @@ import java.util.List;
 
 /**
  * Created by mivanzhang on 17/2/27.
+ *
+ * We recommend you rewrite your own PatchManipulate class ,adding your special patch Strategy，in the demo we just load the patch directly
+ *
+ * <br>
+ *   Pay attention to the difference of patch's LocalPath and patch's TempPath
+ *
+ *     <br>
+ *    We recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
  */
 
 public class PatchManipulateImp extends PatchManipulate {
