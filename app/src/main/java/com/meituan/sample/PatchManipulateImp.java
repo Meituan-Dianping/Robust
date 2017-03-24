@@ -39,11 +39,27 @@ public class PatchManipulateImp extends PatchManipulate {
         return patches;
     }
 
+    /**
+     *
+     * @param context
+     * @param patch
+     * @return
+     *
+     * you can verify your patches here
+     */
     @Override
+
     protected boolean verifyPatch(Context context, Patch patch) {
         return true;
     }
 
+    /**
+     *
+     * @param patch
+     * @return
+     *
+     * you may download your patches here
+     */
     @Override
     protected boolean ensurePatchExist(Patch patch) {
         return true;
