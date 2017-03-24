@@ -25,7 +25,7 @@
         android:layout_marginEnd="248dp"
         android:layout_marginRight="248dp"
         android:layout_marginTop="37dp"
-        android:text="New Button" />
+        android:text="SHOW TEXT" />
 
     <Button
         android:id="@+id/patch"
