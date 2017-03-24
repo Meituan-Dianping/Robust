@@ -11,5 +11,6 @@ dependencies {
     compile 'org.javassist:javassist:3.20.0-GA'
 //    compile 'com.meituan.robust:autopatchbase:' + VERSION_NAME
     compile project(':autopatchbase')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }
 apply from: '../gradle_mvn_push.gradle'
