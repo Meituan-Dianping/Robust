@@ -1,8 +1,8 @@
 package com.meituan.robust.utils;
 
+import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.ClassMapping;
 import com.meituan.robust.autopatch.Config;
-import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.NameManger;
 import com.meituan.robust.autopatch.ReadMapping;
 
@@ -16,15 +16,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtPrimitiveType;
 
-import static com.meituan.robust.autopatch.Config.classPool;
-import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 import static com.meituan.robust.Constants.PACKNAME_END;
 import static com.meituan.robust.Constants.PACKNAME_START;
+import static com.meituan.robust.autopatch.Config.classPool;
+import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 
 /**
  * Created by mivanzhang on 17/2/8.
@@ -45,9 +46,9 @@ public class SmaliUitils {
     }
 
     public void dealObscureInSmali() {
-        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", File.separator));
+        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", Matcher.quoteReplacement(File.separator)));
         if (!diretory.isDirectory() || diretory == null) {
-            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", File.separator) + " contains no smali file error!! ");
+            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", Matcher.quoteReplacement(File.separator)) + " contains no smali file error!! ");
         }
         List<File> smaliFileList = covertPathToFile(Config.robustGenerateDirectory + "classout" + File.separator, Config.newlyAddedClassNameList);
         for (File file : diretory.listFiles()) {
@@ -97,7 +98,7 @@ public class SmaliUitils {
         }
         List<File> fileList = new ArrayList<>();
         for (String packname : packNameList) {
-            fileList.add(new File(directory + packname.replaceAll("\\.", "\\/") + ".smali"));
+            fileList.add(new File(directory + packname.replaceAll("\\.", Matcher.quoteReplacement(File.separator)) + ".smali"));
         }
         return fileList;
     }
@@ -335,7 +336,7 @@ public class SmaliUitils {
 
         ClassMapping classMapping = ReadMapping.getInstance().getClassMapping(className);
         if (classMapping == null) {
-            System.out.println("Warning: getObscuredMemberName ~~~~~~~~~~~~~~~~class " + className + "   member  " + memberName + "  robust can not find in mapping ");
+            System.out.println("Warning: getObscuredMemberName  class  name " + className + "   member name is  " + memberName + "  robust can not find in mapping!!! ");
             return JavaUtils.eradicatReturnType(memberName);
         }
 
@@ -362,7 +363,7 @@ public class SmaliUitils {
         if (null == classMapping || classMapping.getValueName() == null) {
             return className;
         }
-        return classMapping.getValueName().replaceAll("\\.", "/");
+        return classMapping.getValueName().replaceAll("\\.","/");
 
 
     }

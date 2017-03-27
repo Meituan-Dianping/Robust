@@ -56,7 +56,7 @@ class PatchesFactory {
 
         dealWithSuperMethod(temPatchClass, modifiedClass, patchPath);
 
-        if (ReadMapping.getInstance().getClassMapping(modifiedClass.getName()) == null) {
+        if (Config.supportProGuard&&ReadMapping.getInstance().getClassMapping(modifiedClass.getName()) == null) {
             throw new RuntimeException(" something wrong with mappingfile ,cannot find  class  " + modifiedClass.getName() + "   in mapping file");
         }
         List<CtMethod> invokeSuperMethodList = Config.invokeSuperMethodMap.getOrDefault(modifiedClass.getName(), new ArrayList<>());
@@ -64,14 +64,12 @@ class PatchesFactory {
         createPublicMethodForPrivate(temPatchClass);
 
         for (CtMethod method : temPatchClass.getDeclaredMethods()) {
-            System.out.println("modifiedClass method.longName  " + method.getLongName() + "    modifiedClass.name  + method.name   " + modifiedClass.getName() + "." + method.getName());
             //  shit !!too many situations need take into  consideration
             //   methods has methodid   and in  patchMethodSignureSet
             if (!Config.addedSuperMethodList.contains(method) && !reaLParameterMethod.equals(method) && !method.getName().startsWith(Constants.ROBUST_PUBLIC_SUFFIX)) {
                 method.instrument(
                         new ExprEditor() {
                             public void edit(FieldAccess f) throws CannotCompileException {
-                                System.out.println("f.field.declaringClass.name  " + " " + f.getFileName() + "  line number is " + f.getLineNumber());
                                 if (Config.newlyAddedClassNameList.contains(f.getClassName())) {
                                     return;
                                 }
@@ -91,7 +89,6 @@ class PatchesFactory {
 
                             @Override
                             void edit(NewExpr e) throws CannotCompileException {
-                                System.out.println(" NewExpr Name class  " + e.getClassName() + "  constructor     line number is " + e.getLineNumber() + " getClassValue(e.className)   " + getClassValue(e.getClassName()));
                                 //inner class in the patched class ,not all inner class
                                 if (Config.newlyAddedClassNameList.contains(e.getClassName())||Config.noNeedReflectClassSet.contains(e.getClassName())) {
                                     return;
@@ -99,7 +96,6 @@ class PatchesFactory {
 
                                 try {
                                     if (!ReflectUtils.isStatic(Config.classPool.get(e.getClassName()).getModifiers()) && JavaUtils.isInnerClassInModifiedClass(e.getClassName(), modifiedClass)) {
-                                        System.out.println(" in NewExpr signature   " + e.getSignature());
                                         e.replace(ReflectUtils.getNewInnerClassString(e.getSignature(), temPatchClass.getName(), ReflectUtils.isStatic(Config.classPool.get(e.getClassName()).getModifiers()), getClassValue(e.getClassName())));
                                         return;
                                     }
@@ -113,7 +109,6 @@ class PatchesFactory {
                             @Override
                             void edit(MethodCall m) throws CannotCompileException {
 
-                                System.out.println(" MethodCall Name class " + m.getClassName() + "  file name is " + m.getFileName() + "  line number is " + m.getLineNumber() + " method name " + m.getMethod().getLongName());
                                 //methods no need reflect
                                 if(Config.noNeedReflectClassSet.contains(m.method.declaringClass.name)){
                                     return;
@@ -190,7 +185,6 @@ class PatchesFactory {
 
     private void dealWithSuperMethod(CtClass patchClass, CtClass modifiedClass, String patchPath) throws NotFoundException, CannotCompileException, IOException {
         StringBuilder methodBuilder;
-        System.out.println(" dealWithSuperMethod  modifiedClass.getName() " + modifiedClass.getName());
         List<CtMethod> invokeSuperMethodList = Config.invokeSuperMethodMap.getOrDefault(modifiedClass.getName(), new ArrayList());
         for (int index = 0; index < invokeSuperMethodList.size(); index++) {
             methodBuilder = new StringBuilder();
@@ -223,7 +217,6 @@ class PatchesFactory {
             }
             methodBuilder.append(JavaUtils.getParameterValue(invokeSuperMethodList.get(index).getParameterTypes().length) + ");");
             methodBuilder.append("}");
-            System.out.println("dealWithSuperMethod methodBuilder is " + methodBuilder.toString());
             CtMethod ctMethod = CtMethod.make(methodBuilder.toString(), patchClass);
             Config.addedSuperMethodList.add(ctMethod);
             patchClass.addMethod(ctMethod);
@@ -273,7 +266,6 @@ class PatchesFactory {
             private2PublicMethod.append("public  " + getMethodStatic(method) + " " + method.getReturnType().getName() + " " + Constants.ROBUST_PUBLIC_SUFFIX + method.getName() + "(" + JavaUtils.getParameterSignure(method) + "){");
             private2PublicMethod.append("return " + method.getName() + "(" + JavaUtils.getParameterValue(method.getParameterTypes().length) + ");");
             private2PublicMethod.append("}");
-//            println("private to Public Methods is  " + private2PublicMethod.toString())
             ctClass.addMethod(CtMethod.make(private2PublicMethod.toString(), ctClass));
         }
 

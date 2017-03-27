@@ -21,7 +21,7 @@ class ConvertUtils {
                 classPool.insertClassPath(it.file.absolutePath)
                 org.apache.commons.io.FileUtils.listFiles(it.file, null, true).each {
                     if (it.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
-                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
+                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(Matcher.quoteReplacement(File.separator), '.')
                         classNames.add(className)
                     }
                 }
@@ -29,7 +29,6 @@ class ConvertUtils {
 
             it.jarInputs.each {
                 classPool.insertClassPath(it.file.absolutePath)
-
                 def jarFile = new JarFile(it.file)
                 Enumeration<JarEntry> classes = jarFile.entries();
                 while (classes.hasMoreElements()) {

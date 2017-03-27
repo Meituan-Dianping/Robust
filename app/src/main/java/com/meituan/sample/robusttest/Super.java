@@ -1,9 +1,10 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 import android.util.Log;
 
-import com.meituan.Hll;
+import com.meituan.sample.robusttest.other.Hll;
 import com.meituan.robust.patch.annotaion.Modify;
+import com.meituan.sample.SecondActivity;
 
 /**
  * Created by mivanzhang on 16/7/21.

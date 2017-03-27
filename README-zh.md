@@ -11,7 +11,7 @@
  
 # 环境
 
- * Mac or Linux 
+ * Mac Linux Windows
  * Gradle 2.10+ 
  * Java 1.7 +
 
@@ -26,7 +26,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.3.0'
+	compile 'com.meituan.robust:robust:0.3.1'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -37,8 +37,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
+	         classpath 'com.meituan.robust:gradle-plugin:0.3.1'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.1'
 	   }
 	}
 	```

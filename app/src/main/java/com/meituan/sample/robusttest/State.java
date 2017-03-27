@@ -1,8 +1,8 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 import android.util.Log;
 
-import com.meituan.Hll;
+import com.meituan.sample.robusttest.other.Hll;
 
 import java.util.ArrayList;
 import java.util.List;

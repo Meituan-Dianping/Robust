@@ -30,7 +30,6 @@ public class PatchesControlFactory {
         StringBuilder getRealParameterMethodBody = new StringBuilder();
         getRealParameterMethodBody.append("public Object getRealParameter(Object parameter) {");
         getRealParameterMethodBody.append("if(parameter instanceof " + modifiedClass.getName() + "){");
-        System.out.println("patchClass.getName() " + patchClass.getName());
         getRealParameterMethodBody.
                 append("return new " + patchClass.getName() + "(parameter);");
         getRealParameterMethodBody.append("}");
@@ -81,9 +80,7 @@ public class PatchesControlFactory {
             CtClass[] parametertypes = method.getParameterTypes();
             String methodSignure = JavaUtils.getJavaMethodSignure(method).replaceAll(patchClass.getName(), modifiedClassName);
             String methodLongName = modifiedClassName + "." + methodSignure;
-            System.out.println("createControlClass methodLongName " + methodLongName + " origin method long name is " + method.getLongName());
             Integer methodNumber = Config.methodMap.get(methodLongName);
-            System.out.println("createControlClass methodmap get long name " + modifiedClassName + "." + methodSignure + "  methodNumber  " + methodNumber + "  methodLongName  " + methodLongName);
             //just Forward methods with methodNumber
             if (methodNumber != null) {
                 accessDispatchMethodBody.append(" if((\"" + methodNumber + "\").equals(methodNo)){\n");
@@ -141,7 +138,6 @@ public class PatchesControlFactory {
             accessDispatchMethodBody.append(" } catch (Throwable e) {");
             accessDispatchMethodBody.append(" e.printStackTrace();}");
         }
-        System.out.println("accessDispatchMethodBody is " + accessDispatchMethodBody.toString());
         return accessDispatchMethodBody.toString();
     }
 
@@ -159,7 +155,6 @@ public class PatchesControlFactory {
             String methodSignure = JavaUtils.getJavaMethodSignure(method).replaceAll(patchClass.getName(), modifiedClassName);
             String methodLongName = modifiedClassName + "." + methodSignure;
             Integer methodNumber = Config.methodMap.get(methodLongName);
-            System.out.println("createControlClass methodmap get long name " + modifiedClassName + "." + methodSignure + "  methodNumber  " + methodNumber + "  methodLongName  " + methodLongName);
             //just Forward methods with methodNumber
             if (methodNumber != null) {
                 methodsIdBuilder.append(methodNumber + ":");
@@ -170,7 +165,6 @@ public class PatchesControlFactory {
             isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains(methodNo));");
         }
         isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains(methodNo);");
-        System.out.println("isSupport MethodBody is " + isSupportBuilder.toString());
         return isSupportBuilder.toString();
     }
 

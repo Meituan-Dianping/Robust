@@ -13,6 +13,7 @@ import robust.gradle.plugin.AutoPatchTransform
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.regex.Matcher
 
 class ReflectUtils {
 
@@ -29,7 +30,7 @@ class ReflectUtils {
                 classPool.insertClassPath(it.file.absolutePath)
                 FileUtils.listFiles(it.file, null, true).each {
                     if (it.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
-                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
+                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(Matcher.quoteReplacement(File.separator), '.')
                         classNames.add(className)
                     }
                 }
@@ -163,7 +164,7 @@ class ReflectUtils {
         String name;
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
-                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\.")
+                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", ".")
                 if (name.equals(pacthClassName)) {
                     signureBuilder.append(getmodifiedClassName(pacthClassName));
                 } else {
@@ -495,7 +496,7 @@ class ReflectUtils {
                 } else {
                     value = name;
                 }
-                AutoPatchTransform.logger.warn("getMappingValue~~~~~~~~~~~~~~~~class " + name + "  robust can not find in mapping ")
+                AutoPatchTransform.logger.warn("Warning  class name  " + name + "   can not find in mapping !! ")
 //                printMap(memberMappingInfo)
             }
             return value;
