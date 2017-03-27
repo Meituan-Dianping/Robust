@@ -13,6 +13,7 @@ import robust.gradle.plugin.AutoPatchTransform
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.regex.Matcher
 
 class ReflectUtils {
 
@@ -29,7 +30,7 @@ class ReflectUtils {
                 classPool.insertClassPath(it.file.absolutePath)
                 FileUtils.listFiles(it.file, null, true).each {
                     if (it.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
-                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(File.separator, '.')
+                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(Matcher.quoteReplacement(File.separator), '.')
                         classNames.add(className)
                     }
                 }
@@ -42,7 +43,7 @@ class ReflectUtils {
                     JarEntry libClass = classes.nextElement();
                     String className = libClass.getName();
                     if (className.endsWith(SdkConstants.DOT_CLASS)) {
-                        className = className.substring(0, className.length() - SdkConstants.DOT_CLASS.length()).replaceAll(File.separator, '.')
+                        className = className.substring(0, className.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
                         classNames.add(className)
                     }
                 }
@@ -163,7 +164,7 @@ class ReflectUtils {
         String name;
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
-                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll(File.separator, "\\.")
+                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", ".")
                 if (name.equals(pacthClassName)) {
                     signureBuilder.append(getmodifiedClassName(pacthClassName));
                 } else {
@@ -219,7 +220,7 @@ class ReflectUtils {
                 stringBuilder.append("\$_=(\$r)" + Constants.ROBUST_UTILS_FULL_NAME + ".invokeReflectConstruct(\"" + className + "\",\$args,null);");
         }
         stringBuilder.append("}");
-//        println("getCreateClassString   " + stringBuilder.toString())
+        println("getCreateClassString   " + stringBuilder.toString())
         return stringBuilder.toString();
     }
 
@@ -495,7 +496,7 @@ class ReflectUtils {
                 } else {
                     value = name;
                 }
-                AutoPatchTransform.logger.warn("getMappingValue~~~~~~~~~~~~~~~~class " + name + "  robust can not find in mapping ")
+                AutoPatchTransform.logger.warn("Warning  class name  " + name + "   can not find in mapping !! ")
 //                printMap(memberMappingInfo)
             }
             return value;

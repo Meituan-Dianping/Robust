@@ -1,8 +1,8 @@
 package com.meituan.robust.utils;
 
+import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.ClassMapping;
 import com.meituan.robust.autopatch.Config;
-import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.NameManger;
 import com.meituan.robust.autopatch.ReadMapping;
 
@@ -16,15 +16,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtPrimitiveType;
 
-import static com.meituan.robust.autopatch.Config.classPool;
-import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 import static com.meituan.robust.Constants.PACKNAME_END;
 import static com.meituan.robust.Constants.PACKNAME_START;
+import static com.meituan.robust.autopatch.Config.classPool;
+import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 
 /**
  * Created by mivanzhang on 17/2/8.
@@ -45,9 +46,9 @@ public class SmaliUitils {
     }
 
     public void dealObscureInSmali() {
-        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", File.separator));
+        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", Matcher.quoteReplacement(File.separator)));
         if (!diretory.isDirectory() || diretory == null) {
-            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", File.separator) + " contains no smali file error!! ");
+            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", Matcher.quoteReplacement(File.separator)) + " contains no smali file error!! ");
         }
         List<File> smaliFileList = covertPathToFile(Config.robustGenerateDirectory + "classout" + File.separator, Config.newlyAddedClassNameList);
         for (File file : diretory.listFiles()) {
@@ -97,7 +98,7 @@ public class SmaliUitils {
         }
         List<File> fileList = new ArrayList<>();
         for (String packname : packNameList) {
-            fileList.add(new File(directory + packname.replaceAll("\\.", "\\"+File.separator) + ".smali"));
+            fileList.add(new File(directory + packname.replaceAll("\\.", Matcher.quoteReplacement(File.separator)) + ".smali"));
         }
         return fileList;
     }
@@ -136,7 +137,7 @@ public class SmaliUitils {
                 // 字段处理
                 //sget-object v4, Lcom/sankuai/meituan/fingerprint/FingerprintConfig;->accelerometerInfoList:Ljava/util/List;
                 String fieldName = result.substring(packageNameIndex + packageNameList.get(index).length() + 3, result.lastIndexOf(":"));
-                result = result.replace(fieldName, getObscuredMemberName(packageNameList.get(index).replaceAll(File.separator, "\\."), fieldName));
+                result = result.replace(fieldName, getObscuredMemberName(packageNameList.get(index).replaceAll("/", "\\."), fieldName));
             }
         }
         for (int index = 0; packageNameList != null && index < packageNameList.size(); index++) {
@@ -159,18 +160,18 @@ public class SmaliUitils {
         if (isInStaticRobustMethod && line.contains(Constants.SMALI_INVOKE_VIRTUAL_COMMAND)) {
             for (CtMethod ctMethod : invokeSuperMethodList) {
                 //java method signure
-                if ((ctMethod.getName().replaceAll("\\.", File.separator) + ctMethod.getSignature().subSequence(0, ctMethod.getSignature().indexOf(")") + 1)).equals(getMethodSignureInSmaliLine(line))) {
+                if ((ctMethod.getName().replaceAll("\\.", "/") + ctMethod.getSignature().subSequence(0, ctMethod.getSignature().indexOf(")") + 1)).equals(getMethodSignureInSmaliLine(line))) {
                     result = line.replace(Constants.SMALI_INVOKE_VIRTUAL_COMMAND, Constants.SMALI_INVOKE_SUPER_COMMAND);
                     try {
                         if (!ctMethod.getReturnType().isPrimitive()) {
-                            returnType = "L" + ctMethod.getReturnType().getName().replaceAll("\\.", File.separator);
+                            returnType = "L" + ctMethod.getReturnType().getName().replaceAll("\\.", "/");
                         } else {
                             returnType = String.valueOf(((CtPrimitiveType) ctMethod.getReturnType()).getDescriptor());
                         }
                         if (NameManger.getInstance().getPatchNameMap().get(fullClassName).equals(fullClassName)) {
                             result = result.replace("p0", "p1");
                         }
-                        String fullClassNameInSmali = ctMethod.getDeclaringClass().getClassPool().get(fullClassName).getSuperclass().getName().replaceAll("\\.", File.separator);
+                        String fullClassNameInSmali = ctMethod.getDeclaringClass().getClassPool().get(fullClassName).getSuperclass().getName().replaceAll("\\.", "/");
                         result = result.replace(result.substring(result.indexOf(PACKNAME_START) + 1, result.indexOf(PACKNAME_END)), fullClassNameInSmali);
                         result = result.substring(0, result.indexOf(")") + 1) + returnType;
                         if (!ctMethod.getReturnType().isPrimitive()) {
@@ -233,7 +234,7 @@ public class SmaliUitils {
         String methodSigure = line.substring(0, endIndex + 1);
         for (int index = line.indexOf("(") + 1; index < endIndex; index++) {
             if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.indexOf(Constants.PACKNAME_END) != -1) {
-                methodSignureBuilder.append(methodSigure.substring(index + 1, methodSigure.indexOf(Constants.PACKNAME_END, index)).replaceAll(File.separator, "\\."));
+                methodSignureBuilder.append(methodSigure.substring(index + 1, methodSigure.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\."));
                 index = methodSigure.indexOf(";", index);
                 methodSignureBuilder.append(",");
             }
@@ -289,7 +290,7 @@ public class SmaliUitils {
         List<String> packageNameList = new ArrayList<>();
         for (int index = 0; index < smaliLine.length(); index++) {
             if (Constants.PACKNAME_START.equals(String.valueOf(smaliLine.charAt(index))) && smaliLine.indexOf(Constants.PACKNAME_END) != -1) {
-                packageNameList.add(smaliLine.substring(index + 1, smaliLine.indexOf(Constants.PACKNAME_END, index)).replaceAll(File.separator, "\\."));
+                packageNameList.add(smaliLine.substring(index + 1, smaliLine.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\."));
                 index = smaliLine.indexOf(";", index);
             }
             if (Constants.PRIMITIVE_TYPE.contains(String.valueOf(smaliLine.charAt(index)))) {
@@ -335,7 +336,7 @@ public class SmaliUitils {
 
         ClassMapping classMapping = ReadMapping.getInstance().getClassMapping(className);
         if (classMapping == null) {
-            System.out.println("Warning: getObscuredMemberName ~~~~~~~~~~~~~~~~class " + className + "   member  " + memberName + "  robust can not find in mapping ");
+            System.out.println("Warning: getObscuredMemberName  class  name " + className + "   member name is  " + memberName + "  robust can not find in mapping!!! ");
             return JavaUtils.eradicatReturnType(memberName);
         }
 
@@ -358,11 +359,11 @@ public class SmaliUitils {
     }
 
     private String getObscuredClassName(String className) {
-        ClassMapping classMapping = ReadMapping.getInstance().getClassMapping(className.replaceAll(File.separator, "\\."));
+        ClassMapping classMapping = ReadMapping.getInstance().getClassMapping(className.replaceAll("/", "\\."));
         if (null == classMapping || classMapping.getValueName() == null) {
             return className;
         }
-        return classMapping.getValueName().replaceAll("\\.", File.separator);
+        return classMapping.getValueName().replaceAll("\\.","/");
 
 
     }
