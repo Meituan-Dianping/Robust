@@ -11,7 +11,7 @@
  
 # 环境
 
- * Mac or Linux 
+ * Mac Linux Windows
  * Gradle 2.10+ 
  * Java 1.7 +
 
