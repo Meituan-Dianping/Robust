@@ -220,7 +220,7 @@ class ReflectUtils {
                 stringBuilder.append("\$_=(\$r)" + Constants.ROBUST_UTILS_FULL_NAME + ".invokeReflectConstruct(\"" + className + "\",\$args,null);");
         }
         stringBuilder.append("}");
-        println("getCreateClassString   " + stringBuilder.toString())
+//        println("getCreateClassString   " + stringBuilder.toString())
         return stringBuilder.toString();
     }
 

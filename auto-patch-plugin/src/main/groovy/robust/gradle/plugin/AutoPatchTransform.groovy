@@ -141,19 +141,12 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
 
         zipPatchClassesFile()
         executeCommand(jar2DexCommand)
-//        Arrays{"--dex","--output=classes.dex ","meituan.jar"}
-//        String[]args=new String[3];
-//        args[0]="--dex";
-//        args[1]="--output=classes.dex";
-//        args[2]=patchPath+"meituan.jar";
-//
-//        com.android.dx.command.Main.main(args);
         executeCommand(dex2SmaliCommand)
         SmaliUitils.getInstance().dealObscureInSmali();
         executeCommand(smali2DexCommand)
         //package patch.dex to patch.jar
         packagePatchDex2Jar()
-//        deleteTmpFiles()
+        deleteTmpFiles()
     }
     def  zipPatchClassesFile(){
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory+ Constants.ZIP_FILE_NAME));
