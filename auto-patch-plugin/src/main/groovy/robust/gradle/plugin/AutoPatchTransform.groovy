@@ -111,7 +111,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
             targetDir.mkdirs();
         }
         for (String libName : Constants.LIB_NAME_ARRAY) {
-            InputStream inputStream = JavaUtils.class.getResourceAsStream("/libs/" + libName);
+            InputStream inputStream = JavaUtils.class.getResourceAsStream(File.separator+"libs"+File.separator + libName);
             if (inputStream == null) {
                 System.out.println("Warning!!!  Did not find " + libName + " ，you must add it to your project's libs ");
                 continue;
@@ -141,6 +141,13 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
 
         zipPatchClassesFile()
         executeCommand(jar2DexCommand)
+//        Arrays{"--dex","--output=classes.dex ","meituan.jar"}
+//        String[]args=new String[3];
+//        args[0]="--dex";
+//        args[1]="--output=classes.dex";
+//        args[2]=patchPath+"meituan.jar";
+//
+//        com.android.dx.command.Main.main(args);
         executeCommand(dex2SmaliCommand)
         SmaliUitils.getInstance().dealObscureInSmali();
         executeCommand(smali2DexCommand)
@@ -161,7 +168,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         if (file.exists()) {
             fullClassName=fullClassName+file.name;
             if (file.isDirectory()) {
-                fullClassName+="/";
+                fullClassName+=File.separator;
                 File[] files = file.listFiles();
                 if (files.length == 0) {
                     return;
@@ -172,7 +179,6 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
                 }
             } else {
                 //文件
-                println(" zipAllPatchClasses fullClassName is  "+fullClassName)
                 zipFile(file,zipOut, fullClassName);
             }
         } else {
@@ -236,23 +242,6 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
 
 
     def executeCommand(String commond) {
-        println("in executeCommand "+commond)
-//        final Runtime re = Runtime.getRuntime();
-//        final Process command = re.exec(commond,null,new File(Config.robustGenerateDirectory));
-//        BufferedReader error = new BufferedReader(new InputStreamReader(command.getErrorStream()));
-//        BufferedReader op = new BufferedReader(new InputStreamReader(command.getInputStream()));
-//        // Wait for the application to Finish
-//        command.waitFor();
-//        if (command.exitValue() != 0) {
-//            throw new IOException("Failed to execure jar, " );
-//        }
-//        op.eachLine { println commond + " inputStream output   " + it }
-//        error.eachLine {
-//            println commond + " errorStream output   " + it;
-//            throw new RuntimeException("execute command " + commond + " error");
-//        }
-
-
         Process output = commond.execute(null, new File(Config.robustGenerateDirectory))
         output.inputStream.eachLine { println commond + " inputStream output   " + it }
         output.errorStream.eachLine {
@@ -311,9 +300,6 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(new File(Config.robustGenerateDirectory, Constants.PATACH_JAR_NAME)))
         zipOut.setLevel(Deflater.NO_COMPRESSION)
         FileInputStream fis = new FileInputStream(inputFile)
-//        byte[] buffer = new byte[fis.available()];
-//        fis.read(buffer)
-//        zipFile(buffer,zipOut,Constants.CLASSES_DEX_NAME);
         zipFile(inputFile,zipOut,Constants.CLASSES_DEX_NAME);
         zipOut.close()
     }
@@ -331,12 +317,6 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         zos.closeEntry();
         zos.flush();
     }
-//    def void zipFile(byte[] classBytesArray, ZipOutputStream zos, String entryName){
-//        ZipEntry entry = new ZipEntry(entryName);
-//        zos.putNextEntry(entry);
-//        zos.write(classBytesArray,0,classBytesArray.length);
-//        zos.closeEntry()
-//        zos.flush();
-//    }
+
 
 }

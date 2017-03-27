@@ -7,7 +7,7 @@ class ReadXML {
     private static robust;
 
     public static void readXMl(String path) {
-        robust = new XmlSlurper().parse(new File("${path}/${Constants.ROBUST_XML}"))
+        robust = new XmlSlurper().parse(new File("${path}${File.separator}${Constants.ROBUST_XML}"))
 
         //读取配置的补丁包名
         if (robust.patchPackname.name.text() != null && !"".equals(robust.patchPackname.name.text()))

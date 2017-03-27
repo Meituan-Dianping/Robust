@@ -279,10 +279,10 @@ public class JavaUtils {
 
     public static String getFullClassNameFromFile(String path) {
         if (path.indexOf("classout") > 0) {
-            return path.substring(path.indexOf("classout") + "classout".length() + 1, path.lastIndexOf(".smali")).replace('/', '.');
+            return path.substring(path.indexOf("classout") + "classout".length() + 1, path.lastIndexOf(".smali")).replace(File.separatorChar, '.');
         }
         if (path.indexOf("main") > 0) {
-            return path.substring(path.indexOf("main") + "main".length() + 1, path.lastIndexOf(".class")).replace('/', '.');
+            return path.substring(path.indexOf("main") + "main".length() + 1, path.lastIndexOf(".class")).replace(File.separatorChar, '.');
         }
         throw new RuntimeException("can not analysis " + path + "  get full class name error!!");
     }

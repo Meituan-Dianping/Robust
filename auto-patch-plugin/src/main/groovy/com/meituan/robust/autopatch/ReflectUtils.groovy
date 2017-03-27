@@ -29,7 +29,7 @@ class ReflectUtils {
                 classPool.insertClassPath(it.file.absolutePath)
                 FileUtils.listFiles(it.file, null, true).each {
                     if (it.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
-                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
+                        def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(File.separator, '.')
                         classNames.add(className)
                     }
                 }
@@ -42,7 +42,7 @@ class ReflectUtils {
                     JarEntry libClass = classes.nextElement();
                     String className = libClass.getName();
                     if (className.endsWith(SdkConstants.DOT_CLASS)) {
-                        className = className.substring(0, className.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
+                        className = className.substring(0, className.length() - SdkConstants.DOT_CLASS.length()).replaceAll(File.separator, '.')
                         classNames.add(className)
                     }
                 }
@@ -163,7 +163,7 @@ class ReflectUtils {
         String name;
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
-                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\.")
+                name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll(File.separator, "\\.")
                 if (name.equals(pacthClassName)) {
                     signureBuilder.append(getmodifiedClassName(pacthClassName));
                 } else {
