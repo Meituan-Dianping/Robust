@@ -7,6 +7,7 @@ import javassist.CtClass
 
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
+import java.util.regex.Matcher
 /**
  * Created by mivanzhang on 16/11/3.
  */

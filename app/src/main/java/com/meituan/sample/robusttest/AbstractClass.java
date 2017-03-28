@@ -14,6 +14,6 @@ public abstract class AbstractClass {
     }
 
     public String getA() {
-        return "new";
+        return " !!! ";
     }
 }
