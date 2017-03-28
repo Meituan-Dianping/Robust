@@ -1,4 +1,4 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 import com.meituan.robust.patch.annotaion.Modify;
 

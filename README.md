@@ -5,13 +5,13 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
-Robust is an Android HotFix solution with high compatibility and high stability.Robust can fix bugs immediately without publishing apk.
+Robust is an Android HotFix solution with high compatibility and high stability. Robust can fix bugs immediately without publishing apk.
  
  [中文说明](README-zh.md)
  
 # Environment
 
- * Mac or Linux 
+ * Mac Linux and Windows
  * Gradle 2.10+  
  * Java 1.7 +
  
@@ -24,7 +24,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	//please uncomment fellow line before you build a patch
 	//apply plugin: 'auto-patch-plugin'
 	apply plugin: 'robust'
-	compile 'com.meituan.robust:robust:0.3.0'
+	compile 'com.meituan.robust:robust:0.3.1'
 	```
 2. Add below codes in the outest project's build.gradle file.
 
@@ -34,8 +34,8 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
+	         classpath 'com.meituan.robust:gradle-plugin:0.3.1'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.1'
 	   }
 	}
 	```
@@ -57,7 +57,7 @@ When you build APK,you may need to save mapping.txt and files in build/outputs/r
 # AutoPatch
  
 
-AutoPatch will generate patch for Robust automatically.You just need to fellow below steps to genrate patches.
+AutoPatch will generate patch for Robust automatically. You just need to fellow below steps to genrate patches. For more details please visit website http://tech.meituan.com/android_autopatch.html
 
 # Steps
 
@@ -111,7 +111,7 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
 2. After install apk on your phone,you need to save **mapping.txt** and **app/build/outputs/robust/methodsMap.robust**
-3. Put mapping.txt and methodsMap.robust which are generated when you build the apks in diretory **app/robust/**,if not exists ,create it!
+3. Put mapping.txt and methodsMap.robust which are generated when you build the apks into diretory **app/robust/**,if directory not exists ,create it!
 4. After modifying the code ,please put annotation `@Modify` on the modified methods or invoke  `RobustModify.modify()` (designed for Lambda Expression )in the modified methods.
 5. Run the same gradle command as you build the apk:
 
@@ -126,10 +126,9 @@ AutoPatch will generate patch for Robust automatically.You just need to fellow b
 	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
 	```
 	patch directory can be configured in ``PatchManipulateImp``.
-8. Open app,and click patch button,patch is used.
- 
-9. Also you can use our sample dex in **app/robust/sample_patch.dex** ,this dex change text after you click **Jump_second_Activity** Button.
-
+8. Open app,and click **Patch** button,patch is used.
+9. Also you can use our sample patch in **app/robust/sample_patch.jar** ,this dex change text after you click **Jump_second_Activity** Button.
+10. In the demo ,we change the text showed on the second activity which is configured in the method ```getTextInfo(String meituan)``` in class ```SecondActivity``` 
 10. Demo delete patch after used.You should copy patch everytimes.
 
 # Attentions

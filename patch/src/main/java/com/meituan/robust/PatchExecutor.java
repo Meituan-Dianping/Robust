@@ -86,6 +86,7 @@ public class PatchExecutor extends Thread {
             robustCallBack.logNotify("verifyPatch failure, patch info:" + "id = " + patch.getName() + ",md5 = " + patch.getMd5(), "class:PatchExecutor method:patch line:107");
             return false;
         }
+
         DexClassLoader classLoader = new DexClassLoader(patch.getTempPath(), context.getCacheDir().getAbsolutePath(),
                 null, PatchExecutor.class.getClassLoader());
         patch.delete(patch.getTempPath());

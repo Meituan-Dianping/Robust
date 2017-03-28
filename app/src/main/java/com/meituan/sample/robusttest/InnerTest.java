@@ -1,6 +1,7 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 import com.meituan.robust.patch.annotaion.Add;
+import com.meituan.sample.SecondActivity;
 
 /**
  * Created by mivanzhang on 17/2/8.

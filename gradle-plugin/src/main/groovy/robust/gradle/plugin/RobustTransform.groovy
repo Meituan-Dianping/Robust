@@ -12,7 +12,10 @@ import org.gradle.api.logging.Logger
 
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.jar.JarOutputStream
 import java.util.zip.GZIPOutputStream
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 /**
  * Created by mivanzhang on 16/11/3.
  *
@@ -130,7 +133,15 @@ class RobustTransform extends Transform implements Plugin<Project> {
         logger.quiet '================robust start================'
         def startTime = System.currentTimeMillis()
         outputProvider.deleteAll()
-        def outDir = outputProvider.getContentLocation("main", outputTypes, scopes, Format.DIRECTORY)
+        File jarFile = outputProvider.getContentLocation("main", getOutputTypes(), getScopes(),
+                Format.JAR);
+        if(!jarFile.getParentFile().exists()){
+            jarFile.getParentFile().mkdirs();
+        }
+        if(jarFile.exists()){
+            jarFile.delete();
+        }
+
         ClassPool classPool = new ClassPool()
         project.android.bootClasspath.each {
             logger.debug "android.bootClasspath   " + (String) it.absolutePath
@@ -140,8 +151,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         def box = ConvertUtils.toCtClasses(inputs, classPool)
         def cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "check all class cost $cost second, class count: ${box.size()}"
-        insertRobustCode(box, outDir.absolutePath)
-        print("outDir  " + outDir)
+        insertRobustCode(box, jarFile)
         writeMap2File(methodMap, Constants.METHOD_MAP_OUT_PATH)
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "robust cost $cost second"
@@ -186,18 +196,18 @@ class RobustTransform extends Transform implements Plugin<Project> {
     }
     static AtomicInteger insertMethodCount = new AtomicInteger(0);
 
-    def insertRobustCode(List<CtClass> box, String outDir) {
+    def insertRobustCode(List<CtClass> box, File jarFile) {
+        ZipOutputStream outStream=new JarOutputStream(new FileOutputStream(jarFile));
         new ForkJoinPool().submit {
             box.each { ctClass ->
                 if (isNeedInsertClass(ctClass.getName())) {
                     ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()))
-
-                    if (ctClass.isInterface() || ctClass.declaredMethods.length < 1) {
-                        ctClass.writeFile(outDir)
-                        return;
-                    }
                     boolean addIncrementalChange = false;
                     ctClass.declaredBehaviors.findAll {
+                        if (ctClass.isInterface() || ctClass.declaredMethods.length < 1) {
+                            println(" class name "+ctClass.name+" should not be insert code ")
+                            return false;
+                        }
                         if (!addIncrementalChange) {
                             addIncrementalChange = true;
                             ClassPool classPool = it.declaringClass.classPool
@@ -280,31 +290,23 @@ class RobustTransform extends Transform implements Plugin<Project> {
                             logger.error "ctClass: " + ctClass.getName() + " error: " + t.toString();
                         }
                     }
-
-                        //不要影响method的插入代码逻辑先独立这块的代码
-//                        if (ctBehavior.getMethodInfo().isConstructor()) {
-//                            String returnTypeString = "Constructor"
-//                            def body = "if (changeQuickRedirect != null) {"
-//                            body += "Object argThis = null;"
-//                            body += "argThis = \$0;"
-//                            body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, changeQuickRedirect,false, " + methodMap.get(ctBehavior.getLongName()) + ")) {"
-//                            body += getReturnStatement(returnTypeString, false, methodMap.get(ctBehavior.getLongName()));
-//                            body += "   }"
-//                            body += "}"
-//                            try {
-//                                ctBehavior.insertBefore(body);
-//                            } catch (Throwable t) {
-//                                logger.error "ctClass: " + ctClass.getName() + " error: " + t.toString();
-//                            }
-//                        }
-
                     }
-                ctClass.writeFile(outDir)
+                zipFile(ctClass.toBytecode(),outStream,ctClass.name.replaceAll("\\.","/")+".class");
             }
         }.get()
-
+        outStream.close();
         logger.debug "robust insertMethodCount: " + insertMethodCount.get()
     }
+
+    def void zipFile(byte[] classBytesArray, ZipOutputStream zos, String entryName){
+        ZipEntry entry = new ZipEntry(entryName);
+        zos.putNextEntry(entry);
+        zos.write(classBytesArray,0,classBytesArray.length);
+        zos.closeEntry()
+        zos.flush();
+    }
+
+
     def HashMap<String, Integer> methodMap = new HashMap();
 
 
