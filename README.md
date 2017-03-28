@@ -57,7 +57,7 @@ When you build APK,you may need to save mapping.txt and files in build/outputs/r
 # AutoPatch
  
 
-AutoPatch will generate patch for Robust automatically.You just need to fellow below steps to genrate patches. For more details please visit website http://tech.meituan.com/android_autopatch.html
+AutoPatch will generate patch for Robust automatically. You just need to fellow below steps to genrate patches. For more details please visit website http://tech.meituan.com/android_autopatch.html
 
 # Steps
 
