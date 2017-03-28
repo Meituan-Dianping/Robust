@@ -21,7 +21,7 @@ class ReadXML {
             Config.mappingFilePath = "${path}${Constants.DEFAULT_MAPPING_FILE}"
         }
 
-        if (!Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
+        if (Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
             throw new RuntimeException("Not found ${Config.mappingFilePath}, please put it on your project's robust dir or change your robust.xml !");
         }
 

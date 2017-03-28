@@ -44,7 +44,6 @@ class PatchesFactory {
         }
 
         CtClass temPatchClass = cloneClass(modifiedClass, patchName, methodNoNeedPatchList);
-//        if (temPatchClass.declaredMethods.size() == 0) {
         if (temPatchClass.getDeclaredMethods().length == 0) {
             printList(patchMethodSignureSet.toList());
             throw new RuntimeException("all methods in patch class are deteted,cannot find patchMethod in class " + temPatchClass.getName());

@@ -81,6 +81,21 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         bundle.putInt("asd",1);
         bundle.getFloat("asd");
     }
+    /**
+     * if you change the return value you will change the show text,in the demo we built a patch to change the text
+     */
+    @Modify
+    public String getTextInfo(String meituan) {
+        People p = new People();
+        p.setName("mivazhang");
+        p.setCates("  AutoPatch");
+        people.setName(" I am Patch");
+        ConcreateClass concreateClass = new ConcreateClass();
+
+//        return  "you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+        return "error occur " + concreateClass.getA();
+    }
+
 // another usage of Modify anntation
 //    @Modify(value = "com.meituan.sample.SecondActivity.onCreate(android.os.Bundle)")
     private String getInfo(State stae, Super s, long l) {
@@ -105,20 +120,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         return super.onCreateView(name, context, attrs);
     }
 
-    /**
-     * if you change the return value you will change the show text,in the demo we built a patch to change the text
-     */
-    @Modify
-    public String getTextInfo(String baidu) {
-        People p = new People();
-        p.setName("mivazhang");
-        p.setCates("  AutoPatch");
-        people.setName(" I am Patch");
-        ConcreateClass concreateClass = new ConcreateClass();
 
-        return  "you make it!!   " + p.getName() + baidu + getTextI1(flag) + people.getAddr() + "   name is  " + people.getName() + " conreate class getA " + concreateClass.getA();
-//        return "error " + concreateClass.getA();
-    }
 
 
     @Add
