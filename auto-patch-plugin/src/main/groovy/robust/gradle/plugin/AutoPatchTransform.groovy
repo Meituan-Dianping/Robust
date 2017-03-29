@@ -111,7 +111,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
             targetDir.mkdirs();
         }
         for (String libName : Constants.LIB_NAME_ARRAY) {
-            InputStream inputStream = JavaUtils.class.getResourceAsStream(File.separator+"libs"+File.separator + libName);
+            InputStream inputStream = JavaUtils.class.getResourceAsStream("/libs/" + libName);
             if (inputStream == null) {
                 System.out.println("Warning!!!  Did not find " + libName + " ，you must add it to your project's libs ");
                 continue;
