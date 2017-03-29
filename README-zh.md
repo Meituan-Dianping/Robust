@@ -26,7 +26,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.3.1'
+	compile 'com.meituan.robust:robust:0.3.2'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -37,8 +37,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.1'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.1'
+	         classpath 'com.meituan.robust:gradle-plugin:0.3.2'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.2'
 	   }
 	}
 	```
