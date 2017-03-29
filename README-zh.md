@@ -11,7 +11,7 @@
  
 # 环境
 
- * Mac or Linux 
+ * Mac Linux Windows
  * Gradle 2.10+ 
  * Java 1.7 +
 
@@ -26,7 +26,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.3.0'
+	compile 'com.meituan.robust:robust:0.3.1'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -37,8 +37,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
+	         classpath 'com.meituan.robust:gradle-plugin:0.3.1'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.1'
 	   }
 	}
 	```
@@ -58,7 +58,7 @@
 # AutoPatch
  
  
-Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交修改完bug后的代码，运行和线上apk打包同样的gradle命令即可，会在项目的app/build/outputs/robust目录下生成补丁。
+Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交修改完bug后的代码，运行和线上apk打包同样的gradle命令即可，会在项目的app/build/outputs/robust目录下生成补丁。更多自动化补丁信息请参考：[Android热更新方案Robust开源，新增自动化补丁工具](http://tech.meituan.com/android_autopatch.html) 。
 
 # 使用方法
 
@@ -113,7 +113,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 安装生成的apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
 3. 修改代码之后，加上**@Modify**注解或者调用指定的方法
-4. 把保存的mapping.txt和methodsMap.robust放到app/robust目录下
+4. 把保存的**mapping.txt**和**methodsMap.robust**放到app/robust目录下
 5. 执行和打包相同的gradle命令：
 	
 	```java
@@ -128,7 +128,8 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。
-9. 也可以加载app/robust的样例dex，修改了Jump_second_Activity跳转Activity的显示文字。
+9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
+10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制
 10. 补丁加载之后每次都会删除，再次运行需要重新copy补丁。
 
 # 注意事项

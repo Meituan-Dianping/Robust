@@ -1,4 +1,4 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 /**
  * Created by mivanzhang on 16/11/10.
@@ -14,6 +14,6 @@ public abstract class AbstractClass {
     }
 
     public String getA() {
-        return "new";
+        return " !!! ";
     }
 }

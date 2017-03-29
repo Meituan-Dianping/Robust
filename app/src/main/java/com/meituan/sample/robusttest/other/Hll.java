@@ -1,12 +1,12 @@
-package com.meituan;
+package com.meituan.sample.robusttest.other;
 
 
 import android.util.Log;
 
-import com.meituan.sample.CallBack;
+import com.meituan.sample.robusttest.CallBack;
 
 import static android.R.attr.name;
-import static com.meituan.sample.State.index;
+import static com.meituan.sample.robusttest.State.index;
 
 /**
  * Created by c_kunwu on 16/5/13.

@@ -7,7 +7,7 @@ class ReadXML {
     private static robust;
 
     public static void readXMl(String path) {
-        robust = new XmlSlurper().parse(new File("${path}/${Constants.ROBUST_XML}"))
+        robust = new XmlSlurper().parse(new File("${path}${File.separator}${Constants.ROBUST_XML}"))
 
         //读取配置的补丁包名
         if (robust.patchPackname.name.text() != null && !"".equals(robust.patchPackname.name.text()))
@@ -15,13 +15,16 @@ class ReadXML {
 
         Config.isManual = robust.switch.manual != null && "true".equals(String.valueOf(robust.switch.manual.text()))
         //读取mapping文件
+        if (robust.switch.proguard.text() != null && !"".equals(robust.switch.proguard.text()))
+            Config.supportProGuard = Boolean.valueOf(robust.switch.proguard.text()).booleanValue();
+
         if (robust.mappingFile.name.text() != null && !"".equals(robust.mappingFile.name.text())) {
             Config.mappingFilePath = robust.mappingFile.name.text()
         } else {
             Config.mappingFilePath = "${path}${Constants.DEFAULT_MAPPING_FILE}"
         }
 
-        if (Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists()) {
+        if (Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
             throw new RuntimeException("Not found ${Config.mappingFilePath}, please put it on your project's robust dir or change your robust.xml !");
         }
 
@@ -50,6 +53,8 @@ class ReadXML {
         for (name in robust.noNeedReflectClass.name) {
             Config.noNeedReflectClassSet.add(name.text());
         }
+
+
 
     }
 }

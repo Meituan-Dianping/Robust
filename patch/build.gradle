@@ -29,8 +29,6 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 dependencies {
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.google.code.gson:gson:2.4'
 //    compile 'com.meituan.robust:autopatchbase:' + VERSION_NAME
     compile project(':autopatchbase')
 }
