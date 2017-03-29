@@ -239,7 +239,7 @@ class ReflectUtils {
         } else {
             if (signatureBuilder.length() > 1) {
                 if (Constants.isLogging)
-                    stringBuilder.append("  android.util.Log.d(\"robust\",\" ge inner Class new     ${getCoutNumber()}\");");
+                    stringBuilder.append("  android.util.Log.d(\"robust\",\"  inner Class new     ${getCoutNumber()}\");");
                 stringBuilder.append("java.lang.Object parameters[]=" + Constants.GET_REAL_PARAMETER + "(\$args);");
                 stringBuilder.append("\$_= (\$r)" + Constants.ROBUST_UTILS_FULL_NAME + ".invokeReflectConstruct(\"" + className + "\",parameters,new Class[]{" + signatureBuilder + "});");
             } else {

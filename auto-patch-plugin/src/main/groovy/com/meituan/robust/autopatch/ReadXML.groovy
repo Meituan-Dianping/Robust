@@ -15,6 +15,9 @@ class ReadXML {
 
         Config.isManual = robust.switch.manual != null && "true".equals(String.valueOf(robust.switch.manual.text()))
         //读取mapping文件
+        if (robust.switch.proguard.text() != null && !"".equals(robust.switch.proguard.text()))
+            Config.supportProGuard = Boolean.valueOf(robust.switch.proguard.text()).booleanValue();
+
         if (robust.mappingFile.name.text() != null && !"".equals(robust.mappingFile.name.text())) {
             Config.mappingFilePath = robust.mappingFile.name.text()
         } else {
@@ -50,8 +53,7 @@ class ReadXML {
         for (name in robust.noNeedReflectClass.name) {
             Config.noNeedReflectClassSet.add(name.text());
         }
-        if (robust.switch.proguard.text() != null && !"".equals(robust.switch.proguard.text()))
-            Config.supportProGuard = Boolean.valueOf(robust.switch.proguard.text()).booleanValue();
+
 
 
     }
