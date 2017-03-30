@@ -40,6 +40,13 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	}
 	```
 3. There are some configure items in **app/robust.xml**,such as classes which Robust will insert code,this may diff from projects to projects.Please copy this file to your project.
+4. Add below codes in the proguard-rules.pro file.
+
+    ```java
+    -keep class meituan.robust.patch.**{*;}
+    -keep class com.meituan.robust.**{*;}
+    -keepattributes *Annotation*
+    ```
 
 # Advantages
 
