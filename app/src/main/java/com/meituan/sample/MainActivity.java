@@ -109,18 +109,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPatchApplied(boolean result, Patch patch) {
-            System.out.println(" robust arrived in onPatchApplied");
+            System.out.println(" robust arrived in onPatchApplied ");
 
         }
 
         @Override
         public void logNotify(String log, String where) {
-            System.out.println(" robust arrived in logNotify");
+            System.out.println(" robust arrived in logNotify "+where);
         }
 
         @Override
         public void exceptionNotify(Throwable throwable, String where) {
-            System.out.println(" robust arrived in exceptionNotify");
+            throwable.printStackTrace();
+            System.out.println(" robust arrived in exceptionNotify "+where);
         }
     }
 
