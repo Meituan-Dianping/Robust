@@ -74,8 +74,8 @@ public class PatchManipulateImp extends PatchManipulate {
 
     protected boolean verifyPatch(Context context, Patch patch) {
         //do your verification, put the real patch to patch
-        //
-        patch.setTempPath(Environment.getExternalStorageDirectory().getPath()+ File.separator+"robust"+File.separator + "patch");
+        //放到app的私有目录
+        patch.setTempPath(context.getCacheDir()+ File.separator+"robust"+File.separator + "patch");
         //in the sample we just copy the file
         try {
             copy(patch.getLocalPath(), patch.getTempPath());
@@ -92,6 +92,9 @@ public class PatchManipulateImp extends PatchManipulate {
             throw new RuntimeException("source patch does not exist ");
         }
         File dst=new File(dstPath);
+        if(!dst.getParentFile().exists()){
+            dst.getParentFile().mkdirs();
+        }
         InputStream in = new FileInputStream(src);
         try {
             OutputStream out = new FileOutputStream(dst);
