@@ -92,8 +92,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         people.setName(" I am Patch");
         ConcreateClass concreateClass = new ConcreateClass();
 
-//        return  "you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
-        return "error occur " + concreateClass.getA();
+        return  "you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+//        return "error occur " + concreateClass.getA();
     }
 
 // another usage of Modify anntation
