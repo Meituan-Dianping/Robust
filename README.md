@@ -123,13 +123,12 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 7. Copy patch to your phone：
 
 	```java
-	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
+	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
 	patch directory can be configured in ``PatchManipulateImp``.
 8. Open app,and click **Patch** button,patch is used.
 9. Also you can use our sample patch in **app/robust/sample_patch.jar** ,this dex change text after you click **Jump_second_Activity** Button.
 10. In the demo ,we change the text showed on the second activity which is configured in the method ```getTextInfo(String meituan)``` in class ```SecondActivity``` 
-10. Demo delete patch after used.You should copy patch everytimes.
 
 # Attentions
 
@@ -150,9 +149,9 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 	```
 3. Not Support add fields,but you can add classes currently, this feature is under testing.
 4. Classes added in patch should  be static nested classes or non-inner classes,and all fields and methods in added class should be public.
-5. Suppoort to  fix bugs in constructors currently is under testing.
+5. Support to  fix bugs in constructors currently is under testing.
 6. Not support methods which only use fields,without method call or new expression. 
-7. Suppoort to resources and so file is under test.
+7. Support to resources and so file is under testing.
 ## License
 
     Copyright 2017 Meituan-Dianping

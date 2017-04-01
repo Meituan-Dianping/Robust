@@ -124,13 +124,12 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 7. 将补丁文件copy到手机上：
 
 	```java
-	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
+	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。
 9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
-10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制
-10. 补丁加载之后每次都会删除，再次运行需要重新copy补丁。
+10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制。
 
 # 注意事项
 
