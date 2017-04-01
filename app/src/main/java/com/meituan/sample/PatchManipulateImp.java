@@ -20,9 +20,21 @@ import java.util.List;
  *
  *     <br>
  *    We recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
+ *<br>
+ *<br>
+ *    我们推荐继承PatchManipulate实现你们App独特的A补丁加载策略，其中setLocalPath设置补丁的原始路径，这个路径存储的补丁是加密过得，setTempPath存储解密之后的补丁，是可以执行的jar文件
+ *     <br>
+ *     setTempPath设置的补丁加载完毕即刻删除，如果不需要加密和解密补丁，两者没有啥区别
  */
 
 public class PatchManipulateImp extends PatchManipulate {
+    /***
+     * connect to the network ,get the latest patches
+     * l联网获取最新的补丁
+     * @param context
+     *
+     * @return
+     */
     @Override
     protected List<Patch> fetchPatchList(Context context) {
         //将app自己的robustApkHash上报给服务端，服务端根据robustApkHash来区分每一次apk build来给app下发补丁
@@ -31,8 +43,11 @@ public class PatchManipulateImp extends PatchManipulate {
         Patch patch = new Patch();
         patch.setName("123");
         //we recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
+        //LocalPath是存储原始的补丁文件，这个文件应该是加密过的，TempPath是加密之后的，TempPath下的补丁加载完毕就删除，保证安全性
         patch.setLocalPath(Environment.getExternalStorageDirectory().getPath()+ File.separator+"robust"+File.separator + "patch.jar");
         patch.setTempPath(Environment.getExternalStorageDirectory().getPath()+ File.separator+"robust"+File.separator + "patch");
+        //setPatchesInfoImplClassFullName 设置项各个App可以独立定制，需要确保的是setPatchesInfoImplClassFullName设置的包名是和xml配置项patchPackname保持一致，而且类名必须是：PatchesInfoImpl
+        //请注意这里的设置
         patch.setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl");
         List  patches = new ArrayList<Patch>();
         patches.add(patch);
@@ -58,7 +73,7 @@ public class PatchManipulateImp extends PatchManipulate {
      * @param patch
      * @return
      *
-     * you may download your patches here
+     * you may download your patches here, you can check whether patch is in the phone
      */
     @Override
     protected boolean ensurePatchExist(Patch patch) {
