@@ -152,6 +152,7 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 5. Support to  fix bugs in constructors currently is under testing.
 6. Not support methods which only use fields,without method call or new expression. 
 7. Support to resources and so file is under testing.
+8. For more help, please visit [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
 ## License
 
     Copyright 2017 Meituan-Dianping

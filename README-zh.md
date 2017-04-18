@@ -153,6 +153,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 5. 对于只有字段访问的函数无法直接修复，可通过调用处间接修复
 6. 构造方法的修复内测中
 7. 资源和so的修复内测中
+8. 更多的信息，请访问我们的[Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
 
 ## License
 
