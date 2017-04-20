@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,20 +26,18 @@ import com.meituan.sample.robusttest.Super;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected String flag = "flagstring";
     protected static String name = "zhang";
-    public int times = 0;
-    public static String staticStringField = "meituan";
-    public static int staticIntField = 12311111;
-    public long longField = 123l;
     public Hll hll = new Hll(true);
     private People people = new People();
     public static State state = new State(new Hll(true));
-
+    private ListView listView;
+    private String[] multiArr = {"列表1", "列表2", "列表3", "列表4"};
     private String inlineToString(){
      return super.toString();
  }
@@ -46,6 +47,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         System.out.println(inlineToString());
         setContentView(R.layout.activity_main2);
+
+        listView = (ListView) findViewById(R.id.listview);
         //test lambda expression
         TextView textView = (TextView) findViewById(R.id.secondtext);
         textView.setOnClickListener(v -> {
@@ -80,6 +83,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         Bundle bundle=new Bundle();
         bundle.putInt("asd",1);
         bundle.getFloat("asd");
+        //test array
+        BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
+        listView.setAdapter(adapter);
     }
     /**
      * if you change the return value you will change the show text,in the demo we built a patch to change the text
@@ -91,9 +97,18 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         p.setCates("  AutoPatch");
         people.setName(" I am Patch");
         ConcreateClass concreateClass = new ConcreateClass();
-
-//        return  "you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+        getArray(meituan);
+        //打开这部分注释，查看修复效果
+//        Arrays.fill(multiArr,"修复后的数据");
+//        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
         return "error occur " + concreateClass.getA();
+    }
+
+    @Add
+    public String[] getArray(String meituan) {
+        People p = new People();
+        p.setName("mivazhang");
+       return new String[]{p.getName(),"meituan"};
     }
 
 // another usage of Modify anntation
@@ -138,18 +153,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
     public static String[] methodWithArrayParameters(String[] flag) {
         return flag;
-    }
-
-    public Boolean getBoolean(String flag) {
-        return false;
-    }
-
-    public String getString(Hll hll) {
-        return "meituan";
-    }
-
-    public Super getStatus() {
-        return new Super();
     }
 
     @Override

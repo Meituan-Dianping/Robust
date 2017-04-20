@@ -162,6 +162,7 @@ class ReflectUtils {
         }
         StringBuilder signureBuilder = new StringBuilder();
         String name;
+        boolean isArray=false;
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
                 name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", ".")
@@ -171,6 +172,10 @@ class ReflectUtils {
                     signureBuilder.append(name);
                 }
                 index = signature.indexOf(";", index);
+                if(isArray){
+                    signureBuilder.append("[]");
+                    isArray=false;
+                }
                 signureBuilder.append(".class,");
             }
             if (Constants.PRIMITIVE_TYPE.contains(String.valueOf(signature.charAt(index)))) {
@@ -185,7 +190,15 @@ class ReflectUtils {
                     case 'D': signureBuilder.append("double"); break;
                     default: break;
                 }
+                if(isArray){
+                    signureBuilder.append("[]");
+                    isArray=false;
+                }
                 signureBuilder.append(".class,");
+            }
+
+            if (Constants.ARRAY_TYPE.equals(String.valueOf(signature.charAt(index)))) {
+                isArray=true;
             }
         }
         if (signureBuilder.toString().length() > 0 && String.valueOf(signureBuilder.charAt(signureBuilder.toString().length() - 1)).equals(","))
@@ -200,7 +213,6 @@ class ReflectUtils {
         if (e.signature == null) {
             return "{\$_=(\$r)\$proceed(\$\$);}";
         }
-
         String signatureBuilder = getParameterClassSignure(e.signature, patchClassName);
         stringBuilder.append("{");
         if (isStatic) {
@@ -252,25 +264,6 @@ class ReflectUtils {
     }
 
 
-    static int calculateParameterCount(String signature) {
-        int endIndex = signature.indexOf(")") == -1 ? signature.length() : signature.indexOf(")")
-        signature = signature.substring(0, endIndex)
-        int parameterCount = 0;
-        if (null == signature) {
-            return 0;
-        }
-        for (int i = 0; i < signature.length(); i++) {
-            //object parameter
-            if (Constants.OBJECT_TYPE == (signature.charAt(i))) {
-                i = signature.indexOf(";", i);
-                parameterCount++;
-            }
-            if (Constants.PRIMITIVE_TYPE.contains(String.valueOf(signature.charAt(i)))) {
-                parameterCount++;
-            }
-        }
-        return parameterCount;
-    }
 
     private static String getParameterClassString(CtClass[] parameters) {
         if (parameters == null || parameters.length < 1) {
@@ -454,7 +447,7 @@ class ReflectUtils {
         if (!m.method.returnType.equals(CtClass.voidType)) {
             stringBuilder.append("\$_=(\$r)");
         }
-        if (calculateParameterCount(m.signature) > 0) {
+        if (m.method.parameterTypes.length > 0) {
             stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ",\$\$);");
         } else {
             stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ");");
