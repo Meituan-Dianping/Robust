@@ -25,8 +25,6 @@ import java.util.zip.ZipOutputStream
  */
 class AutoPatchTransform extends Transform implements Plugin<Project> {
     private
-    static String zipCommand = "  zip -r " + Constants.ZIP_FILE_NAME + " com  -x \"*/\\.*\" -x \"\\.*\"";
-    private
     static String dex2SmaliCommand;
     private
     static String smali2DexCommand;
@@ -102,7 +100,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         JavaUtils.printMap(Config.methodMap)
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "autoPatch cost $cost second"
-        throw new RuntimeException("auto patch end successfully")
+//        throw new RuntimeException("auto patch end successfully")
     }
 
     static def copyJarToRobust() {
@@ -150,8 +148,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
     }
     def  zipPatchClassesFile(){
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory+ Constants.ZIP_FILE_NAME));
-        zipAllPatchClasses(Config.robustGenerateDirectory+"com","",zipOut);
-
+        zipAllPatchClasses(Config.robustGenerateDirectory+Config.patchPackageName.substring(0,Config.patchPackageName.indexOf(".")),"",zipOut);
         zipOut.close();
 
     }
