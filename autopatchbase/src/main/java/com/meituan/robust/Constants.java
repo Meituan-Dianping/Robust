@@ -48,10 +48,11 @@ public class Constants {
     public static Class AddAnnotationClass = null;
 
     public final static String[] LIB_NAME_ARRAY = {"baksmali-2.1.2.jar", "smali-2.1.2.jar", "dx.jar"};
-    public static final String PACKNAME_START = "L";
     public static final String PACKNAME_END = ";";
     public final static String PRIMITIVE_TYPE = "ZCBSIJFDV";
+    public final static String ARRAY_TYPE = "[";
     public final static char OBJECT_TYPE = 'L';
+    public static final String PACKNAME_START = String.valueOf(OBJECT_TYPE);
     public static final Boolean OBSCURE = true;
     //    public static final Boolean OBSCURE = false;
     //    public static final Boolean isLogging = false;

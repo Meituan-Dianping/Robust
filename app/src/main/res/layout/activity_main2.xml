@@ -31,4 +31,10 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_dialog_email" />
 
+    <ListView
+        android:layout_width="318dp"
+        android:layout_height="381dp"
+        android:id="@+id/listview"
+        android:layout_gravity="bottom|left"/>
+
 </android.support.design.widget.CoordinatorLayout>
