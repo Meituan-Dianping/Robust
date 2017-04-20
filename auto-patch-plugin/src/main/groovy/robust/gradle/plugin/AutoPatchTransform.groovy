@@ -25,8 +25,6 @@ import java.util.zip.ZipOutputStream
  */
 class AutoPatchTransform extends Transform implements Plugin<Project> {
     private
-    static String zipCommand = "  zip -r " + Constants.ZIP_FILE_NAME + " com  -x \"*/\\.*\" -x \"\\.*\"";
-    private
     static String dex2SmaliCommand;
     private
     static String smali2DexCommand;
@@ -150,8 +148,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
     }
     def  zipPatchClassesFile(){
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory+ Constants.ZIP_FILE_NAME));
-        zipAllPatchClasses(Config.robustGenerateDirectory+"com","",zipOut);
-
+        zipAllPatchClasses(Config.robustGenerateDirectory+Config.patchPackageName.substring(0,Config.patchPackageName.indexOf(".")),"",zipOut);
         zipOut.close();
 
     }
