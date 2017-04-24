@@ -205,7 +205,6 @@ class RobustTransform extends Transform implements Plugin<Project> {
                     boolean addIncrementalChange = false;
                     ctClass.declaredBehaviors.findAll {
                         if (ctClass.isInterface() || ctClass.declaredMethods.length < 1) {
-//                            println(" class name "+ctClass.name+" should not be insert code ")
                             return false;
                         }
                         if (!addIncrementalChange) {
@@ -274,20 +273,19 @@ class RobustTransform extends Transform implements Plugin<Project> {
                                 boolean isStatic = ctBehavior.getModifiers() & AccessFlag.STATIC;
                                 CtClass returnType = ctBehavior.getReturnType0();
                                 String returnTypeString = returnType.getName();
-                                def body = "if (${Constants.INSERT_FIELD_NAME} != null) {"
-                                body += "Object argThis = null;"
+                                def body = "Object argThis = null;";
                                 if (!isStatic) {
                                     body += "argThis = \$0;"
                                 }
-
-                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ")) {"
-                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.longName));
+                                String parametersClassType=getParametersClassType((CtMethod)ctBehavior)
+                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
+                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.longName),parametersClassType,returnTypeString+".class");
                                 body += "   }"
-                                body += "}"
                                 ctBehavior.insertBefore(body);
                             }
                         } catch (Throwable t ) {
-                            logger.error "ctClass: " + ctClass.getName() + " error: " + t.toString();
+                            t.printStackTrace();
+                            logger.error "ctClass: " + ctClass.getName() + " error: " + t.getMessage();
                         }
                     }
                     }
@@ -296,6 +294,22 @@ class RobustTransform extends Transform implements Plugin<Project> {
         }.get()
         outStream.close();
         logger.debug "robust insertMethodCount: " + insertMethodCount.get()
+    }
+
+    def String getParametersClassType(CtMethod method){
+        if(method.parameterTypes.length==0){
+            return " null ";
+        }
+       StringBuilder parameterType=new StringBuilder();
+        parameterType.append("new Class[]{")
+        for(CtClass paramterClass:method.getParameterTypes()){
+            parameterType.append(paramterClass.name+".class,")
+        }
+        //remove last ','
+        if(','==parameterType.charAt(parameterType.length()-1))
+            parameterType.deleteCharAt(parameterType.length()-1)
+        parameterType.append("}")
+        return parameterType.toString();
     }
 
     def void zipFile(byte[] classBytesArray, ZipOutputStream zos, String entryName){
@@ -389,56 +403,56 @@ class RobustTransform extends Transform implements Plugin<Project> {
      * @param methodNumber 方法数
      * @return 返回return语句
      */
-    def String getReturnStatement(String type, boolean isStatic, int methodNumber) {
+    def String getReturnStatement(String type, boolean isStatic, int methodNumber,String parametersClassType,String returnTypeString) {
         switch (type) {
             case Constants.CONSTRUCTOR:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber);  "
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);  "
             case Constants.LANG_VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber);   return null;"
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);   return null;"
 
             case Constants.VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber);   return ;"
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);   return ;"
 
             case Constants.LANG_BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             case Constants.BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).booleanValue();"
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).booleanValue();"
 
             case Constants.INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).intValue();"
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).intValue();"
             case Constants.LANG_INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)); "
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)); "
 
             case Constants.LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).longValue();"
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).longValue();"
             case Constants.LANG_LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).doubleValue();"
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).doubleValue();"
             case Constants.LANG_DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).floatValue();"
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).floatValue();"
             case Constants.LANG_FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).shortValue();"
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).shortValue();"
             case Constants.LANG_SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).byteValue();"
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).byteValue();"
             case Constants.LANG_BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             case Constants.CHAR:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber)).charValue();"
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).charValue();"
             case Constants.LANG_CHARACTER:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber));"
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             default:
-                return "   return ($type)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber);"
+                return "   return ($type)com.meituan.robust.PatchProxy.accessDispatch(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);"
         }
     }
 
