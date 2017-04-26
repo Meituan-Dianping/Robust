@@ -222,8 +222,12 @@ public class SmaliUitils {
         return packageNameList;
 
     }
+    public static void main(String[] args) {
+        SmaliUitils smaliUitils=new SmaliUitils();
+        smaliUitils.getObscuredMethodSignure("invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;","com.meituan.second");
+    }
+    private  String getObscuredMethodSignure(final String line, String className) {
 
-    private String getObscuredMethodSignure(final String line, String className) {
         if (className.endsWith(Constants.PATCH_SUFFIX) && Config.modifiedClassNameList.contains(className.substring(0, className.indexOf(Constants.PATCH_SUFFIX)))) {
             className = className.substring(0, className.indexOf(Constants.PATCH_SUFFIX));
         }
@@ -232,9 +236,15 @@ public class SmaliUitils {
         String parameter = line.substring(line.indexOf("("), line.indexOf(")") + 1);
         int endIndex = line.indexOf(")");
         String methodSigure = line.substring(0, endIndex + 1);
+        //invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;
+        boolean isArray=false;
         for (int index = line.indexOf("(") + 1; index < endIndex; index++) {
-            if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.indexOf(Constants.PACKNAME_END) != -1) {
+            if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.contains(Constants.PACKNAME_END)) {
                 methodSignureBuilder.append(methodSigure.substring(index + 1, methodSigure.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\."));
+                if(isArray){
+                    methodSignureBuilder.append("[]");
+                    isArray=false;
+                }
                 index = methodSigure.indexOf(";", index);
                 methodSignureBuilder.append(",");
             }
@@ -271,7 +281,15 @@ public class SmaliUitils {
                     default:
                         break;
                 }
+                if(isArray){
+                    methodSignureBuilder.append("[]");
+                    isArray=false;
+                }
                 methodSignureBuilder.append(",");
+            }
+
+            if (Constants.ARRAY_TYPE.equals(String.valueOf(methodSigure.charAt(index)))) {
+                isArray=true;
             }
 
         }
@@ -283,6 +301,7 @@ public class SmaliUitils {
         String obscuredMethodSignure = methodSignureBuilder.toString();
         String obscuredMethodName = getObscuredMemberName(className, ReadMapping.getInstance().getMethodSignureWithReturnType(returnTypeList.get(0), obscuredMethodSignure));
         obscuredMethodSignure = obscuredMethodName + parameter;
+//        System.out.println("getObscuredMethodSignure is "+obscuredMethodSignure.substring(0, obscuredMethodSignure.indexOf("(")) + parameter);
         return obscuredMethodSignure.substring(0, obscuredMethodSignure.indexOf("(")) + parameter;
     }
 
