@@ -52,7 +52,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
                 //FIXME: assembleRelease下屏蔽Prepare，这里因为还没有执行Task，没法直接通过当前的BuildType来判断，所以直接分析当前的startParameter中的taskname，
                 //另外这里有一个小坑task的名字不能是缩写必须是全称 例如assembleDebug不能是任何形式的缩写输入
                 if (taskName.endsWith("Debug") && taskName.contains("Debug")) {
-                    logger.warn " Don't register robust transform for debug model !!! task is：${taskName}"
+//                    logger.warn " Don't register robust transform for debug model !!! task is：${taskName}"
                     isDebugTask = true
                     break;
                 }
@@ -144,13 +144,13 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
         ClassPool classPool = new ClassPool()
         project.android.bootClasspath.each {
-            logger.debug "android.bootClasspath   " + (String) it.absolutePath
+//            logger.debug "android.bootClasspath   " + (String) it.absolutePath
             classPool.appendClassPath((String) it.absolutePath)
         }
 
         def box = ConvertUtils.toCtClasses(inputs, classPool)
         def cost = (System.currentTimeMillis() - startTime) / 1000
-        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
+//        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
         insertRobustCode(box, jarFile)
         writeMap2File(methodMap, Constants.METHOD_MAP_OUT_PATH)
         cost = (System.currentTimeMillis() - startTime) / 1000
@@ -205,7 +205,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
                     boolean addIncrementalChange = false;
                     ctClass.declaredBehaviors.findAll {
                         if (ctClass.isInterface() || ctClass.declaredMethods.length < 1) {
-                            println(" class name "+ctClass.name+" should not be insert code ")
+//                            println(" class name "+ctClass.name+" should not be insert code ")
                             return false;
                         }
                         if (!addIncrementalChange) {
@@ -215,7 +215,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
                             CtField ctField = new CtField(type, Constants.INSERT_FIELD_NAME, ctClass);
                             ctField.setModifiers(AccessFlag.PUBLIC | AccessFlag.STATIC)
                             ctClass.addField(ctField)
-                            logger.debug "ctClass: " + ctClass.getName();
+//                            logger.debug "ctClass: " + ctClass.getName();
                         }
 
                         if (it.getMethodInfo().isStaticInitializer()) {
