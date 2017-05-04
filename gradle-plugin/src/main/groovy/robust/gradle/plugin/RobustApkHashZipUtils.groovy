@@ -55,7 +55,7 @@ class RobustApkHashZipUtils {
             return;
         }
 
-        zos.putNextEntry(new ZipEntry(buildPath(path, file.getName())));
+        zos.putNextEntry(new ZipEntry(buildPath(path, file.getAbsolutePath().replace(File.separatorChar,"_"))));
 
         FileInputStream fis = new FileInputStream(file);
 
