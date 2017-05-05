@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.meituan.sample.robusttest.other.Hll;
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchExecutor;
 import com.meituan.robust.RobustCallBack;
@@ -18,6 +17,9 @@ import com.meituan.sample.robusttest.NoField;
 import com.meituan.sample.robusttest.SampleClass;
 import com.meituan.sample.robusttest.State;
 import com.meituan.sample.robusttest.Super;
+import com.meituan.sample.robusttest.other.Hll;
+
+import java.util.List;
 
 /**
  *
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
     class Callback implements RobustCallBack {
 
         @Override
-        public void onPatchListFetched(boolean result, boolean isNet) {
+        public void onPatchListFetched(boolean result, boolean isNet, List<Patch> patches) {
              System.out.println(" robust arrived in onPatchListFetched");
         }
 
