@@ -93,6 +93,7 @@ class ReadAnnotation {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     try {
+
                         if (Constants.LAMBDA_MODIFY.equals(m.method.declaringClass.name)) {
                             isAllMethodsPatch = false;
                             addPatchMethodAndModifiedClass(patchMethodSignureSet, method);

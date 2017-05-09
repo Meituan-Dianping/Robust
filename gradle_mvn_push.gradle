@@ -42,13 +42,13 @@ artifacts {
     archives sourcesJar
 }
 
-uploadArchives {
-    repositories.mavenDeployer {
-        repository(url: repositoryUrl) {
-            authentication(userName: getPropertyFromLocalProperties("USER"), password: getPropertyFromLocalProperties("PASSWORD"))
-        }
-    }
-}
+//uploadArchives {
+//    repositories.mavenDeployer {
+//        repository(url: repositoryUrl) {
+//            authentication(userName: getPropertyFromLocalProperties("USER"), password: getPropertyFromLocalProperties("PASSWORD"))
+//        }
+//    }
+//}
 bintray {
     user = getPropertyFromLocalProperties("bintray.user")
     key = getPropertyFromLocalProperties("bintray.apikey")

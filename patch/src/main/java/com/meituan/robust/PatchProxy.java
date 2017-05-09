@@ -13,65 +13,65 @@ public class PatchProxy {
     private static Set<RobustExtension> registerSet=new LinkedHashSet<>();
     private static RobustExtension executedExtension=null;
 
-//    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-    static public boolean isSupport(Arguments arguments) {
+    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+//    static public boolean isSupport(Arguments arguments) {
         //Robust补丁优先执行，其他功能靠后
-        if (arguments.changeQuickRedirect == null) {
+        if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
             if(registerSet==null||registerSet.isEmpty()){
                 return false;
             }
             for(RobustExtension robustExtension:registerSet){
-                if(robustExtension.isSupport(arguments.paramsArray,arguments.current,arguments.methodNumber,arguments.paramsClassTypes,arguments.returnType)){
+                if(robustExtension.isSupport(paramsArray,current,methodNumber,paramsClassTypes,returnType)){
                     executedExtension=robustExtension;
                     return true;
                 }
             }
             return false;
         }
-        String classMethod = getClassMethod(arguments.isStatic, arguments.methodNumber);
+        String classMethod = getClassMethod(isStatic, methodNumber);
         if (TextUtils.isEmpty(classMethod)) {
             return false;
         }
-        Object[] objects = getObjects(arguments.paramsArray, arguments.current, arguments.isStatic);
+        Object[] objects = getObjects(paramsArray, current, isStatic);
 
         try {
-            return arguments.changeQuickRedirect.isSupport(classMethod, objects);
+            return changeQuickRedirect.isSupport(classMethod, objects);
         } catch (Throwable t) {
             return false;
         }
     }
 
-//    static public Object accessDispatch(Object[] arrayOfObject, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-    static public Object accessDispatch(Arguments arguments) {
-        if (arguments.changeQuickRedirect == null) {
+    static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+//    static public Object accessDispatch(Arguments arguments) {
+        if (changeQuickRedirect == null) {
             if(executedExtension!=null){
-                return executedExtension.accessDispatch(arguments.paramsArray,arguments.current,arguments.methodNumber,arguments.paramsClassTypes,arguments.returnType);
+                return executedExtension.accessDispatch(paramsArray,current, methodNumber, paramsClassTypes, returnType);
             }
             return null;
         }
-        String classMethod = getClassMethod(arguments.isStatic,arguments. methodNumber);
+        String classMethod = getClassMethod(isStatic,  methodNumber);
         if (TextUtils.isEmpty(classMethod)) {
             return null;
         }
-        Object[] objects = getObjects(arguments.paramsArray, arguments.current, arguments.isStatic);
-        return arguments.changeQuickRedirect.accessDispatch(classMethod, objects);
+        Object[] objects = getObjects( paramsArray,  current,  isStatic);
+        return  changeQuickRedirect.accessDispatch(classMethod, objects);
     }
 
-//    static public void accessDispatchVoid(Object[] arrayOfObject, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-    static public void accessDispatchVoid(Arguments arguments) {
-        if (arguments.changeQuickRedirect == null) {
+    static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+//    static public void accessDispatchVoid(Arguments arguments) {
+        if ( changeQuickRedirect == null) {
             if(executedExtension!=null){
-                executedExtension.accessDispatch(arguments.paramsArray,arguments.current,arguments.methodNumber,arguments.paramsClassTypes,arguments.returnType);
+                executedExtension.accessDispatch( paramsArray, current, methodNumber, paramsClassTypes, returnType);
             }
             return;
         }
-        String classMethod = getClassMethod(arguments.isStatic, arguments.methodNumber);
+        String classMethod = getClassMethod( isStatic,  methodNumber);
         if (TextUtils.isEmpty(classMethod)) {
             return;
         }
-        Object[] objects = getObjects(arguments.paramsArray, arguments.current, arguments.isStatic);
-        arguments.changeQuickRedirect.accessDispatch(classMethod, objects);
+        Object[] objects = getObjects( paramsArray,  current,  isStatic);
+         changeQuickRedirect.accessDispatch(classMethod, objects);
     }
 
 

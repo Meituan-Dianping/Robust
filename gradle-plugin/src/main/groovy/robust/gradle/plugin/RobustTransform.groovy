@@ -180,7 +180,11 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
     }
 
-    def isNeedInsertClass(String className) {
+    def isNeedInsertClass(CtClass ctClass) {
+        if(Constants.ASPECTJ_AROUND_CLASS.equals(ctClass.getSuperclass().name)){
+            return false;
+        }
+        String className =ctClass.name;
         //这样子可以在需要埋点的剔除指定的类
         for (String exceptName : exceptPackageList) {
             if (className.startsWith(exceptName)) {
@@ -192,6 +196,9 @@ class RobustTransform extends Transform implements Plugin<Project> {
                 return true;
             }
         }
+
+
+
         return false;
     }
     static AtomicInteger insertMethodCount = new AtomicInteger(0);
@@ -200,7 +207,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         ZipOutputStream outStream=new JarOutputStream(new FileOutputStream(jarFile));
         new ForkJoinPool().submit {
             box.each { ctClass ->
-                if (isNeedInsertClass(ctClass.getName())) {
+                if (isNeedInsertClass(ctClass)) {
                     ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()))
                     boolean addIncrementalChange = false;
                     ctClass.declaredBehaviors.findAll {
@@ -273,15 +280,21 @@ class RobustTransform extends Transform implements Plugin<Project> {
                                 boolean isStatic = ctBehavior.getModifiers() & AccessFlag.STATIC;
                                 CtClass returnType = ctBehavior.getReturnType0();
                                 String returnTypeString = returnType.getName();
-                                def body = "Object argThis = null;";
-                                if (!isStatic) {
-                                    body += "argThis = \$0;"
-                                }
+//                                def body = "Object argThis = null;";
+//                                if (!isStatic) {
+//                                    body += "argThis = \$0;"
+//                                }
+//                            def body = "if (${Constants.INSERT_FIELD_NAME} != null) {"
+                            def body = "Object argThis = null;"
+                            if (!isStatic) {
+                                body += "argThis = \$0;"
+                            }
                                 String parametersClassType=getParametersClassType(ctBehavior as CtMethod)
 //                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
-                                body += "   if (com.meituan.robust.PatchProxy.isSupport(new com.meituan.robust.Arguments(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class))) {"
+                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
                                 body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.longName),parametersClassType,returnTypeString+".class");
                                 body += "   }"
+//                                body += "   }"
 //                                println("before insert body "+body);
                                 ctBehavior.insertBefore(body);
                             }
@@ -346,7 +359,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
              *
              * @param e the <tt>new</tt> expression creating an object.
              */
-            public void edit(NewExpr e) throws CannotCompileException { isCallMethod = true; }
+//            public void edit(NewExpr e) throws CannotCompileException { isCallMethod = true; }
 
             /**
              * Edits an expression for array creation (overridable).
@@ -408,53 +421,53 @@ class RobustTransform extends Transform implements Plugin<Project> {
     def String getReturnStatement(String type, boolean isStatic, int methodNumber,String parametersClassType,String returnTypeString) {
         switch (type) {
             case Constants.CONSTRUCTOR:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));  "
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);  "
             case Constants.LANG_VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));   return null;"
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);   return null;"
 
             case Constants.VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));   return ;"
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);   return ;"
 
             case Constants.LANG_BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             case Constants.BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).booleanValue();"
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).booleanValue();"
 
             case Constants.INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).intValue();"
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).intValue();"
             case Constants.LANG_INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))); "
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)); "
 
             case Constants.LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).longValue();"
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).longValue();"
             case Constants.LANG_LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).doubleValue();"
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).doubleValue();"
             case Constants.LANG_DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).floatValue();"
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).floatValue();"
             case Constants.LANG_FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).shortValue();"
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).shortValue();"
             case Constants.LANG_SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
 
             case Constants.BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).byteValue();"
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).byteValue();"
             case Constants.LANG_BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             case Constants.CHAR:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString))).charValue();"
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)).charValue();"
             case Constants.LANG_CHARACTER:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString)));"
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
             default:
-                return "   return ($type)com.meituan.robust.PatchProxy.accessDispatch(new com.meituan.robust.Arguments(\$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString));"
+                return "   return ($type)com.meituan.robust.PatchProxy.accessDispatch( \$args, argThis, changeQuickRedirect, $isStatic, $methodNumber,$parametersClassType,$returnTypeString);"
         }
     }
 

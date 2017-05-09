@@ -110,5 +110,8 @@ public class Constants {
 
     //robust apk hash : apk's unique id
     public static final String ROBUST_APK_HASH_FILE_NAME = "robust.apkhash";
+    public static final String ASPECTJ_AROUND_CLASS = "org.aspectj.runtime.internal.AroundClosure";
+
+
 
 }
