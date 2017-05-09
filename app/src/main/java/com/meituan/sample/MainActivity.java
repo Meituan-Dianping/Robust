@@ -23,20 +23,19 @@ import com.meituan.sample.robusttest.other.Hll;
 import java.util.List;
 
 /**
- *
  * For users of Robust you may only to use MainActivity or SecondActivity,other classes are used for test.<br>
- *<br>
+ * <br>
  * If you just want to use Robust ,we recommend you just focus on MainActivity SecondActivity and PatchManipulateImp.Especially three buttons in MainActivity<br>
- *<br>
+ * <br>
  * in the MainActivity have three buttons; "SHOW TEXT " Button will change the text in the MainActivity,you can patch the show text.<br>
- *<br>
+ * <br>
  * "PATCH" button will load the patch ,the patch path can be configured in PatchManipulateImp.<br>
- *<br>
+ * <br>
  * "JUMP_SECOND_ACTIVITY" button will jump to the second ACTIVITY,so you can patch a Activity.<br>
- *<br>
+ * <br>
  * Attention to this ,We recommend that one patch is just for one built apk ,because every  built apk has its unique mapping.txt and resource id<br>
  *
- *@author mivanzhang
+ * @author mivanzhang
  */
 
 public class MainActivity extends AppCompatActivity {
@@ -59,24 +58,22 @@ public class MainActivity extends AppCompatActivity {
         patch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isGrantSDCardWriteAndPhoneStatePermission()) {
-                    Toast.makeText(getApplicationContext(),"onClick",Toast.LENGTH_SHORT).show();
+                if (isGrantSDCardReadPermission()) {
                     runRobust();
                 } else {
                     requestPermission();
                 }
-
             }
         });
 
         findViewById(R.id.jump_second_activity).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent =  new Intent(MainActivity.this,SecondActivity.class);
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
                 startActivity(intent);
                 Log.d("robusttest", (new NoField()).toString());
                 Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
-                SampleClass sampleClass=new SampleClass();
+                SampleClass sampleClass = new SampleClass();
                 sampleClass.multiple(-1);
             }
         });
@@ -102,12 +99,13 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     //patch  data report
     class Callback implements RobustCallBack {
 
         @Override
         public void onPatchListFetched(boolean result, boolean isNet, List<Patch> patches) {
-             System.out.println(" robust arrived in onPatchListFetched");
+            System.out.println(" robust arrived in onPatchListFetched");
         }
 
         @Override
@@ -123,17 +121,17 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void logNotify(String log, String where) {
-            System.out.println(" robust arrived in logNotify "+where);
+            System.out.println(" robust arrived in logNotify " + where);
         }
 
         @Override
         public void exceptionNotify(Throwable throwable, String where) {
             throwable.printStackTrace();
-            System.out.println(" robust arrived in exceptionNotify "+where);
+            System.out.println(" robust arrived in exceptionNotify " + where);
         }
     }
 
-    private boolean isGrantSDCardWriteAndPhoneStatePermission() {
+    private boolean isGrantSDCardReadPermission() {
         return PermissionUtils.isGrantSDCardReadPermission(this);
     }
 
@@ -147,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CODE_SDCARD_READ:
-                handlePermissionResult(grantResults);
+                handlePermissionResult();
                 break;
 
             default:
@@ -155,18 +153,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void handlePermissionResult(@NonNull int[] grantResults) {
-        if (isGrantSDCardWriteAndPhoneStatePermission()){
-            Toast.makeText(this,"failure because without sd card read permission",Toast.LENGTH_SHORT).show();
+    private void handlePermissionResult() {
+        if (isGrantSDCardReadPermission()) {
             runRobust();
         } else {
-            Toast.makeText(this,"failure because without sd card read permission",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "failure because without sd card read permission", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private void runRobust(){
-        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(),  new Callback()).start();
+    private void runRobust() {
+        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new Callback()).start();
     }
 
 
