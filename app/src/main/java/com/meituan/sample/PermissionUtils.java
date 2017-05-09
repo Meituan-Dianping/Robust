@@ -46,15 +46,11 @@ public class PermissionUtils {
         return true;
     }
 
-    public static boolean isGrantPhoneStatePermission(Context context) {
-        return checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE);
+    public static boolean isGrantSDCardReadPermission(Context context) {
+        return checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
 
-    public static boolean isGrantSDCardWritePermission(Context context) {
-        return checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-    }
-
-    public static void requestSDCardWriteAndPhoneStatePermission(Activity activity, int requestCode) {
-        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+    public static void requestSDCardReadPermission(Activity activity, int requestCode) {
+        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, requestCode);
     }
 }

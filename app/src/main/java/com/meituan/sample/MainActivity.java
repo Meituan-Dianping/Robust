@@ -134,41 +134,35 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isGrantSDCardWriteAndPhoneStatePermission() {
-        return PermissionUtils.isGrantPhoneStatePermission(this) && PermissionUtils.isGrantSDCardWritePermission(this);
+        return PermissionUtils.isGrantSDCardReadPermission(this);
     }
 
     private void requestPermission() {
-        PermissionUtils.requestSDCardWriteAndPhoneStatePermission(this, REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE);
-//        PermissionUtil.requestPhoneStatePermission(this, REQUEST_CODE_PHONE_STATE);
-//        PermissionUtil.requestSDCardWritePermission(this, REQUEST_CODE_SDCARD_WRITE);
+        PermissionUtils.requestSDCardReadPermission(this, REQUEST_CODE_SDCARD_READ);
     }
 
-    public static final int REQUEST_CODE_SDCARD_WRITE = 1;
-    public static final int REQUEST_CODE_PHONE_STATE = 2;
-    public static final int REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE = 3;
+    private static final int REQUEST_CODE_SDCARD_READ = 1;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_CODE_SDCARD_WRITE:
-                handlePermissionResult();
+            case REQUEST_CODE_SDCARD_READ:
+                handlePermissionResult(grantResults);
                 break;
-
-            case REQUEST_CODE_PHONE_STATE:
-                handlePermissionResult();
-                break;
-
-            case REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE:
-                handlePermissionResult();
 
             default:
                 break;
         }
     }
 
-    private void handlePermissionResult() {
-        Toast.makeText(this,"handlePermissionResult",Toast.LENGTH_SHORT).show();
-        runRobust();
+    private void handlePermissionResult(@NonNull int[] grantResults) {
+        if (isGrantSDCardWriteAndPhoneStatePermission()){
+            Toast.makeText(this,"failure because without sd card read permission",Toast.LENGTH_SHORT).show();
+            runRobust();
+        } else {
+            Toast.makeText(this,"failure because without sd card read permission",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     private void runRobust(){
