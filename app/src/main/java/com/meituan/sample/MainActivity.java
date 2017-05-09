@@ -2,6 +2,7 @@ package com.meituan.sample;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -58,7 +59,12 @@ public class MainActivity extends AppCompatActivity {
         patch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new PatchExecutor(getApplicationContext(), new PatchManipulateImp(),  new Callback()).start();
+                if (isGrantSDCardWriteAndPhoneStatePermission()) {
+                    Toast.makeText(getApplicationContext(),"onClick",Toast.LENGTH_SHORT).show();
+                    runRobust();
+                } else {
+                    requestPermission();
+                }
 
             }
         });
@@ -125,6 +131,48 @@ public class MainActivity extends AppCompatActivity {
             throwable.printStackTrace();
             System.out.println(" robust arrived in exceptionNotify "+where);
         }
+    }
+
+    private boolean isGrantSDCardWriteAndPhoneStatePermission() {
+        return PermissionUtils.isGrantPhoneStatePermission(this) && PermissionUtils.isGrantSDCardWritePermission(this);
+    }
+
+    private void requestPermission() {
+        PermissionUtils.requestSDCardWriteAndPhoneStatePermission(this, REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE);
+//        PermissionUtil.requestPhoneStatePermission(this, REQUEST_CODE_PHONE_STATE);
+//        PermissionUtil.requestSDCardWritePermission(this, REQUEST_CODE_SDCARD_WRITE);
+    }
+
+    public static final int REQUEST_CODE_SDCARD_WRITE = 1;
+    public static final int REQUEST_CODE_PHONE_STATE = 2;
+    public static final int REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE = 3;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_SDCARD_WRITE:
+                handlePermissionResult();
+                break;
+
+            case REQUEST_CODE_PHONE_STATE:
+                handlePermissionResult();
+                break;
+
+            case REQUEST_CODE_PHONE_STATE_AND_SDCARD_WRITE:
+                handlePermissionResult();
+
+            default:
+                break;
+        }
+    }
+
+    private void handlePermissionResult() {
+        Toast.makeText(this,"handlePermissionResult",Toast.LENGTH_SHORT).show();
+        runRobust();
+    }
+
+    private void runRobust(){
+        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(),  new Callback()).start();
     }
 
 
