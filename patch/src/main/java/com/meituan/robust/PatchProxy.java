@@ -1,7 +1,5 @@
 package com.meituan.robust;
 
-import android.text.TextUtils;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -14,7 +12,6 @@ public class PatchProxy {
     private static RobustExtension executedExtension=null;
 
     static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-//    static public boolean isSupport(Arguments arguments) {
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
@@ -22,56 +19,43 @@ public class PatchProxy {
                 return false;
             }
             for(RobustExtension robustExtension:registerSet){
-                if(robustExtension.isSupport(paramsArray,current,methodNumber,paramsClassTypes,returnType)){
+                if(robustExtension.isSupport(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()))){
                     executedExtension=robustExtension;
                     return true;
                 }
             }
             return false;
         }
-        String classMethod = getClassMethod(isStatic, methodNumber);
-        if (TextUtils.isEmpty(classMethod)) {
-            return false;
-        }
-        Object[] objects = getObjects(paramsArray, current, isStatic);
 
+        Object[] objects = getObjects(paramsArray, current, isStatic);
         try {
-            return changeQuickRedirect.isSupport(classMethod, objects);
+            return changeQuickRedirect.isSupport(String.valueOf(methodNumber), objects);
         } catch (Throwable t) {
             return false;
         }
     }
 
     static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-//    static public Object accessDispatch(Arguments arguments) {
         if (changeQuickRedirect == null) {
             if(executedExtension!=null){
-                return executedExtension.accessDispatch(paramsArray,current, methodNumber, paramsClassTypes, returnType);
+                return executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return null;
         }
-        String classMethod = getClassMethod(isStatic,  methodNumber);
-        if (TextUtils.isEmpty(classMethod)) {
-            return null;
-        }
-        Object[] objects = getObjects( paramsArray,  current,  isStatic);
-        return  changeQuickRedirect.accessDispatch(classMethod, objects);
+
+        Object[] objects = getObjects(paramsArray,  current,  isStatic);
+        return  changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
 
     static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-//    static public void accessDispatchVoid(Arguments arguments) {
-        if ( changeQuickRedirect == null) {
+        if (changeQuickRedirect == null) {
             if(executedExtension!=null){
-                executedExtension.accessDispatch( paramsArray, current, methodNumber, paramsClassTypes, returnType);
+                executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return;
         }
-        String classMethod = getClassMethod( isStatic,  methodNumber);
-        if (TextUtils.isEmpty(classMethod)) {
-            return;
-        }
         Object[] objects = getObjects( paramsArray,  current,  isStatic);
-         changeQuickRedirect.accessDispatch(classMethod, objects);
+        changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
 
 
@@ -96,16 +80,14 @@ public class PatchProxy {
         return objects;
     }
 
-    static private String getClassMethod(boolean isStatic, int methodNumber) {
-        String classMethod = "";
-        try {
+   public static  String getClassName() {
             java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
-            String methodName = stackTraceElement.getMethodName();
-            String className = stackTraceElement.getClassName();
-            classMethod = className + ":" + methodName + ":" + isStatic + ":" + methodNumber;
-        } catch (Throwable t) {
-        }
-        return classMethod;
+            return stackTraceElement.getClassName();
+    }
+
+    public static  String getMethodName() {
+        java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
+        return stackTraceElement.getMethodName();
     }
 
     /***

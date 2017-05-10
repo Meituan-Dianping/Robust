@@ -14,7 +14,7 @@ buildscript {
         // in the individual module build.gradle files
         classpath 'com.meituan.gradle:roboaspectj:0.9.2'
 
-        classpath 'com.meituan.robust:gradle-plugin:0.4.0-SNAPSHOT'
+        classpath 'com.meituan.robust:gradle-plugin:0.4.2-SNAPSHOT'
         classpath 'com.meituan.robust:auto-patch-plugin:0.4.0-SNAPSHOT'
         classpath 'me.tatarka:gradle-retrolambda:3.2.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'

@@ -104,14 +104,14 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         ConcreateClass concreateClass = new ConcreateClass();
         getArray(meituan);
         //打开这部分注释，查看修复效果
-//        Arrays.fill(multiArr,"修复后的数据");
-//        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
-        return "error occur " + concreateClass.getA();
+        Arrays.fill(multiArr,"修复后的数据");
+        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+//        return "error occur " + concreateClass.getA();
 
     }
 
     @Add
-    public String[] getArray(String meituan) {
+    public String[] getArray(Object[] meituan) {
         People p = new People();
         p.setName("mivazhang");
        return new String[]{p.getName(),"meituan"};

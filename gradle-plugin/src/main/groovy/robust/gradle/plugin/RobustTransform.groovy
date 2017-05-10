@@ -181,8 +181,12 @@ class RobustTransform extends Transform implements Plugin<Project> {
     }
 
     def isNeedInsertClass(CtClass ctClass) {
-        if(Constants.ASPECTJ_AROUND_CLASS.equals(ctClass.getSuperclass().name)){
-            return false;
+        try {
+            if (Constants.ASPECTJ_AROUND_CLASS.equals(ctClass.getSuperclass().name)) {
+                return false;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         String className =ctClass.name;
         //这样子可以在需要埋点的剔除指定的类

@@ -1,25 +1,27 @@
 package com.meituan.robust;
 
 /**
- * Created by zhangmeng on 2017/4/25.
+ * Created by zhangmeng on 2017/5/9.
  */
 
-public class Arguments {
+public class RobustArguments {
     public Object[] paramsArray;
     public Object current;
-    public ChangeQuickRedirect changeQuickRedirect;
-    public boolean isStatic;
+    public  boolean isStatic;
     public int methodNumber;
     public Class[] paramsClassTypes;
     public Class returnType;
+    public String className;
+    public String methodName;
 
-    public Arguments(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber, Class[] paramsClassTypes, Class returnType) {
+    public RobustArguments(Object[] paramsArray, Object current,  boolean isStatic, int methodNumber, Class[] paramsClassTypes, Class returnType, String className, String methodName) {
         this.paramsArray = paramsArray;
         this.current = current;
-        this.changeQuickRedirect = changeQuickRedirect;
         this.isStatic = isStatic;
         this.methodNumber = methodNumber;
         this.paramsClassTypes = paramsClassTypes;
         this.returnType = returnType;
+        this.className = className;
+        this.methodName = methodName;
     }
 }

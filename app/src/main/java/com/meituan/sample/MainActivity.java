@@ -12,7 +12,9 @@ import android.widget.Toast;
 
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
+import com.meituan.sample.extension.LogExtension;
 import com.meituan.sample.robusttest.ImageQualityUtil;
 import com.meituan.sample.robusttest.NoField;
 import com.meituan.sample.robusttest.SampleClass;
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        PatchProxy.registerListener(new LogExtension());
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.button);
