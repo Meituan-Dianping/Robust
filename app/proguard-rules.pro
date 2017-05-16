@@ -16,6 +16,7 @@
 #   public *;
 #}
 -keep class meituan.robust.patch.**{*;}
+-keep class com.meituan.sample.MainActivity2{*;}
 
 -keep class com.google.gson.**{*;}
 -keep class com.meituan.robust.**{*;}

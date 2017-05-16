@@ -42,6 +42,7 @@
     <!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加-->
     <exceptPackname name="exceptPackage">
         <name>com.meituan.robust</name>
+        <name>com.meituan.sample.extension</name>
     </exceptPackname>
 
     <!--补丁的包名，请保持和类PatchManipulateImp中fetchPatchList方法中设置的补丁类名保持一致（ setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl")），

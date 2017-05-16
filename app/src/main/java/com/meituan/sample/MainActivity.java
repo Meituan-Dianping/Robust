@@ -50,11 +50,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        PatchProxy.registerListener(new LogExtension());
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PatchProxy.registerListener(new LogExtension());
+
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);
         state = new State<>(hll);
@@ -103,6 +102,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        MainActivity2 mainActivity2=new MainActivity2(new Object[]{1,2,3});
+        mainActivity2.run(new Object[]{1,2,3});
+
+        System.out.println("in MainActivity end ");
     }
 
     //patch  data report

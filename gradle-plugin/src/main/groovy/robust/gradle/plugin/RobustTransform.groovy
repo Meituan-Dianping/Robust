@@ -16,6 +16,7 @@ import java.util.jar.JarOutputStream
 import java.util.zip.GZIPOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import robust.gradle.plugin.asm.InsertMethodBodyAdapter
 /**
  * Created by mivanzhang on 16/11/3.
  *
@@ -181,17 +182,23 @@ class RobustTransform extends Transform implements Plugin<Project> {
     }
 
     def isNeedInsertClass(CtClass ctClass) {
-        try {
-            if (Constants.ASPECTJ_AROUND_CLASS.equals(ctClass.getSuperclass().name)) {
-                return false;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
+
+//        if(!ctClass.name.equals("com.meituan.sample.MainActivity2")){
+//            return true;
+//        }
+//        try {
+//            if (Constants.ASPECTJ_AROUND_CLASS.equals(ctClass.getSuperclass().name)) {
+//                return false;
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
         String className =ctClass.name;
         //这样子可以在需要埋点的剔除指定的类
         for (String exceptName : exceptPackageList) {
             if (className.startsWith(exceptName)) {
+
                 return false;
             }
         }
@@ -201,24 +208,29 @@ class RobustTransform extends Transform implements Plugin<Project> {
             }
         }
 
-
-
         return false;
     }
     static AtomicInteger insertMethodCount = new AtomicInteger(0);
 
     def insertRobustCode(List<CtClass> box, File jarFile) {
+        def ClassNAme="com.meituan.sample.MainActivity\$AjcClosure1";
         ZipOutputStream outStream=new JarOutputStream(new FileOutputStream(jarFile));
         new ForkJoinPool().submit {
             box.each { ctClass ->
-                if (isNeedInsertClass(ctClass)) {
-                    ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()))
+
+//                if("com.meituan.robust.PatchProxy".equals(ctClass.name)){
+//                    println("in isNeedInsertClass ctClass name "+ctClass.name+"  exceptPackageList is  "+exceptPackageList.toListString()+" isNeedInsertClass "+isNeedInsertClass(ctClass))
+//                }
+                if(isNeedInsertClass(ctClass)&&!ctClass.name.equals(ClassNAme)) {
+//                if (isNeedInsertClass(ctClass)) {
+
                     boolean addIncrementalChange = false;
                     ctClass.declaredBehaviors.findAll {
                         if (ctClass.isInterface() || ctClass.declaredMethods.length < 1) {
                             return false;
                         }
                         if (!addIncrementalChange) {
+                            println("insertRobustCode field changeQuickRedirect class name is "+ctClass.name)
                             addIncrementalChange = true;
                             ClassPool classPool = it.declaringClass.classPool
                             CtClass type = classPool.getOrNull(Constants.INTERFACE_NAME);
@@ -280,15 +292,11 @@ class RobustTransform extends Transform implements Plugin<Project> {
                         // methodMap must be put here
                         methodMap.put(ctBehavior.longName, insertMethodCount.incrementAndGet());
                         try {
-                        if (ctBehavior.getMethodInfo().isMethod()) {
+
+                            if (ctBehavior.getMethodInfo().isMethod()) {
                                 boolean isStatic = ctBehavior.getModifiers() & AccessFlag.STATIC;
                                 CtClass returnType = ctBehavior.getReturnType0();
                                 String returnTypeString = returnType.getName();
-//                                def body = "Object argThis = null;";
-//                                if (!isStatic) {
-//                                    body += "argThis = \$0;"
-//                                }
-//                            def body = "if (${Constants.INSERT_FIELD_NAME} != null) {"
                             def body = "Object argThis = null;"
                             if (!isStatic) {
                                 body += "argThis = \$0;"
@@ -308,7 +316,16 @@ class RobustTransform extends Transform implements Plugin<Project> {
                         }
                     }
                     }
-                zipFile(ctClass.toBytecode(),outStream,ctClass.name.replaceAll("\\.","/")+".class");
+
+
+                if(ctClass.name.equals(ClassNAme)){
+//                if(ctClass.name.equals("com.meituan.sample.MainActivity2")){
+                    println(" insert code by asm in com.meituan.sample.MainActivity\$AjcClosure1")
+                    zipFile(InsertMethodBodyAdapter.deCode(ctClass.toBytecode(),ctClass.name.replaceAll("\\.","/"),String.valueOf(insertMethodCount.get())),outStream,ctClass.name.replaceAll("\\.","/")+".class");
+                }else {
+                    zipFile(ctClass.toBytecode(), outStream, ctClass.name.replaceAll("\\.", "/") + ".class");
+                }
+//                zipFile(ctClass.toBytecode(), outStream, ctClass.name.replaceAll("\\.", "/") + ".class");
             }
         }.get()
         outStream.close();
@@ -332,11 +349,15 @@ class RobustTransform extends Transform implements Plugin<Project> {
     }
 
     def void zipFile(byte[] classBytesArray, ZipOutputStream zos, String entryName){
-        ZipEntry entry = new ZipEntry(entryName);
-        zos.putNextEntry(entry);
-        zos.write(classBytesArray,0,classBytesArray.length);
-        zos.closeEntry()
-        zos.flush();
+        try {
+            ZipEntry entry = new ZipEntry(entryName);
+            zos.putNextEntry(entry);
+            zos.write(classBytesArray, 0, classBytesArray.length);
+            zos.closeEntry()
+            zos.flush();
+        }catch (Exception e){
+            e.printStackTrace()
+        }
     }
 
 
