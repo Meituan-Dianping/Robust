@@ -145,7 +145,6 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
         ClassPool classPool = new ClassPool()
         project.android.bootClasspath.each {
-//            logger.debug "android.bootClasspath   " + (String) it.absolutePath
             classPool.appendClassPath((String) it.absolutePath)
         }
 
@@ -213,14 +212,12 @@ class RobustTransform extends Transform implements Plugin<Project> {
     static AtomicInteger insertMethodCount = new AtomicInteger(0);
 
     def insertRobustCode(List<CtClass> box, File jarFile) {
-        def ClassNAme="com.meituan.sample.MainActivity\$AjcClosure1";
+//        def ClassNAme="com.meituan.sample.MainActivity\$AjcClosure1";
+        def ClassNAme="com.meituan.sample.MainActivity";
         ZipOutputStream outStream=new JarOutputStream(new FileOutputStream(jarFile));
         new ForkJoinPool().submit {
             box.each { ctClass ->
 
-//                if("com.meituan.robust.PatchProxy".equals(ctClass.name)){
-//                    println("in isNeedInsertClass ctClass name "+ctClass.name+"  exceptPackageList is  "+exceptPackageList.toListString()+" isNeedInsertClass "+isNeedInsertClass(ctClass))
-//                }
                 if(isNeedInsertClass(ctClass)&&!ctClass.name.equals(ClassNAme)) {
 //                if (isNeedInsertClass(ctClass)) {
 
@@ -291,40 +288,40 @@ class RobustTransform extends Transform implements Plugin<Project> {
                     }.each { ctBehavior ->
                         // methodMap must be put here
                         methodMap.put(ctBehavior.longName, insertMethodCount.incrementAndGet());
-                        try {
-
-                            if (ctBehavior.getMethodInfo().isMethod()) {
-                                boolean isStatic = ctBehavior.getModifiers() & AccessFlag.STATIC;
-                                CtClass returnType = ctBehavior.getReturnType0();
-                                String returnTypeString = returnType.getName();
-                            def body = "Object argThis = null;"
-                            if (!isStatic) {
-                                body += "argThis = \$0;"
-                            }
-                                String parametersClassType=getParametersClassType(ctBehavior as CtMethod)
+//                        try {
+//
+//                            if (ctBehavior.getMethodInfo().isMethod()) {
+//                                boolean isStatic = ctBehavior.getModifiers() & AccessFlag.STATIC;
+//                                CtClass returnType = ctBehavior.getReturnType0();
+//                                String returnTypeString = returnType.getName();
+//                            def body = "Object argThis = null;"
+//                            if (!isStatic) {
+//                                body += "argThis = \$0;"
+//                            }
+//                                String parametersClassType=getParametersClassType(ctBehavior as CtMethod)
+////                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
 //                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
-                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
-                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.longName),parametersClassType,returnTypeString+".class");
-                                body += "   }"
+//                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.longName),parametersClassType,returnTypeString+".class");
 //                                body += "   }"
-//                                println("before insert body "+body);
-                                ctBehavior.insertBefore(body);
-                            }
-                        } catch (Throwable t ) {
-                            t.printStackTrace();
-                            logger.error "ctClass: " + ctClass.getName() + " error: " + t.getMessage();
-                        }
+////                                body += "   }"
+////                                println("before insert body "+body);
+//                                ctBehavior.insertBefore(body);
+//                            }
+//                        } catch (Throwable t ) {
+//                            t.printStackTrace();
+//                            logger.error "ctClass: " + ctClass.getName() + " error: " + t.getMessage();
+//                        }
                     }
                     }
 
 
-                if(ctClass.name.equals(ClassNAme)){
+//                if(ctClass.name.equals(ClassNAme)){
 //                if(ctClass.name.equals("com.meituan.sample.MainActivity2")){
-                    println(" insert code by asm in com.meituan.sample.MainActivity\$AjcClosure1")
+//                    println(" insert code by asm in com.meituan.sample.MainActivity\$AjcClosure1")
                     zipFile(InsertMethodBodyAdapter.deCode(ctClass.toBytecode(),ctClass.name.replaceAll("\\.","/"),String.valueOf(insertMethodCount.get())),outStream,ctClass.name.replaceAll("\\.","/")+".class");
-                }else {
-                    zipFile(ctClass.toBytecode(), outStream, ctClass.name.replaceAll("\\.", "/") + ".class");
-                }
+//                }else {
+//                    zipFile(ctClass.toBytecode(), outStream, ctClass.name.replaceAll("\\.", "/") + ".class");
+//                }
 //                zipFile(ctClass.toBytecode(), outStream, ctClass.name.replaceAll("\\.", "/") + ".class");
             }
         }.get()

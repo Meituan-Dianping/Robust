@@ -6,7 +6,7 @@ apply plugin: 'robust'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.meituan.robust.sample"
         minSdkVersion 9

@@ -11,7 +11,12 @@ public class PatchProxy {
     private static Set<RobustExtension> registerSet=new LinkedHashSet<>();
     private static RobustExtension executedExtension=null;
 
+    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes) {
+        System.out.println("arrived in hook isSupport ");
+        return true;
+    }
     static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+        System.out.println("arrived in really isSupport ");
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
@@ -35,7 +40,12 @@ public class PatchProxy {
         }
     }
 
+    static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber) {
+        System.out.println("arrived in hook accessDispatch ");
+        return "accessDispatch";
+    }
     static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+        System.out.println("arrived in real accessDispatch ");
         if (changeQuickRedirect == null) {
             if(executedExtension!=null){
                 return executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
@@ -47,6 +57,9 @@ public class PatchProxy {
         return  changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
 
+    static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber) {
+        System.out.println("arrived in hook accessDispatchVoid ");
+    }
     static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
             if(executedExtension!=null){
