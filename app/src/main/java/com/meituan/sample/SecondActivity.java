@@ -64,10 +64,10 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         Class clsArr = null;
         try {
             clsArr = Class.forName("[Ljava/lang/Object;");
+            System.out.println(clsArr.getName());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        System.out.println(clsArr.getName());
         // belows are test!!,you may ignore
         // belows are test!!,you may ignore
         // belows are test!!,you may ignore

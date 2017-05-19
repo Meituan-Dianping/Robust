@@ -9,6 +9,7 @@ import javassist.expr.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
+import robust.gradle.plugin.javaassist.JavaAssistInsertImpl
 
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicInteger
@@ -35,7 +36,10 @@ class RobustTransform extends Transform implements Plugin<Project> {
     private static boolean isExceptMethodLevel = false;
 //    private static boolean isForceInsert = true;
     private static boolean isForceInsert = false;
+    private static boolean useASM = false;
+//    private static boolean useASM = true;
     def robust
+    InsertcodeStrategy insertcodeStrategy;
 
     @Override
     void apply(Project target) {
@@ -151,8 +155,11 @@ class RobustTransform extends Transform implements Plugin<Project> {
         def box = ConvertUtils.toCtClasses(inputs, classPool)
         def cost = (System.currentTimeMillis() - startTime) / 1000
 //        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
-        insertRobustCode(box, jarFile)
-        writeMap2File(methodMap, Constants.METHOD_MAP_OUT_PATH)
+        if(!useASM){
+            insertcodeStrategy=new JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
+        }
+        insertcodeStrategy.inserCode(box, jarFile);
+        writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "robust cost $cost second"
         logger.quiet '================robust   end================'

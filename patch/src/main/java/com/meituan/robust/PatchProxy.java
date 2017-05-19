@@ -11,7 +11,7 @@ public class PatchProxy {
     private static Set<RobustExtension> registerSet=new LinkedHashSet<>();
     private static RobustExtension executedExtension=null;
 
-    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes) {
+    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber) {
         System.out.println("arrived in hook isSupport ");
         return true;
     }
