@@ -37,10 +37,9 @@ public abstract class InsertcodeStrategy {
         insertMethodCount.set(0);
     }
 
-    protected abstract void inserCode(List<CtClass> box, File jarFile) throws CannotCompileException, IOException, NotFoundException;
-    protected  boolean isNeedInsertClass(CtClass ctClass) {
+    protected abstract void insertCode(List<CtClass> box, File jarFile) throws CannotCompileException, IOException, NotFoundException;
+    protected  boolean isNeedInsertClass(String className) {
 
-        String className =ctClass.getName();
         //这样子可以在需要埋点的剔除指定的类
         for (String exceptName : exceptPackageList) {
             if (className.startsWith(exceptName)) {

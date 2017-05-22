@@ -9,6 +9,7 @@ import org.objectweb.asm.commons.GeneratorAdapter;
 
 import java.util.List;
 
+
 public final class RobustAsmUtils {
 
 	public final static String REDIRECTFIELD_NAME = "changeQuickRedirect";
@@ -44,13 +45,6 @@ public final class RobustAsmUtils {
 	 * @param isStatic
 	 */
 	public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId){
-		//获取changeQuickRedirect静态变量
-//		mv.visitFieldInsn(Opcodes.GETSTATIC,
-//				className,
-//				REDIRECTFIELD_NAME,
-//				REDIRECTCLASSNAME);
-		Label l1 = new Label();
-//		mv.visitJumpInsn(Opcodes.IFNULL, l1);
 
 		/**
 		 * 调用isSupport方法
@@ -61,35 +55,8 @@ public final class RobustAsmUtils {
 				PROXYCLASSNAME,
 				"isSupport",
 				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZI[Ljava/lang/Class;Ljava/lang/Class;)Z");
+		Label l1 = new Label();
 		mv.visitJumpInsn(Opcodes.IFEQ, l1);
-
-//		/**
-//		 * 调用accessDispatch方法
-//		 */
-//		//第一个参数：new Object[]{...};,如果方法没有参数直接传入new Object[0]
-//		if(args.size() == 0){
-//			mv.visitInsn(Opcodes.ICONST_0);
-//			mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/Object");
-//		}else{
-//			createObjectArray(mv, args, isStatic);
-//		}
-//
-//		//第二个参数：this,如果方法是static的话就直接传入null
-//		if(isStatic){
-//			mv.visitInsn(Opcodes.ACONST_NULL);
-//		}else{
-//			mv.visitVarInsn(Opcodes.ALOAD, 0);
-//		}
-//
-//		//第三个参数:changeQuickRedirect
-//		mv.visitFieldInsn(Opcodes.GETSTATIC,
-//				className,
-//				REDIRECTFIELD_NAME,
-//				REDIRECTCLASSNAME);
-//		//第四个参数：false,标志是否为static
-//		mv.visitInsn(isStatic ? Opcodes.ICONST_1 : Opcodes.ICONST_0);
-//		//第五个参数：methodid
-//		mv.push(methodId);
 		prepareMethodParameters(mv,className,args,returnType,isStatic,methodId);
 		//开始调用
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC,
@@ -222,7 +189,7 @@ public final class RobustAsmUtils {
 				mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Long", "TYPE", "Ljava/lang/Class;");
 				break;
 			case "V":
-				mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Void/", "TYPE", "Ljava/lang/Class;");
+				mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Void", "TYPE", "Ljava/lang/Class;");
 				break;
 			default:
 				mv.visitLdcInsn(Type.getType(arg.getDescriptor()));

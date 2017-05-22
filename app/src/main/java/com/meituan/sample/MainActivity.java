@@ -104,9 +104,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-//        MainActivity2 mainActivity2=new MainActivity2(new Object[]{1,2,3});
-//        mainActivity2.run(new Object[]{1,2,3});
-
+        MainActivity2 mainActivity2=new MainActivity2(new Object[]{1,2,3});
+        mainActivity2.run(new Object[]{1,2,3});
+//
         System.out.println(" run(String x) "+run("robust ",123));
         System.out.println("  run(People x) "+run(new People(),123d));
         System.out.println("  run(float x) "+run(123f));
