@@ -40,6 +40,7 @@ public class PatchProxy {
     static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
             if(executedExtension!=null){
+                notify(executedExtension.describeSelfFunction());
                 return executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return null;
@@ -52,6 +53,7 @@ public class PatchProxy {
     static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
             if(executedExtension!=null){
+                notify(executedExtension.describeSelfFunction());
                 executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return;
