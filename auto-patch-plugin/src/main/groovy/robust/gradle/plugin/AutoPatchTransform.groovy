@@ -5,7 +5,7 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.meituan.robust.Constants
 import com.meituan.robust.autopatch.*
 import com.meituan.robust.utils.JavaUtils
-import com.meituan.robust.utils.SmaliUitils
+import com.meituan.robust.utils.SmaliTool
 import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.CtMethod
@@ -141,7 +141,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         zipPatchClassesFile()
         executeCommand(jar2DexCommand)
         executeCommand(dex2SmaliCommand)
-        SmaliUitils.getInstance().dealObscureInSmali();
+        SmaliTool.getInstance().dealObscureInSmali();
         executeCommand(smali2DexCommand)
         //package patch.dex to patch.jar
         packagePatchDex2Jar()

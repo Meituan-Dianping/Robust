@@ -9,6 +9,8 @@ Robust is an Android HotFix solution with high compatibility and high stability.
  
  [中文说明](README-zh.md)
  
+ [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+ 
 # Environment
 
  * Mac Linux and Windows
@@ -24,7 +26,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	//please uncomment fellow line before you build a patch
 	//apply plugin: 'auto-patch-plugin'
 	apply plugin: 'robust'
-	compile 'com.meituan.robust:robust:0.3.8'
+	compile 'com.meituan.robust:robust:0.4.0'
 	```
 2. Add below codes in the outest project's build.gradle file.
 
@@ -34,8 +36,8 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.8'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.8'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.0'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.0'
 	   }
 	}
 	```

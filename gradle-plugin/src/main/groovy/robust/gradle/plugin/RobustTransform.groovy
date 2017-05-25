@@ -93,6 +93,14 @@ class RobustTransform extends Transform implements Plugin<Project> {
         if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnHotfixMethod.text()))) {
             isHotfixMethodLevel = true;
         }
+
+        if (null != robust.switch.useAsm && "false".equals(String.valueOf(robust.switch.useAsm.text()))) {
+            useASM = false;
+        }else {
+            //默认使用asm
+            useASM = true;
+        }
+
         if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnExceptMethod.text()))) {
             isExceptMethodLevel = true;
         }
@@ -154,6 +162,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         }
         insertcodeStrategy.insertCode(box, jarFile);
         writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)
+
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "robust cost $cost second"
         logger.quiet '================robust   end================'

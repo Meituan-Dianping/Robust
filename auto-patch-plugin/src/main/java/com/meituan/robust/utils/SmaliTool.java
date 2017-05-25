@@ -31,17 +31,17 @@ import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
  * Created by mivanzhang on 17/2/8.
  */
 
-public class SmaliUitils {
-    private static SmaliUitils instance;
+public class SmaliTool {
+    private static SmaliTool instance;
 
-    public static SmaliUitils getInstance() {
+    public static SmaliTool getInstance() {
         if (instance == null) {
-            instance = new SmaliUitils();
+            instance = new SmaliTool();
         }
         return instance;
     }
 
-    private SmaliUitils() {
+    private SmaliTool() {
 
     }
 
@@ -223,7 +223,7 @@ public class SmaliUitils {
 
     }
     public static void main(String[] args) {
-        SmaliUitils smaliUitils=new SmaliUitils();
+        SmaliTool smaliUitils=new SmaliTool();
         smaliUitils.getObscuredMethodSignure("invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;","com.meituan.second");
     }
     private  String getObscuredMethodSignure(final String line, String className) {

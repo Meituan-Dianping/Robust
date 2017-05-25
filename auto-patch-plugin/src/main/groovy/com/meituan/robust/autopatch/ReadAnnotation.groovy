@@ -129,6 +129,8 @@ class ReadAnnotation {
 
     public static Set addPatchMethodAndModifiedClass(Set patchMethodSignureSet, CtMethod method) {
         if (Config.methodMap.get(method.longName) == null) {
+            print("addPatchMethodAndModifiedClass pint methodmap ");
+            JavaUtils.printMap(Config.methodMap);
             throw new GroovyException("patch method " + method.longName + " haven't insert code by Robust.Cannot patch this method, method.signature  " + method.signature + "  ");
         }
         Modify methodModifyAnootation = method.getAnnotation(Constants.ModifyAnnotationClass) as Modify;
