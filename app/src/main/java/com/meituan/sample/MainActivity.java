@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PatchProxy.registerListener(new LogExtension());
+        PatchProxy.register(new LogExtension());
 
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);

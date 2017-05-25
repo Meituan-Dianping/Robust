@@ -71,7 +71,7 @@ public class ReadMapping {
                         }
                         String[] lineinfo = line.split(" ");
                         if (lineinfo.length != 4) {
-                            throw new RuntimeException("line info is error  " + line);
+                            throw new RuntimeException("mapping line info is error  " + line);
                         }
                         if (lineinfo[1].contains("(") && lineinfo[1].contains(")")) {
                             //methods need return type

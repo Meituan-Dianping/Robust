@@ -13,7 +13,7 @@ public class Patch implements Cloneable {
     }
 
     public void setName(String name) {
-        this.name = name;
+        Object o=new Object();
     }
 
     public String getUrl() {

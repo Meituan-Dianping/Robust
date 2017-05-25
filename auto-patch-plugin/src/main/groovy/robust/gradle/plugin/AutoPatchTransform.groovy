@@ -59,6 +59,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         jar2DexCommand = "   java -jar ${dxFilePath} --dex --output=$Constants.CLASSES_DEX_NAME  " + Constants.ZIP_FILE_NAME;
         ReadXML.readXMl(project.projectDir.path);
         Config.methodMap = JavaUtils.getMapFromZippedFile(project.projectDir.path + Constants.METHOD_MAP_PATH)
+        JavaUtils.printMap(Config.methodMap)
     }
 
     @Override
