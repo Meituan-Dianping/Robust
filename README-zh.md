@@ -43,7 +43,13 @@
 	}
 	```
 3. 需要在项目的src同级目录下配置部分配置robust.xml文件，具体项请参考**app/robust.xml**，在这里面有多个配置项。
- 
+4. 需要在项目的proguard-rules.pro加入robust的相关keep
+    ```java
+    -keep class meituan.robust.patch.**{*;}
+    -keep class com.meituan.robust.**{*;}
+    -keepattributes *Annotation*
+    ```
+
 # 优势
 
 * 支持Android2.3-7.X版本
