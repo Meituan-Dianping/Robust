@@ -9,7 +9,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
  
  [中文说明](README-zh.md)
  
- [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+ More help on [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
  
 # Environment
 

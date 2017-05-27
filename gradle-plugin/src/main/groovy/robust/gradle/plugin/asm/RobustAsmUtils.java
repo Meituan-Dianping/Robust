@@ -1,6 +1,5 @@
 package robust.gradle.plugin.asm;
 
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
@@ -14,27 +13,7 @@ public final class RobustAsmUtils {
 
 	public final static String REDIRECTFIELD_NAME = "changeQuickRedirect";
 	public final static String REDIRECTCLASSNAME = Type.getDescriptor(com.meituan.robust.ChangeQuickRedirect.class);
-//	public final static String PROXYCLASSNAME = PatchProxy.class.getName().replace(".", "/");
 	public final static String PROXYCLASSNAME = "com.meituan.robust.PatchProxy".replace(".", "/");
-
-	public static void addClassStaticField(ClassVisitor cv, String fieldName, Class<?> typeClass){
-		cv.visitField(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC, fieldName,
-				Type.getDescriptor(typeClass), null, null);
-	}
-
-	public static void addClassStaticField(ClassVisitor cv, String fieldName, String typeClass){
-		cv.visitField(Opcodes.ACC_PUBLIC|Opcodes.ACC_STATIC, fieldName, typeClass, null, null);
-	}
-
-	public static void setClassStaticFieldValue(MethodVisitor mv, String className, String fieldName, String typeSign){
-		mv.visitFieldInsn(Opcodes.PUTSTATIC, className, fieldName, typeSign);
-	}
-
-	public static void getClassStaticFieldValue(MethodVisitor mv, String className, String fieldName, String typeSign){
-		mv.visitFieldInsn(Opcodes.GETSTATIC, className, fieldName, typeSign);
-	}
-
-
 
 	/**
 	 * 插入代码
@@ -146,7 +125,7 @@ public final class RobustAsmUtils {
 //			 mv.box(arg);
 			 mv.arrayStore(Type.getType(Class.class));
 			 // stack index must progress according to the parameter type we just processed.
-			 stackIndex += arg.getSize();
+//			 stackIndex += arg.getSize();
 		 }
 	 }
 
@@ -162,7 +141,6 @@ public final class RobustAsmUtils {
 	 * Pushes in the stack the value that should be redirected for the given local.
 	 */
 	protected static void redirectLocal(GeneratorAdapter mv, Type arg) {
-//		mv.visitVarInsn(arg.getOpcode(Opcodes.ILOAD), local);
 		switch (arg.getDescriptor()){
 			case "Z":
 				mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/Boolean", "TYPE", "Ljava/lang/Class;");

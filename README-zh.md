@@ -9,7 +9,7 @@
  
  [English Introduction](README.md)
  
-  [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+  关于如何定制化以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
  
 # 环境
 
