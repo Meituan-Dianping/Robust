@@ -1,27 +1,28 @@
 package com.meituan.robust;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by c_kunwu on 16/7/5.
  */
 public class PatchProxy {
 
-    private static Set<RobustExtension> registerSet=new LinkedHashSet<>();
-    private static RobustExtension executedExtension=null;
+    private static List<RobustExtension> registerExtensionList;
+    private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
 
     static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
-            if(registerSet==null||registerSet.isEmpty()){
+            if(registerExtensionList ==null|| registerExtensionList.isEmpty()){
                 return false;
             }
-            for(RobustExtension robustExtension:registerSet){
+            for(RobustExtension robustExtension: registerExtensionList){
                 if(robustExtension.isSupport(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()))){
-                    executedExtension=robustExtension;
+                    robustExtensionThreadLocal.set(robustExtension);
                     return true;
                 }
             }
@@ -39,25 +40,26 @@ public class PatchProxy {
 
     static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
-            if(executedExtension!=null){
-                notify(executedExtension.describeSelfFunction());
-                return executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
+            if(robustExtensionThreadLocal.get() !=null){
+                notify(robustExtensionThreadLocal.get().describeSelfFunction());
+                return robustExtensionThreadLocal.get().accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return null;
         }
-
+        notify(Constants.PATCH_EXECUTE);
         Object[] objects = getObjects(paramsArray,  current,  isStatic);
         return  changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
 
     static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
-            if(executedExtension!=null){
-                notify(executedExtension.describeSelfFunction());
-                executedExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
+            if(robustExtensionThreadLocal.get() !=null){
+                notify(robustExtensionThreadLocal.get().describeSelfFunction());
+                robustExtensionThreadLocal.get().accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return;
         }
+        notify(Constants.PATCH_EXECUTE);
         Object[] objects = getObjects( paramsArray,  current,  isStatic);
         changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
@@ -101,29 +103,42 @@ public class PatchProxy {
      * @return
      */
     public static boolean register(RobustExtension robustExtension){
-        if(registerSet==null){
-            registerSet=new LinkedHashSet<RobustExtension>();
+        if(registerExtensionList ==null){
+            registerExtensionList =new CopyOnWriteArrayList<RobustExtension>();
         }
-        return registerSet.add(robustExtension);
+        if(!registerExtensionList.contains(robustExtension)) {
+            return registerExtensionList.add(robustExtension);
+        }else {
+            return true;
+        }
     }
 
     public static boolean unregister(RobustExtension robustExtension){
-        if(registerSet==null){
+        if(registerExtensionList ==null){
             return false;
         }
-        if(robustExtension.equals(executedExtension)){
-            executedExtension=null;
+        if(robustExtension.equals(robustExtensionThreadLocal.get())){
+            robustExtensionThreadLocal =null;
         }
-        return registerSet.remove(robustExtension);
+        return registerExtensionList.remove(robustExtension);
+    }
+
+    /**
+     * if you do not want your robustExtensionThreadLocal executed, please invoke this method
+     */
+    public static void reset(){
+        registerExtensionList =new CopyOnWriteArrayList<RobustExtension>();
+        robustExtensionThreadLocal.set(null);
     }
 
     private static void notify(String info){
-       for(RobustExtension robustExtension:registerSet){
+        if(registerExtensionList ==null){
+            return;
+        }
+
+       for(RobustExtension robustExtension: registerExtensionList){
            robustExtension.notifyListner(info);
-           registerSet.remove(robustExtension);
        }
-        //手动制空，防止内存泄漏
-        registerSet=null;
     }
 
 }
