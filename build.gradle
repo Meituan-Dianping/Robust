@@ -30,9 +30,6 @@ allprojects {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url "http://depot.sankuai.com/nexus/content/groups/public/"
-        }
     }
     tasks.withType(JavaCompile) { options.encoding = "UTF-8" }
 }

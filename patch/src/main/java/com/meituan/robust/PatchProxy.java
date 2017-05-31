@@ -1,6 +1,5 @@
 package com.meituan.robust;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -13,7 +12,7 @@ public class PatchProxy {
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
 
-    static public boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
@@ -38,11 +37,14 @@ public class PatchProxy {
     }
 
 
-    static public Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+
         if (changeQuickRedirect == null) {
-            if(robustExtensionThreadLocal.get() !=null){
-                notify(robustExtensionThreadLocal.get().describeSelfFunction());
-                return robustExtensionThreadLocal.get().accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
+            RobustExtension robustExtension = robustExtensionThreadLocal.get();
+            robustExtensionThreadLocal.remove();
+            if(robustExtension !=null){
+                notify(robustExtension.describeSelfFunction());
+                return robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return null;
         }
@@ -51,11 +53,13 @@ public class PatchProxy {
         return  changeQuickRedirect.accessDispatch(String.valueOf(isStatic+":"+methodNumber), objects);
     }
 
-    static public void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
-            if(robustExtensionThreadLocal.get() !=null){
-                notify(robustExtensionThreadLocal.get().describeSelfFunction());
-                robustExtensionThreadLocal.get().accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
+            RobustExtension robustExtension = robustExtensionThreadLocal.get();
+            robustExtensionThreadLocal.remove();
+            if(robustExtension !=null){
+                notify(robustExtension.describeSelfFunction());
+                robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,getClassName(),getMethodName()));
             }
             return;
         }
@@ -65,7 +69,7 @@ public class PatchProxy {
     }
 
 
-    static private Object[] getObjects(Object[] arrayOfObject, Object current, boolean isStatic) {
+    private static Object[] getObjects(Object[] arrayOfObject, Object current, boolean isStatic) {
         Object[] objects;
         if (arrayOfObject == null) {
             return null;
@@ -86,12 +90,12 @@ public class PatchProxy {
         return objects;
     }
 
-   public static  String getClassName() {
+   public static String getClassName() {
             java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
             return stackTraceElement.getClassName();
     }
 
-    public static  String getMethodName() {
+    public static String getMethodName() {
         java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
         return stackTraceElement.getMethodName();
     }
@@ -117,9 +121,6 @@ public class PatchProxy {
         if(registerExtensionList ==null){
             return false;
         }
-        if(robustExtension.equals(robustExtensionThreadLocal.get())){
-            robustExtensionThreadLocal =null;
-        }
         return registerExtensionList.remove(robustExtension);
     }
 
@@ -128,14 +129,13 @@ public class PatchProxy {
      */
     public static void reset(){
         registerExtensionList =new CopyOnWriteArrayList<RobustExtension>();
-        robustExtensionThreadLocal.set(null);
+        robustExtensionThreadLocal.remove();
     }
 
     private static void notify(String info){
         if(registerExtensionList ==null){
             return;
         }
-
        for(RobustExtension robustExtension: registerExtensionList){
            robustExtension.notifyListner(info);
        }
