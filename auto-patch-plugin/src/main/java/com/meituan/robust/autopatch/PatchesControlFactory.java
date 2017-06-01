@@ -52,7 +52,7 @@ public class PatchesControlFactory {
         }
         //create patch instance
         accessDispatchMethodBody.append(patchClass.getName() + " patch= null;\n");
-        accessDispatchMethodBody.append(" String isStatic=$1.split(\":\")[0];");
+        accessDispatchMethodBody.append(" String isStatic=$1.split(\":\")[2];");
         accessDispatchMethodBody.append(" if (isStatic.equals(\"false\")) {\n");
         accessDispatchMethodBody.append(" if (keyToValueRelation.get(paramArrayOfObject[paramArrayOfObject.length - 1]) == null) {\n");
         if (Constants.isLogging) {
@@ -70,7 +70,7 @@ public class PatchesControlFactory {
         }
         accessDispatchMethodBody.append("patch=new " + patchClass.getName() + "(null);\n");
         accessDispatchMethodBody.append("}");
-        accessDispatchMethodBody.append("String methodNo=$1.split(\":\")[1];\n");
+        accessDispatchMethodBody.append("String methodNo=$1.split(\":\")[3];\n");
         if (Constants.isLogging) {
             accessDispatchMethodBody.append("  android.util.Log.d(\"robust\",\"assemble method number  is  \" + methodNo);");
         }
@@ -147,9 +147,9 @@ public class PatchesControlFactory {
         if (Constants.isLogging) {
             isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject);");
         }
-//        isSupportBuilder.append("String methodNo=$1.split(\":\")[3];\n");
+        isSupportBuilder.append("String methodNo=$1.split(\":\")[3];\n");
         if (Constants.isLogging) {
-            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"in isSupport assemble method number  is  \" + $1);");
+            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"in isSupport assemble method number  is  \" + methodNo);");
         }
         for (CtMethod method : patchClass.getDeclaredMethods()) {
             String methodSignure = JavaUtils.getJavaMethodSignure(method).replaceAll(patchClass.getName(), modifiedClassName);
@@ -162,9 +162,9 @@ public class PatchesControlFactory {
         }
 
         if (Constants.isLogging) {
-            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains($1));");
+            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains(methodNo));");
         }
-        isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains($1);");
+        isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains(methodNo);");
         return isSupportBuilder.toString();
     }
 
