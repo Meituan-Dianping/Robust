@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class PatchProxy {
 
-    private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<RobustExtension>();;
+    private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
 
@@ -143,11 +143,11 @@ public class PatchProxy {
     }
 
     /**
-     * if you do not want your robustExtensionThreadLocal executed, please invoke this method
+     * clear registerExtensionList and executing robustExtension
      */
     public static void reset(){
-        registerExtensionList =new CopyOnWriteArrayList<RobustExtension>();
-        robustExtensionThreadLocal.remove();
+        registerExtensionList =new CopyOnWriteArrayList<>();
+        robustExtensionThreadLocal =new ThreadLocal<>();
     }
 
     private static void notify(String info){
