@@ -105,7 +105,10 @@ public class PatchProxy {
     private static String getClassMethod(boolean isStatic, int methodNumber) {
         String classMethod = "";
         try {
-            classMethod = getClassName() + ":" + getMethodName() + ":" + isStatic + ":" + methodNumber;
+            java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
+            String methodName = stackTraceElement.getMethodName();
+            String className = stackTraceElement.getClassName();
+            classMethod = className + ":" + methodName + ":" + isStatic + ":" + methodNumber;
         }catch (Exception e){
 
         }
