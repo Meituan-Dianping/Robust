@@ -4,7 +4,6 @@ import com.android.utils.AsmUtils;
 import com.meituan.robust.ChangeQuickRedirect;
 import com.meituan.robust.Constants;
 
-import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -199,7 +198,7 @@ public class AsmInsertImpl extends InsertcodeStrategy {
     }
     public  byte [] transformCode2(byte []b1, String className) throws IOException {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-        InsertMethodBodyAdapter insertMethodBodyAdapter=new InsertMethodBodyAdapter(cw,className,new HashedMap());
+        InsertMethodBodyAdapter insertMethodBodyAdapter=new InsertMethodBodyAdapter(cw,className,new HashMap());
         ClassReader cr = new ClassReader(b1);
         cr.accept(insertMethodBodyAdapter,ClassReader.EXPAND_FRAMES);
         return cw.toByteArray();
