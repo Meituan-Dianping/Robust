@@ -9,6 +9,8 @@
  
  [English Introduction](README.md)
  
+  关于如何定制化以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+ 
 # 环境
 
  * Mac Linux Windows
@@ -26,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.3.8'
+	compile 'com.meituan.robust:robust:0.4.0'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -37,8 +39,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.8'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.8'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.0'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.0'
 	   }
 	}
 	```

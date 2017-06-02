@@ -60,9 +60,14 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 }
         );
         //change text on the  SecondActivity
-        textView.setText(getTextInfo(name));
-
-
+        textView.setText(getTextInfo(new Object[]{(name)}));
+//        Class clsArr = null;
+//        try {
+//            clsArr = Class.forName("[Ljava/lang/Object;");
+//            System.out.println(clsArr.getName());
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
         // belows are test!!,you may ignore
         // belows are test!!,you may ignore
         // belows are test!!,you may ignore
@@ -91,7 +96,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
      * if you change the return value you will change the show text,in the demo we built a patch to change the text
      */
     @Modify
-    public String getTextInfo(String meituan) {
+    public String getTextInfo(Object[] meituan) {
         People p = new People();
         p.setName("mivazhang");
         p.setCates("  AutoPatch");
@@ -102,10 +107,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 //        Arrays.fill(multiArr,"修复后的数据");
 //        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
         return "error occur " + concreateClass.getA();
+
     }
 
     @Add
-    public String[] getArray(String meituan) {
+    public String[] getArray(Object[] meituan) {
         People p = new People();
         p.setName("mivazhang");
        return new String[]{p.getName(),"meituan"};

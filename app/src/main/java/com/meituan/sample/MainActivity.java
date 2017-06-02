@@ -12,9 +12,12 @@ import android.widget.Toast;
 
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
+import com.meituan.sample.extension.LogExtension;
 import com.meituan.sample.robusttest.ImageQualityUtil;
 import com.meituan.sample.robusttest.NoField;
+import com.meituan.sample.robusttest.People;
 import com.meituan.sample.robusttest.SampleClass;
 import com.meituan.sample.robusttest.State;
 import com.meituan.sample.robusttest.Super;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PatchProxy.register(new LogExtension());
+
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);
         state = new State<>(hll);
@@ -98,6 +103,32 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        MainActivity2 mainActivity2=new MainActivity2(new Object[]{1,2,3});
+        mainActivity2.run(new Object[]{1,2,3});
+//
+        System.out.println(" run(String x) "+run("robust ",123));
+        System.out.println("  run(People x) "+run(new People(),123d));
+        System.out.println("  run(float x) "+run(123f));
+        System.out.println("  double run() "+run());
+        System.out.println("in MainActivity end ");
+    }
+
+
+
+    private String run(String x,int p){
+        return x+"meituan";
+    }
+    private String run(People x,double d){
+        x.setAddr("meituan");
+        return x.getAddr();
+    }
+    private int run(float x){
+        return (int)x;
+    }
+
+    private double run(){
+        return 1d;
     }
 
     //patch  data report
