@@ -201,8 +201,8 @@ class ReflectUtils {
                 isArray=true;
             }
         }
-        if (signureBuilder.toString().length() > 0 && String.valueOf(signureBuilder.charAt(signureBuilder.toString().length() - 1)).equals(","))
-            signureBuilder.deleteCharAt(signureBuilder.toString().length() - 1);
+        if (signureBuilder.length() > 0 && String.valueOf(signureBuilder.charAt(signureBuilder.length() - 1)).equals(","))
+            signureBuilder.deleteCharAt(signureBuilder.length() - 1);
 //        println("ggetParameterClassSignure   " + signureBuilder.toString())
         return signureBuilder.toString();
     }
@@ -490,7 +490,7 @@ class ReflectUtils {
                     value = name;
                 }
                 AutoPatchTransform.logger.warn("Warning  class name  " + name + "   can not find in mapping !! ")
-//                printMap(memberMappingInfo)
+//                JavaUtils.printMap(memberMappingInfo)
             }
             return value;
         } else {

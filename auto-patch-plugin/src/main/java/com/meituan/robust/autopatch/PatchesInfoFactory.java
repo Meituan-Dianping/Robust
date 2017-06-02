@@ -43,6 +43,7 @@ public class PatchesInfoFactory {
             ctPatchesInfoImpl.addMethod(m);
             return ctPatchesInfoImpl;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }

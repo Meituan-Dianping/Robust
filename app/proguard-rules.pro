@@ -15,10 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class meituan.robust.patch.**{*;}
-
--keep class com.google.gson.**{*;}
--keep class com.meituan.robust.**{*;}
+-keep class com.meituan.sample.MainActivity2{*;}
 -dontwarn
 -keepattributes Signature,SourceFile,LineNumberTable
 -keepattributes *Annotation*

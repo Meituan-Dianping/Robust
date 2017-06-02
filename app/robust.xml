@@ -28,6 +28,10 @@
         <!--项目是否支持progaurd-->
         <proguard>true</proguard>
         <!--<proguard>false</proguard>-->
+
+        <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
+        <useAsm>true</useAsm>
+        <!--<useAsm>false</useAsm>-->
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
@@ -42,6 +46,7 @@
     <!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加-->
     <exceptPackname name="exceptPackage">
         <name>com.meituan.robust</name>
+        <name>com.meituan.sample.extension</name>
     </exceptPackname>
 
     <!--补丁的包名，请保持和类PatchManipulateImp中fetchPatchList方法中设置的补丁类名保持一致（ setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl")），

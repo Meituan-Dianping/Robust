@@ -9,6 +9,7 @@ import javassist.CtClass
 import javassist.CtMethod
 import javassist.expr.ExprEditor
 import javassist.expr.MethodCall
+import org.codehaus.groovy.GroovyException
 import org.gradle.api.logging.Logger
 import robust.gradle.plugin.AutoPatchTransform
 
@@ -93,6 +94,7 @@ class ReadAnnotation {
                 @Override
                 public void edit(MethodCall m) throws CannotCompileException {
                     try {
+
                         if (Constants.LAMBDA_MODIFY.equals(m.method.declaringClass.name)) {
                             isAllMethodsPatch = false;
                             addPatchMethodAndModifiedClass(patchMethodSignureSet, method);
@@ -127,7 +129,9 @@ class ReadAnnotation {
 
     public static Set addPatchMethodAndModifiedClass(Set patchMethodSignureSet, CtMethod method) {
         if (Config.methodMap.get(method.longName) == null) {
-            throw new RuntimeException("patch method " + method.longName + " haven't insert code by Robust.Cannot patch this method, method.signature  " + method.signature + "  ");
+            print("addPatchMethodAndModifiedClass pint methodmap ");
+            JavaUtils.printMap(Config.methodMap);
+            throw new GroovyException("patch method " + method.longName + " haven't insert code by Robust.Cannot patch this method, method.signature  " + method.signature + "  ");
         }
         Modify methodModifyAnootation = method.getAnnotation(Constants.ModifyAnnotationClass) as Modify;
         Modify classModifyAnootation = method.declaringClass.getAnnotation(Constants.ModifyAnnotationClass) as Modify;
