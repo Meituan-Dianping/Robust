@@ -141,8 +141,22 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         return super.onCreateView(name, context, attrs);
     }
 
-
-
+    @Modify
+    //    public String getTextInfo(String baidu, People p) {
+    public String getTextInfo(String baidu) {
+        Bundle baseBundle=new Bundle();
+        baseBundle.putInt("asd",1);
+        baseBundle.getFloat("asd");
+        RobustModify.modify();
+        People p = new People();
+        p.setName("mivazhang");
+        p.setCates("  AutoPatch");
+        people.setAddr(baidu);
+        people.setName(" I am Patch");
+        ConcreateClass concreateClass = new ConcreateClass();
+        return p.getCates() + "you make it!!   " + p.getName() + baidu + getTextI1(flag) + people.getAddr() + "   name is  " + people.getName() + " conreate class getA " + concreateClass.getA();
+//        return "error " + concreateClass.getA();
+    }
 
     @Add
     public State getTextI2(String baidu) {

@@ -26,26 +26,26 @@ public class EnhancedRobustUtils {
         return null;
     }
 
-    public static Object invokeReflectMethod(String methodName, Object targetObject, Object[] parameters, Class[] args, Class declaringClass) {
+    public static Object invokeReflectMethod(String methodName, Object targetObject, Object[] parameter, Class[] args, Class declaringClass) {
         try {
             Method method = getDeclaredMethod(targetObject, methodName, args, declaringClass);
-            return method.invoke(targetObject, parameters);
+            return method.invoke(targetObject, parameter);
         } catch (Exception e) {
             e.printStackTrace();
         }
         if (isThrowable) {
-            throw new RuntimeException("invokeReflectMethod error " + methodName + "   parameter   " + parameters + " targetObject " + targetObject.toString() + "  args  " + args);
+            throw new RuntimeException("invokeReflectMethod error " + methodName + "   parameter   " + parameter + " targetObject " + targetObject.toString() + "  args  " + args);
         }
         return null;
     }
 
-    public static Method getDeclaredMethod(Object object, String methodName, Class[] parameterTypes, Class declaringClass) {
+    public static Method getDeclaredMethod(Object object, String name, Class[] args, Class declaringClass) {
         Method method = null;
         if (null == declaringClass || !declaringClass.isInterface()) {
 
             for (Class<?> clazz = object.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
                 try {
-                    method = clazz.getDeclaredMethod(methodName, parameterTypes);
+                    method = clazz.getDeclaredMethod(name, args);
                     if (!method.isAccessible()) {
                         method.setAccessible(true);
                     }
@@ -57,14 +57,14 @@ public class EnhancedRobustUtils {
             }
         } else {
             try {
-                method = declaringClass.getDeclaredMethod(methodName, parameterTypes);
+                method = declaringClass.getDeclaredMethod(name, args);
                 return method;
             } catch (Exception e) {
 
             }
         }
         if (isThrowable) {
-            throw new RuntimeException("getDeclaredMethod error " + methodName + "   parameterTypes   " + parameterTypes + " targetObject " + object.toString());
+            throw new RuntimeException("getDeclaredMethod error " + name + "   parameterTypes   " + args + " targetObject " + object.toString());
         }
         return null;
     }
