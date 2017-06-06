@@ -20,9 +20,8 @@ public class PatchProxy {
             if(registerExtensionList ==null|| registerExtensionList.isEmpty()){
                 return false;
             }
-            String[] classMethodName = getClassMethodName();
             for(RobustExtension robustExtension: registerExtensionList){
-                if(robustExtension.isSupport(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,classMethodName[0],classMethodName[1]))){
+                if(robustExtension.isSupport(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType))){
                     robustExtensionThreadLocal.set(robustExtension);
                     return true;
                 }
@@ -48,9 +47,8 @@ public class PatchProxy {
             RobustExtension robustExtension = robustExtensionThreadLocal.get();
             robustExtensionThreadLocal.remove();
             if(robustExtension !=null){
-                String[] classMethodName = getClassMethodName();
                 notify(robustExtension.describeSelfFunction());
-                return robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,classMethodName[0],classMethodName[1]));
+                return robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType));
             }
             return null;
         }
@@ -69,8 +67,7 @@ public class PatchProxy {
             robustExtensionThreadLocal.remove();
             if(robustExtension !=null){
                 notify(robustExtension.describeSelfFunction());
-                String[] classMethodName = getClassMethodName();
-                robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType,classMethodName[0],classMethodName[1]));
+                robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType));
             }
             return;
         }
@@ -108,9 +105,12 @@ public class PatchProxy {
     private static String getClassMethod(boolean isStatic, int methodNumber) {
         String classMethod = "";
         try {
-            java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
-            String methodName = stackTraceElement.getMethodName();
-            String className = stackTraceElement.getClassName();
+            //可能过于耗时，这部分需要请自己调用函数
+//            java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
+//            String methodName = stackTraceElement.getMethodName();
+//            String className = stackTraceElement.getClassName();
+            String methodName="";
+            String className="";
             classMethod = className + ":" + methodName + ":" + isStatic + ":" + methodNumber;
         }catch (Exception e){
 

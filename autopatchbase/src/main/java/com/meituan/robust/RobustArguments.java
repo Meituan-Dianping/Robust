@@ -11,17 +11,13 @@ public class RobustArguments {
     public int methodNumber;
     public Class[] paramsClassTypes;
     public Class returnType;
-    public String className;
-    public String methodName;
 
-    public RobustArguments(Object[] paramsArray, Object current,  boolean isStatic, int methodNumber, Class[] paramsClassTypes, Class returnType, String className, String methodName) {
+    public RobustArguments(Object[] paramsArray, Object current,  boolean isStatic, int methodNumber, Class[] paramsClassTypes, Class returnType) {
         this.paramsArray = paramsArray;
         this.current = current;
         this.isStatic = isStatic;
         this.methodNumber = methodNumber;
         this.paramsClassTypes = paramsClassTypes;
         this.returnType = returnType;
-        this.className = className;
-        this.methodName = methodName;
     }
 }
