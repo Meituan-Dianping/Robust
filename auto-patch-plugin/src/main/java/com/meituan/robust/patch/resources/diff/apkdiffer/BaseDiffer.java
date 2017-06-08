@@ -71,7 +71,7 @@ public class BaseDiffer {
     }
 
     public String getRelativePathStringToOldFile(File oldFile) {
-        return config.oldApkUnZipDir.toPath().relativize(oldFile.toPath()).toString().replace("\\", "/");
+        return config.oldApkUnZipDir.toPath().relativize(oldFile.toPath()).toString();
     }
 
     public Path getRelativePathToOldFile(File oldFile) {
@@ -83,7 +83,7 @@ public class BaseDiffer {
     }
 
     public String getRelativePathStringToNewFile(File newFile) {
-        return config.newApkUnZipDir.toPath().relativize(newFile.toPath()).toString().replace("\\", "/");
+        return config.newApkUnZipDir.toPath().relativize(newFile.toPath()).toString();
     }
 
     public String getParentRelativePathStringToNewFile(File newFile) {
@@ -94,10 +94,6 @@ public class BaseDiffer {
      * @param newFilePath
      */
     protected boolean diffNewFile(Path newFilePath) {
-        if (!isNeed(newFilePath)) {
-            return false;
-        }
-
         Path newApkPath = newApkUnZipDir.toPath();
         Path oldApkPath = oldApkUnZipDir.toPath();
 
@@ -126,10 +122,6 @@ public class BaseDiffer {
      * @param oldFilePath
      */
     protected boolean diffOldFile(Path oldFilePath) {
-        if (!isNeed(oldFilePath)) {
-            return false;
-        }
-
         Path newApkPath = newApkUnZipDir.toPath();
         Path oldApkPath = oldApkUnZipDir.toPath();
 

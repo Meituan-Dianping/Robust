@@ -55,6 +55,9 @@ public class APKDiffer extends BaseDiffer {
     @Override
     public boolean diffOldFile(Path oldFilePath) {
         oldFilePath = getRelativePathToOldFile(oldFilePath.toFile());
+        if (oldFilePath.endsWith("res/drawable-xhdpi-v4/bg_partner_logo.png")){
+            System.out.println("oldFilePath : "+oldFilePath);
+        }
         BaseDiffer differ = distributor(oldFilePath);
         if (null != differ) {
             differ.diffOldFile(oldFilePath);

@@ -1,5 +1,7 @@
 package com.meituan.robust.patch.resources.diff.data;
 
+import com.meituan.robust.patch.resources.APKStructure;
+
 /**
  * Created by hedingxu on 17/5/31.
  */
@@ -7,6 +9,6 @@ package com.meituan.robust.patch.resources.diff.data;
 public class AndroidManifestDiffData extends BaseDiffData {
     public AndroidManifestDiffData() {
         super();
-        diffTypeName = "AndroidManifest.xml";
+        diffTypeName = APKStructure.AndroidManifest_Type;
     }
 }
