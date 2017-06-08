@@ -10,7 +10,6 @@ public class RobustPatchPlugin implements Plugin<Project> {
     public static final String ROBUST_BUILD_OUTPUTS = "build" + File.separator + "outputs" + File.separator + "robust" + File.separator
     public final static String ROBUST_XML = "robust.xml"
     File outputFolderTest
-    int res_largeModSize
     String resRDotTxtPath
     String originApkPath
     boolean resourcesEnable
