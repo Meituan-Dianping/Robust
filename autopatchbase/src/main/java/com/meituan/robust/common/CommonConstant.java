@@ -1,7 +1,6 @@
 package com.meituan.robust.common;
 
 interface CommonConstant {
-
     interface Symbol {
         /**
          * dot "."
