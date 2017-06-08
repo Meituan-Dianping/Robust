@@ -40,10 +40,9 @@ public class RobustResources {
         if (!ApkRecover.isRecovered(context, patchName, patchMd5)) {
             // 开启一个进程去做
             // 做完了自动退出
-            // 本次不执行补丁应用，下一次启动的时候执行
             // base apk + resources_patch -> resources.apk
             RobustRecoverService.startRobustRecoverService(context, patchName, patchMd5, patchPath);//call ApkRecover.recover
-            ApkRecover.recover(context, patchName, patchMd5, patchPath);
+//            ApkRecover.recover(context, patchName, patchMd5, patchPath);
             return false;
         }
         String resourcesApkPath = ApkRecover.getRobustResourcesApkPath(context, patchName, patchMd5);

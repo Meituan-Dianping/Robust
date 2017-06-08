@@ -17,20 +17,11 @@ public class ResDiffer extends BaseDiffer {
 
     @Override
     public boolean diffNewFile(Path newFilePath) {
-
-        if (!isNeed(newFilePath)) {
-            return false;
-        }
-
         return super.diffNewFile(newFilePath);
     }
 
     @Override
     public boolean diffOldFile(Path oldFilePath) {
-        if (!isNeed(oldFilePath)) {
-            return false;
-        }
-
         return super.diffOldFile(oldFilePath);
     }
 

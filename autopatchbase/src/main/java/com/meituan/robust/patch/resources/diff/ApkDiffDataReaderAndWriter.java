@@ -2,6 +2,7 @@ package com.meituan.robust.patch.resources.diff;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
 
 import java.io.BufferedReader;
@@ -69,6 +70,7 @@ public class ApkDiffDataReaderAndWriter {
         if (null == file || null == content) {
             return false;
         }
+        FileUtil.createFile(file.getAbsolutePath());
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file);

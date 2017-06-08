@@ -19,9 +19,9 @@ public class OldApkFileVisitor extends SimpleFileVisitor<Path> {
     Path newApkPath;
     Path oldApkPath;
     //相对路径
-    private HashSet<Path> visitedPathes;
+    private HashSet<String> visitedPathes;
 
-    OldApkFileVisitor(RobustResourceConfig config, Path newPath, Path oldPath, APKDiffer apkDiffer, HashSet<Path> visitedPathes) {
+    OldApkFileVisitor(RobustResourceConfig config, Path newPath, Path oldPath, APKDiffer apkDiffer, HashSet<String> visitedPathes) {
         this.config = config;
         this.apkDiffer = apkDiffer;
         this.newApkPath = newPath;
@@ -32,13 +32,11 @@ public class OldApkFileVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path filePath, BasicFileAttributes attrs) throws IOException {
 
-        Path newFilePath = filePath;
-        //new File 相对路径
-        Path relativePath = newApkPath.relativize(newFilePath);
-        if (visitedPathes.contains(relativePath)) {
+        Path relativePath = oldApkPath.relativize(filePath);
+        if (visitedPathes.contains(relativePath.toString())) {
             return FileVisitResult.CONTINUE;
         }
-        visitedPathes.add(relativePath);
+        visitedPathes.add(relativePath.toString());
 
         try {
             apkDiffer.diffOldFile(filePath);

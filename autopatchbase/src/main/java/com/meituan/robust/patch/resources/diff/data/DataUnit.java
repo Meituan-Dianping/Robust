@@ -28,4 +28,20 @@ public class DataUnit {
         stringBuffer.append(newCrc);
         return stringBuffer.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DataUnit){
+            DataUnit diffData = (DataUnit)obj;
+            if (this.name.equals(diffData.name)){
+                return true;
+            }
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }

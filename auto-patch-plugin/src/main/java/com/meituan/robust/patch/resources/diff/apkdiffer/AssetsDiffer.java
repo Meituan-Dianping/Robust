@@ -21,7 +21,6 @@ public class AssetsDiffer extends BaseDiffer {
         apkResourceType = APKStructure.Assets_Type;
     }
 
-
     @Override
     public boolean diffNewFile(Path newFilePath) {
         if (isRobustApkHashFile(newFilePath)) {
@@ -29,10 +28,6 @@ public class AssetsDiffer extends BaseDiffer {
         }
 
         if (isRobustApkDataDiffFile(newFilePath)){
-            return false;
-        }
-
-        if (!isNeed(newFilePath)) {
             return false;
         }
 
@@ -60,10 +55,6 @@ public class AssetsDiffer extends BaseDiffer {
         }
 
         if (isRobustApkDataDiffFile(oldFilePath)){
-            return false;
-        }
-
-        if (!isNeed(oldFilePath)) {
             return false;
         }
 

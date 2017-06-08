@@ -3,6 +3,7 @@ package com.meituan.robust.patch.resources.diff.apkdiffer;
 import com.meituan.robust.common.CrcUtil;
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
+import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
 import com.meituan.robust.patch.resources.diff.data.BaseDiffData;
 import com.meituan.robust.patch.resources.diff.data.DataUnit;
@@ -235,6 +236,9 @@ public class BaseDiffer {
             return false;
         }
 
+        if (newFile.toPath().endsWith(APKStructure.ResourcesArsc_Type)){
+            System.out.println("arsc");
+        }
         String newMd5 = MD5.getHashString(newFile);
         String oldMd5 = MD5.getHashString(oldFile);
 

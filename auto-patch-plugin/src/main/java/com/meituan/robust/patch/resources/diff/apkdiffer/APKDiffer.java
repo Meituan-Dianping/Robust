@@ -45,6 +45,10 @@ public class APKDiffer extends BaseDiffer {
     @Override
     public boolean diffNewFile(Path newFilePath) {
         newFilePath = getRelativePathToNewFile(newFilePath.toFile());
+        if (newFilePath.endsWith("res/drawable-xhdpi-v4/bg_partner_logo.png")){
+            System.out.println("oldFilePath : "+newFilePath);
+        }
+
         BaseDiffer differ = distributor(newFilePath);
         if (null != differ) {
             differ.diffNewFile(newFilePath);
@@ -199,7 +203,7 @@ public class APKDiffer extends BaseDiffer {
         if (!unzipResults) {
             return apkDiffData;
         }
-        HashSet<Path> visitedPathes = new HashSet<>();
+        HashSet<String> visitedPathes = new HashSet<String>();
 
         Files.walkFileTree(newApkUnZipDir.toPath(), new NewApkFileVisitor(config, newApkUnZipDir.toPath(), oldApkUnZipDir.toPath(), this, visitedPathes));
 
