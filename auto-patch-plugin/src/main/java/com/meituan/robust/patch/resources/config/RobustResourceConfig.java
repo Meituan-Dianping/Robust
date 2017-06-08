@@ -119,6 +119,7 @@ public class RobustResourceConfig {
     }
 
     /**
+     * For test
      * @param args
      */
     public static void main(String[] args) {
@@ -126,8 +127,8 @@ public class RobustResourceConfig {
         RobustXmlResourceInfo xmlResourceInfo = new RobustXmlResourceInfo();
 
         //todo
-        String oldApkPath = "";
-        String newApkPath = "";
+        String oldApkPath = "/Users/hedingxu/Downloads/aimeituan_513_huawei.apk";
+        String newApkPath = "/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk";
         HashSet<String> assetsExcludeStrings = new HashSet<>();
         HashSet<String> assetsIncludeStrings = new HashSet<>();
         HashSet<String> resExcludeStrings = new HashSet<>();
