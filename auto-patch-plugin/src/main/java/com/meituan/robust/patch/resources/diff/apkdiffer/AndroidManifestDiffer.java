@@ -25,7 +25,6 @@ public class AndroidManifestDiffer extends BaseDiffer {
         return false;
     }
 
-
     @Override
     protected boolean isNeed(Path filePath) {
         return false;

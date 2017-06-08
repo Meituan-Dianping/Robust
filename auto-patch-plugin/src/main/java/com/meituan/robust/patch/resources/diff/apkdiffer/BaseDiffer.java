@@ -104,10 +104,11 @@ public class BaseDiffer {
         File oldFile = null;
         File newFile = null;
 
-        newFile = newFilePath.toFile();
+        newFile = new File(newApkUnZipDir,newFilePath.toString());
 
         //new File 相对路径
-        Path relativePath = newApkPath.relativize(newFilePath);
+        Path relativePath = newFilePath;
+
         //对应的old File路径
         Path oldPath = oldApkPath.resolve(relativePath);
 
@@ -136,12 +137,12 @@ public class BaseDiffer {
         File newFile = null;
 
 
-        oldFile = oldFilePath.toFile();
+        oldFile = new File(oldApkUnZipDir,oldFilePath.toString());
 //        newFile = newFilePath.toFile();
 
         //new File 相对路径
 //        Path relativePath = newApkPath.relativize(newFilePath);
-        Path relativePath = oldApkPath.relativize(oldFilePath);
+        Path relativePath = oldFilePath;
         //对应的old File路径
 //        Path oldPath = oldApkPath.resolve(relativePath);
         Path newPath = newApkPath.resolve(relativePath);
@@ -158,21 +159,8 @@ public class BaseDiffer {
     }
 
     protected boolean isNeed(Path filePath) {
-        //文件目录
-        if (filePath.toFile().isDirectory()) {
-            return false;
-        }
+        Path relativeFilePath = filePath;
 
-        Path newFilePath = filePath;
-
-        Path newApkPath = newApkUnZipDir.toPath();
-
-        //new File 相对路径
-        Path relativeFilePath = newApkPath.relativize(newFilePath);
-
-        if (checkResourceType(relativeFilePath)) {
-            return false;
-        }
         if (checkPatterns(excludePatterns, relativeFilePath)) {
             return false;
         }

@@ -2,6 +2,7 @@ package com.meituan.robust.patch.resources.config;
 
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.StringUtil;
+import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.diff.APKDiffUtils;
 
 import java.io.File;
@@ -70,7 +71,7 @@ public class RobustResourceConfig {
 
         newApkPath = robustXmlResourceInfo.newApkPath;
         newApkFile = new File(newApkPath);
-        robustOutputsFolder = robustXmlResourceInfo.outFolder;
+        robustOutputsFolder = robustXmlResourceInfo.robustOutputDirPath;
         FileUtil.deleteAllFile(robustOutputsFolder);
         configOutputDirectory();
     }
@@ -120,6 +121,7 @@ public class RobustResourceConfig {
 
     /**
      * For test
+     *
      * @param args
      */
     public static void main(String[] args) {
@@ -130,14 +132,19 @@ public class RobustResourceConfig {
         String oldApkPath = "/Users/hedingxu/Downloads/aimeituan_513_huawei.apk";
         String newApkPath = "/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk";
         HashSet<String> assetsExcludeStrings = new HashSet<>();
+        assetsExcludeStrings.add(APKStructure.Assets_Type + "/robust.apkhash");
         HashSet<String> assetsIncludeStrings = new HashSet<>();
+        assetsIncludeStrings.add(APKStructure.Assets_Type + "/*");
         HashSet<String> resExcludeStrings = new HashSet<>();
         HashSet<String> resIncludeStrings = new HashSet<>();
+        resIncludeStrings.add(APKStructure.Res_Type + "/*");
         HashSet<String> libExcludeStrings = new HashSet<>();
         HashSet<String> libIncludeStrings = new HashSet<>();
+        libIncludeStrings.add(APKStructure.Lib_Type + "/*");
 
         xmlResourceInfo.oldApkPath = oldApkPath;
         xmlResourceInfo.newApkPath = newApkPath;
+        xmlResourceInfo.robustOutputDirPath = "/Users/hedingxu/robust-github/Robust/app/build/outputs/robust";
         xmlResourceInfo.assetsExcludeStrings = assetsExcludeStrings;
         xmlResourceInfo.assetsIncludeStrings = assetsIncludeStrings;
         xmlResourceInfo.resExcludeStrings = resExcludeStrings;
@@ -147,7 +154,9 @@ public class RobustResourceConfig {
 
         RobustResourceConfig config = new RobustResourceConfig(xmlResourceInfo);
         try {
+            long time = System.currentTimeMillis();
             APKDiffUtils.execute(config);
+            System.out.println("APKDiffUtils.execute(config) spend:" + (System.currentTimeMillis() - time));
         } catch (IOException e) {
             e.printStackTrace();
         }

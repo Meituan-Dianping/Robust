@@ -40,14 +40,14 @@ public class AssetsDiffer extends BaseDiffer {
     }
 
     private boolean isRobustApkHashFile(Path filePath) {
-        if (filePath.startsWith("robust.apkhash")) {
+        if (filePath.equals(APKStructure.Assets_Type + "/robust.apkhash")) {
             return true;
         }
         return false;
     }
 
     private boolean isRobustApkDataDiffFile(Path filePath) {
-        if (filePath.startsWith(APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH)) {
+        if (filePath.equals(APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH)) {
             return true;
         }
         return false;

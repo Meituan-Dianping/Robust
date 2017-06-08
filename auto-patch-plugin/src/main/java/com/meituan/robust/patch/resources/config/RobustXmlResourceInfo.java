@@ -9,7 +9,7 @@ import java.util.HashSet;
 public class RobustXmlResourceInfo {
     public String oldApkPath;
     public String newApkPath;
-    public String outFolder;
+    public String robustOutputDirPath;
 
     public HashSet<String> resIncludeStrings;
     public HashSet<String> resExcludeStrings;

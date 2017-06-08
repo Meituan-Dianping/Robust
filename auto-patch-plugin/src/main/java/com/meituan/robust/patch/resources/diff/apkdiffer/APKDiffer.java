@@ -2,6 +2,7 @@ package com.meituan.robust.patch.resources.diff.apkdiffer;
 
 
 import com.meituan.robust.common.FileUtil;
+import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
 import com.meituan.robust.patch.resources.diff.data.BaseDiffData;
@@ -22,21 +23,30 @@ import java.util.zip.ZipFile;
 
 public class APKDiffer extends BaseDiffer {
     private List<BaseDiffer> differs = new ArrayList<>();
+    private BaseDiffer androidManifestDiffer = new AndroidManifestDiffer(config);
+    private BaseDiffer resourcesArscDiffer = new ResourcesArscDiffer(config);
+    private BaseDiffer resDiffer = new ResDiffer(config);
+    private BaseDiffer assetsDiffer = new AssetsDiffer(config);
+    private BaseDiffer libDiffer = new LibDiffer(config);
+    private BaseDiffer dexDiffer = new DexDiffer(config);
+    private BaseDiffer mETAINFDiff = new METAINFDiff(config);
 
     public APKDiffer(RobustResourceConfig config) {
         super(config);
-        differs.add(new AndroidManifestDiffer(config));
-        differs.add(new ResourcesArscDiffer(config));
-        differs.add(new ResDiffer(config));
-        differs.add(new AssetsDiffer(config));
-        differs.add(new LibDiffer(config));
-        differs.add(new DexDiffer(config));
-        differs.add(new METAINFDiff(config));
+        differs.add(androidManifestDiffer);
+        differs.add(resourcesArscDiffer);
+        differs.add(resDiffer);
+        differs.add(assetsDiffer);
+        differs.add(libDiffer);
+        differs.add(dexDiffer);
+        differs.add(mETAINFDiff);
     }
 
     @Override
     public boolean diffNewFile(Path newFilePath) {
-        for (BaseDiffer differ : differs) {
+        newFilePath = getRelativePathToNewFile(newFilePath.toFile());
+        BaseDiffer differ = distributor(newFilePath);
+        if (null != differ) {
             differ.diffNewFile(newFilePath);
         }
         return true;
@@ -44,10 +54,55 @@ public class APKDiffer extends BaseDiffer {
 
     @Override
     public boolean diffOldFile(Path oldFilePath) {
-        for (BaseDiffer differ : differs) {
+        oldFilePath = getRelativePathToOldFile(oldFilePath.toFile());
+        BaseDiffer differ = distributor(oldFilePath);
+        if (null != differ) {
             differ.diffOldFile(oldFilePath);
         }
         return true;
+    }
+
+    private BaseDiffer distributor(Path filePath) {
+        //文件目录
+        if (filePath.toFile().isDirectory()) {
+            return null;
+        }
+        if (filePath.startsWith(APKStructure.AndroidManifest_Type)) {
+            if (androidManifestDiffer.isNeed(filePath)) {
+                return androidManifestDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.ResourcesArsc_Type)) {
+            if (resourcesArscDiffer.isNeed(filePath)) {
+                return resourcesArscDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.Res_Type)) {
+            if (resDiffer.isNeed(filePath)) {
+                return resDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.Assets_Type)) {
+            if (assetsDiffer.isNeed(filePath)) {
+                return assetsDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.Lib_Type)) {
+            if (libDiffer.isNeed(filePath)) {
+                return libDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.Dex_Type)) {
+            if (dexDiffer.isNeed(filePath)) {
+                return dexDiffer;
+            }
+        }
+        if (filePath.startsWith(APKStructure.METAINF_Type)) {
+            if (mETAINFDiff.isNeed(filePath)) {
+                return mETAINFDiff;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -59,7 +114,9 @@ public class APKDiffer extends BaseDiffer {
         List<BaseDiffData> diffDatas = new ArrayList<>();
         for (BaseDiffer differ : differs) {
             BaseDiffData diffData = differ.getDiffData();
-            diffDatas.add(diffData);
+            if (null != diffData) {
+                diffDatas.add(diffData);
+            }
         }
         return diffDatas;
     }
@@ -77,7 +134,7 @@ public class APKDiffer extends BaseDiffer {
         return true;
     }
 
-    private boolean unzipApkFiles(File oldFile, File newFile) throws IOException{
+    private boolean unzipApkFiles(File oldFile, File newFile) throws IOException {
         return unzipApkFile(oldFile, this.oldApkUnZipDir) &&
                 unzipApkFile(newFile, this.newApkUnZipDir);
     }
