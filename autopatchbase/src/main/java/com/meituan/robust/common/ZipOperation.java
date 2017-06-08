@@ -1,7 +1,5 @@
 package com.meituan.robust.common;
 
-import com.meituan.robust.patch.resources.config.RobustResourceConfig;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,7 +14,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class ZipOperation {
-
+    private static final int BUFFER_SIZE = 8 * 1024;
     /**
      * zip list of file
      *
@@ -25,7 +23,7 @@ public class ZipOperation {
      * @throws IOException
      */
     public static void zipFiles(Collection<File> resFileList, File zipFile) throws IOException {
-        ZipOutputStream zipout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile), RobustResourceConfig.BUFFER_SIZE));
+        ZipOutputStream zipout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFile), BUFFER_SIZE));
         for (File resFile : resFileList) {
             if (resFile.exists()) {
                 zipFile(resFile, zipout, "");
@@ -58,7 +56,7 @@ public class ZipOperation {
 
     private static byte[] readContents(final File file) throws IOException {
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
-        final int bufferSize = RobustResourceConfig.BUFFER_SIZE;
+        final int bufferSize = BUFFER_SIZE;
         try {
             final FileInputStream in = new FileInputStream(file);
             final BufferedInputStream bIn = new BufferedInputStream(in);
