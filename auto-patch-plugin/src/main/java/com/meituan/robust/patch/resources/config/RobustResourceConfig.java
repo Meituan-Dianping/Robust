@@ -1,8 +1,8 @@
 package com.meituan.robust.patch.resources.config;
 
-import com.meituan.robust.patch.resources.diff.APKDiffUtils;
 import com.meituan.robust.common.FileUtil;
-import com.meituan.robust.common.PatternUtils;
+import com.meituan.robust.common.StringUtil;
+import com.meituan.robust.patch.resources.diff.APKDiffUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -110,7 +110,8 @@ public class RobustResourceConfig {
             return patterns;
         }
         for (String str : strings) {
-            String patternString = PatternUtils.convertToPatternString(str);
+            str = StringUtil.trim(str);
+            String patternString = StringUtil.convertToPatternString(str);
             Pattern pattern = Pattern.compile(patternString);
             patterns.add(pattern);
         }

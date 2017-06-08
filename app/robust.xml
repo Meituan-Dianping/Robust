@@ -59,4 +59,8 @@
     <noNeedReflectClass name="classes no need to reflect">
 
     </noNeedReflectClass>
+
+
+    <!--resources fix -->
+    <
 </resources>
