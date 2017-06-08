@@ -5,7 +5,9 @@ import com.meituan.robust.patch.resources.config.RobustResourceConfig;
 import com.meituan.robust.patch.resources.diff.data.ResDiffData;
 
 import java.nio.file.Path;
-
+/**
+ * Created by hedingxu on 17/5/31.
+ */
 public class ResDiffer extends BaseDiffer {
     public ResDiffer(RobustResourceConfig config) {
         super(config);

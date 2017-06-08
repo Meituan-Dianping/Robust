@@ -25,7 +25,7 @@ import java.util.zip.ZipOutputStream;
 
 
 /**
- * patch's 资源 + base.apk -> resources.apk
+ * Created by hedingxu on 17/6/6.
  */
 public class ApkRecover {
 
@@ -50,7 +50,7 @@ public class ApkRecover {
         if (!robustResourcesApkFile.exists() || !robustResourcesApkMd5File.exists()) {
             return false;
         }
-        String wantedMd5 = VerifyUtils.readResourcesApkMd5(robustResourcesApkMd5File);
+        String wantedMd5 = ResourcesApkVerifyUtils.readResourcesApkMd5(robustResourcesApkMd5File);
         try {
             String realMd5 = MD5.getHashString(robustResourcesApkFile);
             if (TextUtils.equals(wantedMd5, realMd5)) {
@@ -88,28 +88,30 @@ public class ApkRecover {
         return libDirFile;
     }
 
+    public static String copyPatch2TmpPath(Context context,String patchName, String patchMd5,String patchPath){
+        String resourcesDirPathString = getResourceDirPathString(context,  patchName,  patchMd5);
+        String tempPatchPath = resourcesDirPathString + File.separator + ROBUST_PATCH_TEMP;
+        boolean result = RecoverUtils.copyPatch(patchPath, tempPatchPath);
+        if (result) {
+            return tempPatchPath;
+        }else {
+            return null;
+        }
+    }
+
     //TODO: 17/5/29 在patch list，遍历到一个patch需要同时应用资源时，需要调用下面的方法，先完成资源的合成
     //TODO: 遍历到这个补丁时，补丁延迟apply，需要检查资源是否已经merge成功，如果已经成功，可以应用
     //TODO: 该方法最好执行在robustresourcesmerge进程
     //TODO: 资源尽量只应用一次; 选取时间戳最大的那个资源作为资源；
     //TODO：可能出现一个资源resources.apk + 多个dex 一起应用的情况
     //recover : 资源patch + base.apk -> resources.apk
-    public static boolean recover(Context context, String patchName, String patchMd5,String patchPath) {
+    public static synchronized boolean recover(Context context, String patchName, String patchMd5,String tempPatchPath) {
         String resourcesDirPathString = getResourceDirPathString(context,  patchName,  patchMd5);
         String robustResourcesApkPath = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK;
         String robustResourcesApkMd5Path = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK_MD5;
         boolean isRecovered = isRecovered(robustResourcesApkPath, robustResourcesApkMd5Path);
         if (isRecovered) {
             return true;
-        }
-
-        //需要开启另外一个进程去做Resource Merge 发Intent
-        //下面是另外一个进程需要做的事情
-
-        String tempPatchPath = resourcesDirPathString + File.separator + ROBUST_PATCH_TEMP;
-        boolean result = RecoverUtils.copyRealPatch(context, patchPath, tempPatchPath);
-        if (!result) {
-            return false;
         }
 
         String recoverResourceDir = resourcesDirPathString + File.separator + ROBUST_RESOURCE_DIR;
@@ -256,7 +258,7 @@ public class ApkRecover {
 
             if (!TextUtils.isEmpty(robustResourcesApkZipFileMd5)) {
                 File robustResourcesApkMd5File = new File(robustResourcesApkMd5Path);
-                boolean writeResult = VerifyUtils.writeResourcesApkMd5(robustResourcesApkMd5File, robustResourcesApkZipFileMd5);
+                boolean writeResult = ResourcesApkVerifyUtils.writeResourcesApkMd5(robustResourcesApkMd5File, robustResourcesApkZipFileMd5);
                 if (writeResult) {
                     return writeResult;
                 }

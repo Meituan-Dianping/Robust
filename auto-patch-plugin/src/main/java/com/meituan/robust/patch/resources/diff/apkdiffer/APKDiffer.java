@@ -20,7 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
+/**
+ * Created by hedingxu on 17/5/31.
+ */
 public class APKDiffer extends BaseDiffer {
     private List<BaseDiffer> differs = new ArrayList<>();
     private BaseDiffer androidManifestDiffer = new AndroidManifestDiffer(config);

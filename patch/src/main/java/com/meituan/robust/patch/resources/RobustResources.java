@@ -7,7 +7,6 @@ import com.meituan.robust.common.ResourceConstant;
 import com.meituan.robust.patch.resources.apply.RobustLibraryApply;
 import com.meituan.robust.patch.resources.apply.RobustResourceApply;
 import com.meituan.robust.patch.resources.recover.ApkRecover;
-import com.meituan.robust.patch.resources.service.RobustRecoverService;
 
 import java.io.File;
 
@@ -21,8 +20,8 @@ public class RobustResources {
     }
 
     //only execute one times
-    public static boolean resFix(Context context, String patchName, String patchMd5, String patchPath) {
-        if (null == context || TextUtils.isEmpty(patchName) || TextUtils.isEmpty(patchMd5) || TextUtils.isEmpty(patchPath)) {
+    public static boolean resFix(Context context, String patchName, String patchMd5/*, String patchPath*/) {
+        if (null == context || TextUtils.isEmpty(patchName) || TextUtils.isEmpty(patchMd5) /*|| TextUtils.isEmpty(patchPath)*/) {
             return false;
         }
         context = context.getApplicationContext();
@@ -36,15 +35,15 @@ public class RobustResources {
             return true;
         }
 
-        // get a patch apk and getRobustAssetsResource valid
-        if (!ApkRecover.isRecovered(context, patchName, patchMd5)) {
-            // 开启一个进程去做
-            // 做完了自动退出
-            // base apk + resources_patch -> resources.apk
-            RobustRecoverService.startRobustRecoverService(context, patchName, patchMd5, patchPath);//call ApkRecover.recover
-//            ApkRecover.recover(context, patchName, patchMd5, patchPath);
-            return false;
-        }
+//        // get a patch apk and getRobustAssetsResource valid
+//        if (!ApkRecover.isRecovered(context, patchName, patchMd5)) {
+//            // 开启一个进程去做
+//            // 做完了自动退出
+//            // base apk + resources_patch -> resources.apk
+//            RobustRecoverService.startRobustRecoverService(context, patchName, patchMd5, patchPath);//call ApkRecover.recover
+////            ApkRecover.recover(context, patchName, patchMd5, patchPath);
+//            return false;
+//        }
         String resourcesApkPath = ApkRecover.getRobustResourcesApkPath(context, patchName, patchMd5);
         File resourcesApk = new File(resourcesApkPath);
         if (!resourcesApk.exists()) {

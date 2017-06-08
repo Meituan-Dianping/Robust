@@ -15,7 +15,9 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.regex.Pattern;
-
+/**
+ * Created by hedingxu on 17/5/31.
+ */
 public class BaseDiffer {
 
     protected final RobustResourceConfig config;

@@ -12,15 +12,12 @@ import com.meituan.robust.patch.resources.diff.util.DiffAndRecoverUtil;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -31,32 +28,20 @@ import java.util.zip.ZipOutputStream;
  */
 
 class RecoverUtils {
-    private static final int SHA_LENGTH = 64;
 
-    public static boolean copyRealPatch(Context context, String patchLocalPath, String destPatchPath) {
+    private RecoverUtils(){
+
+    }
+
+    public static boolean copyPatch(String patchLocalPath, String destPatchPath) {
+        boolean result = false;
         try {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream(ResourceConstant.BUFFER_SIZE);
-            int length = -1;
-            byte[] temp = new byte[ResourceConstant.BUFFER_SIZE];
-            FileInputStream fileInputStream = new FileInputStream(patchLocalPath);
+            FileUtil.copyFile(patchLocalPath, destPatchPath);
+            result = true;
+        } catch (Throwable throwable) {
 
-            while ((length = fileInputStream.read(temp)) != -1) {
-                bout.write(temp, 0, length);
-            }
-            fileInputStream.close();
-            byte[] rawResult = bout.toByteArray();
-            bout.flush();
-            bout.close();
-            int shaLength = SHA_LENGTH;
-            byte[] patchBytes = Arrays.copyOfRange(rawResult, 0, rawResult.length - shaLength);
-            OutputStream out = new FileOutputStream(destPatchPath);
-            out.write(patchBytes);
-            out.flush();
-            out.close();
-            return true;
-        } catch (Exception e) {
-            return false;
         }
+        return result;
     }
 
     public static void cleanDir(File dir) {

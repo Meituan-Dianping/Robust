@@ -6,6 +6,9 @@ import com.meituan.robust.patch.resources.diff.data.LibDiffData;
 
 import java.nio.file.Path;
 
+/**
+ * Created by hedingxu on 17/5/31.
+ */
 public class LibDiffer extends BaseDiffer {
 
     public LibDiffer(RobustResourceConfig config) {

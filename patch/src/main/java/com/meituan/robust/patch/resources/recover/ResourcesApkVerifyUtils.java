@@ -1,5 +1,7 @@
 package com.meituan.robust.patch.resources.recover;
 
+import com.meituan.robust.common.FileUtil;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -7,12 +9,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * 仅用于读写MD5这样简答的内容
  * Created by hedingxu on 17/6/5.
+ * 仅用于读写MD5这样简答的内容
  */
-public class VerifyUtils {
+public class ResourcesApkVerifyUtils {
 
-    private VerifyUtils() {
+    private ResourcesApkVerifyUtils() {
 
     }
 
@@ -57,6 +59,7 @@ public class VerifyUtils {
         if (null == file) {
             return false;
         }
+        FileUtil.createFile(file.getAbsolutePath());
         FileWriter fileWriter = null;
         try {
             fileWriter = new FileWriter(file);
