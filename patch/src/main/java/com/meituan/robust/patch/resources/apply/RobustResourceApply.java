@@ -111,7 +111,7 @@ public class RobustResourceApply {
         */
 
 //        // First get on ui thread
-//        Object currentActivityThread = RobustResourceHook.getCurrentActivityThread(context);
+//        Object currentActivityThread = RobustResourceReflect.getCurrentActivityThread(context);
 //        if (null == currentActivityThread) {
 //            return false;
 //        }
@@ -154,7 +154,7 @@ public class RobustResourceApply {
         for (String fieldName : new String[]{"mPackages", "mResourcePackages"}) {
             Field field = activityThread.getDeclaredField(fieldName);
             field.setAccessible(true);
-            Object value = field.get(RobustResourceHook.getCurrentActivityThread(context));
+            Object value = field.get(RobustResourceReflect.getCurrentActivityThread(context));
             for (Map.Entry<String, WeakReference<?>> entry :
                     ((Map<String, WeakReference<?>>) value).entrySet()) {
                 Object loadedApk = entry.getValue().get();
@@ -225,7 +225,7 @@ public class RobustResourceApply {
         } else {
             Field fMActiveResources = activityThread.getDeclaredField("mActiveResources");
             fMActiveResources.setAccessible(true);
-            Object thread = RobustResourceHook.getCurrentActivityThread(context);
+            Object thread = RobustResourceReflect.getCurrentActivityThread(context);
             @SuppressWarnings("unchecked")
             HashMap<?, WeakReference<Resources>> map =
                     (HashMap<?, WeakReference<Resources>>) fMActiveResources.get(thread);
@@ -334,7 +334,7 @@ public class RobustResourceApply {
 //            }
 //        }
 //        if (lock == null) {
-//            lock = RobustResourceHook.class;
+//            lock = RobustResourceReflect.class;
 //        }
 //        //noinspection SynchronizationOnLocalVariableOrMethodParameter
 //        synchronized (lock) {

@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  * Created by hedingxu on 17/6/6.
  */
 
-public class RobustResourceHook {
+public class RobustResourceReflect {
     private static Object sThreadLocal;
 
     //@UiThread

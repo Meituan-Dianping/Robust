@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
  * Created by hedingxu on 17/6/7.
  */
 
-public class RobustLibraryHook {
+public class RobustLibraryReflect {
     public static Object getFieldValue(Class cls, Object obj, String name) throws Exception {
         Field declaredField = cls.getDeclaredField(name);
         declaredField.setAccessible(true);
@@ -17,7 +17,7 @@ public class RobustLibraryHook {
 
     public static Object getFieldValueWithTryCatch(Class cls, Object obj, String name) {
         try {
-            return RobustLibraryHook.getFieldValue(cls, obj, name);
+            return RobustLibraryReflect.getFieldValue(cls, obj, name);
         } catch (Exception e) {
             return null;
         }
@@ -31,7 +31,7 @@ public class RobustLibraryHook {
 
     public static void setFieldWithTryCatch(Class cls, Object obj, String fieldName, Object value) {
         try {
-            RobustLibraryHook.setField(cls, obj, fieldName, value);
+            RobustLibraryReflect.setField(cls, obj, fieldName, value);
         } catch (Exception e) {
         }
     }
@@ -58,7 +58,7 @@ public class RobustLibraryHook {
 
     public static Object invokeMethodWithTryCatch(Class cls, Object obj, String str, Class[] clsArr, Object... objArr) {
         try {
-            return RobustLibraryHook.invokeMethod(cls, obj, str, clsArr, objArr);
+            return RobustLibraryReflect.invokeMethod(cls, obj, str, clsArr, objArr);
         } catch (Exception e) {
             return null;
         }
