@@ -83,7 +83,7 @@ public class RobustResourcePatchAction implements Action<Project> {
                         project.logger.debug("robust: resource fix end")
                         Config.patchHasResource = true
 
-                        //todo call merge dex part and resource part
+                        RobustPatchMerger.mergeDexPartAndResourcePart()
                         throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
                     }
 
@@ -103,7 +103,7 @@ public class RobustResourcePatchAction implements Action<Project> {
                         project.logger.debug("robust: resource fix end")
                         Config.patchHasResource = true
 
-                        //todo call merge dex part and resource part
+                        RobustPatchMerger.mergeDexPartAndResourcePart()
 
                         throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
                     }

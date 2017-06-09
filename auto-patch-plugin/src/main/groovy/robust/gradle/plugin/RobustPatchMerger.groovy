@@ -31,8 +31,8 @@ public class RobustPatchMerger {
         // name is patch_resources.apk
         File resourcePartFile = getPatchResourcePart()
 
-        boolean hasDex = dexPartFile.exists() && dexPartFile.length() > 0;
-        boolean hasResource = resourcePartFile.exists() && resourcePartFile.length() > 0;
+        boolean hasDex = Config.patchHasDex && dexPartFile.exists() && dexPartFile.length() > 0;
+        boolean hasResource = Config.patchHasResource resourcePartFile.exists() && resourcePartFile.length() > 0;
 
 
         if (hasDex & hasResource) {
@@ -88,7 +88,8 @@ public class RobustPatchMerger {
         }
     }
 
-    private static void zipEntry2ZipOutputStream(ZipFile zipFile, ZipEntry zipEntry, ZipOutputStream outputStream) throws IOException {
+    private
+    static void zipEntry2ZipOutputStream(ZipFile zipFile, ZipEntry zipEntry, ZipOutputStream outputStream) throws IOException {
         InputStream inputStream = null;
         try {
             inputStream = zipFile.getInputStream(zipEntry);
