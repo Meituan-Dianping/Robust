@@ -62,7 +62,7 @@ public class ApkRecover {
         return false;
     }
 
-    public static boolean isRecovered(Context context,String patchName, String patchMd5) {
+    public static boolean isRecovered(Context context, String patchName, String patchMd5) {
         String resourcesDirPathString = getResourceDirPathString(context, patchName, patchMd5);
         String robustResourcesApkPath = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK;
         String robustResourcesApkMd5Path = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK_MD5;
@@ -88,20 +88,20 @@ public class ApkRecover {
         return libDirFile;
     }
 
-    public static String copyPatch2TmpPath(Context context,String patchName, String patchMd5,String patchPath){
-        String resourcesDirPathString = getResourceDirPathString(context,  patchName,  patchMd5);
+    public static String copyPatch2TmpPath(Context context, String patchName, String patchMd5, String patchPath) {
+        String resourcesDirPathString = getResourceDirPathString(context, patchName, patchMd5);
         String tempPatchPath = resourcesDirPathString + File.separator + ROBUST_PATCH_TEMP;
         boolean result = RecoverUtils.copyPatch(patchPath, tempPatchPath);
         if (result) {
             return tempPatchPath;
-        }else {
+        } else {
             return null;
         }
     }
 
     //recover : 资源patch + base.apk -> resources.apk
-    public static synchronized boolean recover(Context context, String patchName, String patchMd5,String tempPatchPath) {
-        String resourcesDirPathString = getResourceDirPathString(context,  patchName,  patchMd5);
+    public static synchronized boolean recover(Context context, String patchName, String patchMd5, String tempPatchPath) {
+        String resourcesDirPathString = getResourceDirPathString(context, patchName, patchMd5);
         String robustResourcesApkPath = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK;
         String robustResourcesApkMd5Path = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK_MD5;
         boolean isRecovered = isRecovered(robustResourcesApkPath, robustResourcesApkMd5Path);
