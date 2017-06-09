@@ -1,5 +1,7 @@
 package com.meituan.robust.patch.resources.config;
 
+import com.meituan.robust.autopatch.Config;
+
 import java.util.HashSet;
 
 /**
@@ -9,7 +11,7 @@ import java.util.HashSet;
 public class RobustXmlResourceInfo {
     public String oldApkPath;
     public String newApkPath;
-    public String robustOutputDirPath;
+    public String robustOutputDirPath = Config.robustGenerateDirectory;
 
     public HashSet<String> resIncludeStrings;
     public HashSet<String> resExcludeStrings;

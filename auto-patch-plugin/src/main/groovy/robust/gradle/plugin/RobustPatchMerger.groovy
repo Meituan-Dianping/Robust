@@ -32,8 +32,7 @@ public class RobustPatchMerger {
         File resourcePartFile = getPatchResourcePart()
 
         boolean hasDex = Config.patchHasDex && dexPartFile.exists() && dexPartFile.length() > 0;
-        boolean hasResource = Config.patchHasResource resourcePartFile.exists() && resourcePartFile.length() > 0;
-
+        boolean hasResource = Config.patchHasResource && resourcePartFile.exists() && resourcePartFile.length() > 0;
 
         if (hasDex & hasResource) {
             //merge

@@ -187,6 +187,9 @@ public final class FileUtil {
      * @param directory
      */
     public static void deleteAllFile(String directory) {
+        if (null == directory || "".equals(directory)){
+            return;
+        }
         List<File> fileList = new ArrayList<File>();
         File directoryFile = new File(directory);
         Queue<File> queue = new ConcurrentLinkedQueue<File>();

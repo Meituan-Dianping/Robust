@@ -73,17 +73,17 @@ public class RobustResourcePatchAction implements Action<Project> {
                     assembleTask.doLast {
                         //diff apk
                         project.logger.debug("robust: resource fix start")
-                        try {
+//                        try {
                             execute(xmlResourceInfo)
-                        } catch (Exception e) {
-                            project.logger.debug("robust: An Error Has Occurred")
-                            throw RuntimeException(e)
-                        }
+//                        } catch (Exception e) {
+//                            project.logger.error("robust: An Error Has Occurred \n"
+//                                    + "robust error: " + e.toString())
+//                        }
                         project.logger.debug("robust: resource fix end")
                         Config.patchHasResource = true
 
                         RobustPatchMerger.mergeDexPartAndResourcePart()
-                        throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
+                        throw new RuntimeException("*** auto patch end successfully! ***, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
                     }
 
                 } else {
@@ -93,18 +93,17 @@ public class RobustResourcePatchAction implements Action<Project> {
                     transformClassesWithRobustTask.doLast {
                         //diff apk
                         project.logger.debug("robust: resource fix start")
-                        try {
+//                        try {
                             execute(xmlResourceInfo)
-                        } catch (Exception e) {
-                            project.logger.debug("robust: An Error Has Occurred")
-                            throw RuntimeException(e)
-                        }
+//                        } catch (Exception e) {
+//                            project.logger.debug("robust: An Error Has Occurred")
+//                        }
                         project.logger.debug("robust: resource fix end")
                         Config.patchHasResource = true
 
                         RobustPatchMerger.mergeDexPartAndResourcePart()
 
-                        throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
+                        throw new RuntimeException("*** auto patch end successfully! ***, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
                     }
                 }
             }

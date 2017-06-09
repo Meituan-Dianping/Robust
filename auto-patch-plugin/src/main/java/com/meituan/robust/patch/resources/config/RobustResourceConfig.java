@@ -1,6 +1,5 @@
 package com.meituan.robust.patch.resources.config;
 
-import com.meituan.robust.autopatch.Config;
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.StringUtil;
 import com.meituan.robust.patch.resources.APKStructure;
@@ -17,7 +16,7 @@ import java.util.regex.Pattern;
 public class RobustResourceConfig {
 
     // case : app/build/outputs/robust/
-    public String robustOutputsFolder = Config.robustGenerateDirectory;
+    public String robustOutputsFolder;
 
     // case : app/build/outputs/robust/resources
     public static final String RESOURCE_OUTPUTS = "resources";

@@ -29,7 +29,7 @@ import java.util.zip.ZipOutputStream;
 
 class RecoverUtils {
 
-    private RecoverUtils(){
+    private RecoverUtils() {
 
     }
 
@@ -151,13 +151,9 @@ class RecoverUtils {
         FileInputStream in = null;
         try {
             in = new FileInputStream(bigFile);
-            robustResourcesApkZipOutputStream.putNextEntry(new ZipEntry(zipEntry));
-            byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
+            FileUtil.addZipEntry(robustResourcesApkZipOutputStream, zipEntry, in);
+        } catch (Exception e) {
 
-            for (int length = in.read(buffer); length != -1; length = in.read(buffer)) {
-                robustResourcesApkZipOutputStream.write(buffer, 0, length);
-            }
-            robustResourcesApkZipOutputStream.closeEntry();
         } finally {
             if (in != null) {
                 try {

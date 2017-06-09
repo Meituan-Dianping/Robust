@@ -1,10 +1,12 @@
 package robust.gradle.plugin
 
+import com.meituan.robust.Constants
+import com.meituan.robust.common.CrcUtil
+import com.meituan.robust.common.FileUtil
+
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-
 /**
  * Created by hedex on 17/2/14.
  */
@@ -70,46 +72,20 @@ class RobustApkHashZipUtils {
         zos.closeEntry();
     }
 
-    def static void addFile2Zip(File zipFile, File robustHashFile) {
-        def tempZipFile = new File(zipFile.name + "temp", zipFile.parentFile);
-        if (tempZipFile.exists()) {
-            tempZipFile.delete();
-        }
+    def static void addFile2Zip(File apFile, File robustHashFile) {
+        String entryName = "assets/" + Constants.ROBUST_APK_HASH_FILE_NAME;
+        ZipEntry zipEntry = new ZipEntry(entryName);
+        zipEntry.setMethod(ZipEntry.STORED);
+        zipEntry.setSize(robustHashFile.length());
+        zipEntry.setCompressedSize(robustHashFile.length());
+        zipEntry.setCrc(CrcUtil.computeFileCrc32(robustHashFile));
 
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipFile))
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tempZipFile))
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(apFile))
+        FileInputStream fileInputStream = new FileInputStream(robustHashFile);
 
-        ZipEntry entry = zin.getNextEntry()
-        byte[] buf = new byte[1024 * 8]
-        while (entry != null) {
-            String name = entry.getName()
+        FileUtil.addZipEntry(zipOutputStream,zipEntry,fileInputStream)
 
-            // Add ZIP entry to output stream.
-            ZipEntry zipEntry = new ZipEntry(name);
-
-            if (ZipEntry.STORED == entry.getMethod()) {
-                zipEntry.setMethod(entry.getMethod())
-                zipEntry.setSize(entry.getSize())
-                zipEntry.setCompressedSize(entry.getCompressedSize())
-                zipEntry.setCrc(entry.getCrc())
-            }
-
-            out.putNextEntry(zipEntry);
-
-            int len
-            while ((len = zin.read(buf)) > 0) {
-                out.write(buf, 0, len)
-            }
-            out.closeEntry()
-            entry = zin.getNextEntry()
-        }
-
-        zin.close()
-
-        RobustApkHashZipUtils.zipFile(out, "assets", robustHashFile)
-        out.close()
-
-        zipFile.delete()
-        tempZipFile.renameTo(zipFile)
+        fileInputStream.close();
+        zipOutputStream.close()
     }
 }
