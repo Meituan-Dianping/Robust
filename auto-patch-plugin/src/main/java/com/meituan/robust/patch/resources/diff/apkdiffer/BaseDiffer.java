@@ -238,9 +238,6 @@ public class BaseDiffer {
             return false;
         }
 
-        if (newFile.toPath().endsWith(APKStructure.ResourcesArsc_Type)){
-            System.out.println("arsc");
-        }
         String newMd5 = MD5.getHashString(newFile);
         String oldMd5 = MD5.getHashString(oldFile);
 
@@ -255,7 +252,10 @@ public class BaseDiffer {
 
         File diffFile = getApkDiffOutPath(newFile).toFile();
 
-        if (isNeedDiff(newFile)) {
+        //todo lib(so) do not use diff-tool
+        boolean isLibFile = getRelativePathStringToNewFile(newFile).startsWith(APKStructure.Lib_Type);
+
+        if (false == isLibFile && isNeedDiff(newFile)) {
             if (!diffFile.getParentFile().exists()) {
                 diffFile.getParentFile().mkdirs();
             }

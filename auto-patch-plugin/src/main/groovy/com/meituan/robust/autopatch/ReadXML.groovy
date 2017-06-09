@@ -54,7 +54,38 @@ class ReadXML {
             Config.noNeedReflectClassSet.add(name.text());
         }
 
+        try {
+            if (robust.switch.fixResources.text() != null && !"".equals(robust.switch.fixResources.text())){
+                Config.isResourceFix = Boolean.valueOf(robust.switch.fixResources.text()).booleanValue();
+            }
 
+            for (name in robust.resourceFix.assets.include.name){
+                Config.assetsInclude.add(name.text());
+            }
+
+            for (name in robust.resourceFix.assets.exclude.name){
+                Config.assetsExclude.add(name.text());
+            }
+
+            for (name in robust.resourceFix.res.include.name){
+                Config.resInclude.add(name.text());
+            }
+
+            for (name in robust.resourceFix.res.exclude.name){
+                Config.resExclude.add(name.text());
+            }
+
+            for (name in robust.resourceFix.lib.include.name){
+                Config.libInclude.add(name.text());
+            }
+
+            for (name in robust.resourceFix.lib.exclude.name){
+                Config.libExclude.add(name.text());
+            }
+
+        } catch (Throwable t){
+
+        }
 
     }
 }

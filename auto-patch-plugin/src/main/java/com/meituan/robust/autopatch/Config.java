@@ -40,6 +40,19 @@ public final class Config {
     public static List<CtMethod> addedSuperMethodList = new ArrayList<>();
     public static Set<String> noNeedReflectClassSet = new HashSet<>();
 
+    public static boolean isResourceFix = false;
+    //assets
+    public static HashSet<String> assetsInclude = new HashSet<>();
+    public static HashSet<String> assetsExclude = new HashSet<>();
+    //res
+    public static HashSet<String> resInclude = new HashSet<>();
+    public static HashSet<String> resExclude = new HashSet<>();
+    //lib
+    public static HashSet<String> libInclude = new HashSet<>();
+    public static HashSet<String> libExclude = new HashSet<>();
+
+
+
 
     public static void init() {
         catchReflectException = false;
