@@ -4,6 +4,7 @@ import com.meituan.robust.Constants;
 
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.bytecode.ClassFile;
 
 import static com.meituan.robust.autopatch.Config.classPool;
 import static javassist.CtNewMethod.make;
@@ -24,6 +25,7 @@ public class PatchesInfoFactory {
     private CtClass createPatchesInfoClass() {
         try {
             CtClass ctPatchesInfoImpl = classPool.makeClass(Config.patchPackageName + ".PatchesInfoImpl");
+            ctPatchesInfoImpl.getClassFile().setMajorVersion(ClassFile.JAVA_7);
             ctPatchesInfoImpl.setInterfaces(new CtClass[]{classPool.get("com.meituan.robust.PatchesInfo")});
             StringBuilder methodBody = new StringBuilder();
             methodBody.append("public java.util.List getPatchedClassesInfo() {");
