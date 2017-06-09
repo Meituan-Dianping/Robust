@@ -34,8 +34,8 @@
         <!--<useAsm>false</useAsm>-->
 
         <!--资源Fix开关-->
-        <!--<fixResources>true</fixResources>-->
-        <fixResources>false</fixResources>
+        <fixResources>true</fixResources>
+        <!--<fixResources>false</fixResources>-->
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
@@ -70,7 +70,7 @@
         <!--线上的apk的完整本地路径-->
         <oldApkPath>
             <!--必填,一次只能填一个-->
-            <name>/Users/hedingxu/Downloads/aimeituan-stage-6661.apk</name>
+            <name>/Users/hedingxu/robust-github/Robust/app/old.apk</name>
         </oldApkPath>
         <!--新的apk的完整本地路径-->
         <!--<newApkPath>-->

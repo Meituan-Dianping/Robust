@@ -31,7 +31,7 @@ public class RobustResourcePatchAction implements Action<Project> {
                 project.logger.error("robust: old apk patch is blank!!!!")
                 throw new RuntimeException("robust: old apk patch is blank !!!!")
             } else {
-                File oldApkFile = new File(Config.oldApkPath).exists()
+                File oldApkFile = new File(Config.oldApkPath)
                 if (!oldApkFile.exists()) {
                     throw new RuntimeException("robust: old apk patch is not exists !!! path is : " + Config.oldApkPath)
                 }
@@ -43,8 +43,7 @@ public class RobustResourcePatchAction implements Action<Project> {
 
                 //keep resource id
                 RobustKeepResourceIdTask keepResourceIdTask = project.tasks.create("robustKeep${variantName}ResourceId", RobustKeepResourceIdTask)
-                keepResourceIdTask.resourcesDir = variantOutput.processResources.resourcesDir
-                keepResourceIdTask.RDotTxtPath = resRDotTxtPath
+                keepResourceIdTask.resDir = variantOutput.processResources.resDir
                 variantOutput.processResources.dependsOn keepResourceIdTask
 
                 RobustXmlResourceInfo xmlResourceInfo = new RobustXmlResourceInfo()
@@ -90,7 +89,7 @@ public class RobustResourcePatchAction implements Action<Project> {
                 } else {
                     xmlResourceInfo.newApkPath = configNewApkPath
 
-                    def transformClassesWithRobustTask = project.tasks.findByName("transformClassesWithRobustFor${variant.name.capitalize()}")
+                    def transformClassesWithRobustTask = project.tasks.findByName("transformClassesWithAutoPatchTransformFor${variant.name.capitalize()}")
                     transformClassesWithRobustTask.doLast {
                         //diff apk
                         project.logger.debug("robust: resource fix start")

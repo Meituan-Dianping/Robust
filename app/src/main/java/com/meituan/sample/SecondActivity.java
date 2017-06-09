@@ -105,8 +105,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         getArray(meituan);
         //打开这部分注释，查看修复效果
 //        Arrays.fill(multiArr,"修复后的数据");
-//        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
-        return "error occur " + concreateClass.getA();
+        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+//        return "error occur " + concreateClass.getA();
 
     }
 

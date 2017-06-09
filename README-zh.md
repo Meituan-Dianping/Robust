@@ -103,7 +103,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	         }
 	    }
 	```
-4. 运行和生成线上apk同样的命令，即可生成补丁，补丁目录app/build/outputs/robust/patch.jar
+4. 运行和生成线上apk同样的命令，即可生成补丁，补丁目录app/build/outputs/robust/patch.apk
 5. 补丁制作成功后会停止构建apk，出现类似于如下的提示，表示补丁生成成功
 ![补丁制作成功图片](images/patchsuccess_cn.png)
 
@@ -126,7 +126,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 7. 将补丁文件copy到手机上：
 
 	```java
-	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.apk /sdcard/robust/patch.apk
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。

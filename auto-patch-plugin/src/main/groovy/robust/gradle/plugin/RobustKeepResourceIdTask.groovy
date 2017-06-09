@@ -17,7 +17,7 @@ public class RobustKeepResourceIdTask extends DefaultTask {
     private static final String RESOURCE_IDX_XML = Config.robustGenerateDirectory + "idx.xml"
 
     @Input
-    String resourcesDir
+    String resDir
 
     RobustKeepResourceIdTask() {
     }
@@ -36,8 +36,8 @@ public class RobustKeepResourceIdTask extends DefaultTask {
                 return
             }
         }
-        String idsXml = resourcesDir + File.separator + "values" + File.separator + "ids.xml"
-        String publicXml = resourcesDir + File.separator + "values" + File.separator + "public.xml"
+        String idsXml = resDir + File.separator + "values" + File.separator + "ids.xml"
+        String publicXml = resDir + File.separator + "values" + File.separator + "public.xml"
         File oldIdsXmlFile = new File(idsXml)
         if (oldIdsXmlFile.exists()) {
             oldIdsXmlFile.delete()
@@ -49,7 +49,7 @@ public class RobustKeepResourceIdTask extends DefaultTask {
         }
 
         List<String> resourceDirectoryList = new ArrayList<String>()
-        resourceDirectoryList.add(resourcesDir)
+        resourceDirectoryList.add(resDir)
 
         Map<RDotTxtEntry.RType, Set<RDotTxtEntry>> rTypeResourceMap = PatchUtil.readRTxt(RDotTxtPath)
 

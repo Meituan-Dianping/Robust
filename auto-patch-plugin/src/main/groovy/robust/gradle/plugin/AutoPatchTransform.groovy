@@ -62,17 +62,6 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         Config.methodMap = JavaUtils.getMapFromZippedFile(project.projectDir.path + Constants.METHOD_MAP_PATH)
     }
 
-    def startKeepResourceIdTask(){
-        def variantOutput = variant.outputs.first()
-        def variantName = variant.name.capitalize()
-
-        //resource id
-        RobustKeepResourceIdAction keepResourceIdTask = project.tasks.create("robustKeep${variantName}ResourceId", RobustKeepResourceIdAction)
-        keepResourceIdTask.resourcesDir = variantOutput.processResources.resourcesDir
-        keepResourceIdTask.RDotTxtPath = resRDotTxtPath
-        variantOutput.processResources.dependsOn keepResourceIdTask
-    }
-
     @Override
     String getName() {
         return "AutoPatchTransform"
@@ -113,6 +102,15 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "autoPatch cost $cost second"
         if (Config.isResourceFix){
+            File jarFile = outputProvider.getContentLocation("main", getOutputTypes(), getScopes(),
+                    Format.JAR);
+            if(!jarFile.getParentFile().exists()){
+                jarFile.getParentFile().mkdirs();
+            }
+            if(jarFile.exists()){
+                jarFile.delete();
+            }
+            ResourceTaskUtils.keepCode(box,jarFile)
             return;
         }
         throw new RuntimeException("auto patch end successfully")
@@ -311,7 +309,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         if (!inputFile.exists() || !inputFile.canRead()) {
             throw new RuntimeException("patch.dex is not exists or readable")
         }
-        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(new File(Config.robustGenerateDirectory, Constants.PATACH_JAR_NAME)))
+        ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME)))
         zipOut.setLevel(Deflater.NO_COMPRESSION)
         FileInputStream fis = new FileInputStream(inputFile)
         zipFile(inputFile, zipOut, Constants.CLASSES_DEX_NAME);
