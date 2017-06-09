@@ -5,6 +5,7 @@ package com.meituan.robust;
  * 1.patches dex + resources
  * 2.patches dex
  * 3.patches resources
+ *
  */
 
 public class PatchTypeUtil {
@@ -19,11 +20,12 @@ public class PatchTypeUtil {
 
     static boolean isResourceType(Patch patch) {
         //// TODO: 17/6/8
-        return true;
+        //TODO CONSIDER SO
+        return false;
     }
 
     static boolean isDexAndResourceType(Patch patch) {
         //// TODO: 17/6/8
-        return true;
+        return false;
     }
 }

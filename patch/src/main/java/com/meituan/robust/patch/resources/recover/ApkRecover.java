@@ -101,7 +101,6 @@ public class ApkRecover {
 
     //TODO: 17/5/29 在patch list，遍历到一个patch需要同时应用资源时，需要调用下面的方法，先完成资源的合成
     //TODO: 遍历到这个补丁时，补丁延迟apply，需要检查资源是否已经merge成功，如果已经成功，可以应用
-    //TODO: 该方法最好执行在robustresourcesmerge进程
     //TODO: 资源尽量只应用一次; 选取时间戳最大的那个资源作为资源；
     //TODO：可能出现一个资源resources.apk + 多个dex 一起应用的情况
     //recover : 资源patch + base.apk -> resources.apk
