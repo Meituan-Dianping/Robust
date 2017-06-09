@@ -13,8 +13,8 @@ import org.gradle.api.tasks.TaskAction
  * Created by hedex on 17/2/21.
  */
 public class RobustKeepResourceIdTask extends DefaultTask {
-    static final String RESOURCE_PUBLIC_XML = RobustPatchPlugin.ROBUST_BUILD_OUTPUTS + "public.xml"
-    static final String RESOURCE_IDX_XML = RobustPatchPlugin.ROBUST_BUILD_OUTPUTS + "idx.xml"
+    private static final String RESOURCE_PUBLIC_XML = Config.robustGenerateDirectory + "public.xml"
+    private static final String RESOURCE_IDX_XML = Config.robustGenerateDirectory + "idx.xml"
 
     @Input
     String resourcesDir
@@ -29,10 +29,10 @@ public class RobustKeepResourceIdTask extends DefaultTask {
             return
         }
         String RDotTxtPath = Config.RDotTxtFilePath
-        if (null == RDotTxtPath || "".equals(RDotTxtPath)) {
+        if (null == RDotTxtPath || "".equals(RDotTxtPath.trim())) {
             File file = new File(RDotTxtPath)
             if (!file.exists() || file.length() == 0) {
-                project.logger.error("apply R.txt file ${RDotTxtPath} is failed")
+                project.logger.error("apply R.txt file ${RDotTxtPath} failed")
                 return
             }
         }
