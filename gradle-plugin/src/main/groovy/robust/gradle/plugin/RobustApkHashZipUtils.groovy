@@ -4,9 +4,7 @@ import com.meituan.robust.Constants
 import com.meituan.robust.common.CrcUtil
 import com.meituan.robust.common.FileUtil
 
-import java.util.zip.Deflater
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
+import java.util.zip.*
 /**
  * Created by hedex on 17/2/14.
  */
@@ -72,7 +70,27 @@ class RobustApkHashZipUtils {
         zos.closeEntry();
     }
 
-    def static void addFile2Zip(File apFile, File robustHashFile) {
+    def static void addApkHashFile2ApFile(File apFile, File robustHashFile) {
+
+        def tempZipFile = new File(apFile.name + "temp", apFile.parentFile);
+        if (tempZipFile.exists()) {
+            tempZipFile.delete();
+        }
+
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(tempZipFile))
+
+        //copy ap file
+        ZipFile apZipFile = new ZipFile(apFile)
+        final Enumeration<? extends ZipEntry> entries = apZipFile.entries();
+        while (entries.hasMoreElements()) {
+//            ZipEntry zipEntry = entries.nextElement();//保守
+            ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
+            if (null != zipEntry ) {
+                FileUtil.addZipEntry(zipOutputStream, zipEntry, apZipFile.getInputStream(zipEntry))
+            }
+        }
+
+        //add hash file
         String entryName = "assets/" + Constants.ROBUST_APK_HASH_FILE_NAME;
         ZipEntry zipEntry = new ZipEntry(entryName);
         zipEntry.setMethod(ZipEntry.STORED);
@@ -80,12 +98,14 @@ class RobustApkHashZipUtils {
         zipEntry.setCompressedSize(robustHashFile.length());
         zipEntry.setCrc(CrcUtil.computeFileCrc32(robustHashFile));
 
-        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(apFile))
-        FileInputStream fileInputStream = new FileInputStream(robustHashFile);
+        FileInputStream hashFileInputStream = new FileInputStream(robustHashFile);
 
-        FileUtil.addZipEntry(zipOutputStream,zipEntry,fileInputStream)
+        FileUtil.addZipEntry(zipOutputStream, zipEntry, hashFileInputStream)
 
-        fileInputStream.close();
+        hashFileInputStream.close();
         zipOutputStream.close()
+
+        apFile.delete()
+        tempZipFile.renameTo(apFile.getAbsolutePath())
     }
 }

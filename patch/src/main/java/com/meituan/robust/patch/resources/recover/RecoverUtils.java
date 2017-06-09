@@ -176,12 +176,14 @@ class RecoverUtils {
                     try {
                         RecoverUtils.extract(diffApkZipFile, zipEntry, newLibFile, data.newMd5);
                     } catch (Throwable throwable) {
+                        throwable.printStackTrace();
                         return false;
                     }
                 } else {
                     try {
-                        RecoverUtils.zipEntry2ApkOutputStream(diffApkZipFile, zipEntry, robustResourcesApkZipOutputStream);
+                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
+                        throwable.printStackTrace();
                         return false;
                     }
                 }
@@ -198,12 +200,14 @@ class RecoverUtils {
                     try {
                         RecoverUtils.extract(diffApkZipFile, zipEntry, newLibFile, data.newMd5);
                     } catch (Throwable throwable) {
+                        throwable.printStackTrace();
                         return false;
                     }
                 } else {
                     try {
-                        RecoverUtils.zipEntry2ApkOutputStream(diffApkZipFile, zipEntry, robustResourcesApkZipOutputStream);
+                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
+                        throwable.printStackTrace();
                         return false;
                     }
                 }
@@ -218,24 +222,6 @@ class RecoverUtils {
 //        }
 
         return true;
-    }
-
-    public static void zipEntry2ApkOutputStream(ZipFile zipFile, ZipEntry zipEntry, ZipOutputStream outputStream) throws IOException {
-        InputStream in = null;
-        try {
-            in = zipFile.getInputStream(zipEntry);
-            outputStream.putNextEntry(new ZipEntry(zipEntry));
-            byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
-
-            for (int length = in.read(buffer); length != -1; length = in.read(buffer)) {
-                outputStream.write(buffer, 0, length);
-            }
-            outputStream.closeEntry();
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-        }
     }
 
     private static void closeQuietly(Closeable closeable) {

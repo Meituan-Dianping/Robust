@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.text.TextUtils;
 
+import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
 import com.meituan.robust.common.ResourceConstant;
 import com.meituan.robust.patch.resources.APKStructure;
@@ -203,8 +204,9 @@ public class ApkRecover {
         //zip diff data file to resources apk
         ZipEntry diffDataZipEntry = diffApkZipFile.getEntry(ResourceConstant.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
         try {
-            RecoverUtils.zipEntry2ApkOutputStream(diffApkZipFile, diffDataZipEntry, resourcesApkZipOutputStream);
+            FileUtil.addZipEntry(resourcesApkZipOutputStream,new ZipEntry(diffDataZipEntry.getName()),diffApkZipFile.getInputStream(diffDataZipEntry));
         } catch (Throwable throwable) {
+            throwable.printStackTrace();
             return false;
         }
 
@@ -223,7 +225,7 @@ public class ApkRecover {
             //classes/d{0,}.dex is no need
             if (!name.startsWith(APKStructure.Dex_Type) && !apkDiffData.isContains(name)) {
                 try {
-                    RecoverUtils.zipEntry2ApkOutputStream(baseApkZipFile, zipEntry, resourcesApkZipOutputStream);
+                    FileUtil.addZipEntry(resourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),baseApkZipFile.getInputStream(zipEntry));
                 } catch (Throwable throwable) {
                     return false;
                 }

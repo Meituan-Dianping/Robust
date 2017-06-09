@@ -2,13 +2,12 @@ package robust.gradle.plugin
 
 import com.meituan.robust.Constants
 import com.meituan.robust.autopatch.Config
-import com.meituan.robust.common.ResourceConstant
+import com.meituan.robust.common.FileUtil
 import com.meituan.robust.patch.resources.config.RobustResourceConfig
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
-
 /**
  * Created by hedex on 17/2/21.
  */
@@ -35,25 +34,36 @@ public class RobustPatchMerger {
         boolean hasResource = Config.patchHasResource && resourcePartFile.exists() && resourcePartFile.length() > 0;
 
         if (hasDex & hasResource) {
+            File mergeFile = new File(dexPartFile.absolutePath + "merge_temp")
+
+            ZipOutputStream mergeZipOutputStream  = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(mergeFile)));
+
             //merge
             ZipFile dexPartZipFile = new ZipFile(dexPartFile)
 
             ZipEntry classesDexEntry = dexPartZipFile.getEntry("classes.dex")
+            FileUtil.addZipEntry(mergeZipOutputStream, classesDexEntry, dexPartZipFile.getInputStream(classesDexEntry))
 
-            ZipOutputStream resourcePartZipOutputStream = null;
-            try {
-                resourcePartZipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(resourcePartFile)));
-                zipEntry2ZipOutputStream(dexPartZipFile, classesDexEntry, resourcePartZipOutputStream);
-            } catch (Throwable throwable) {
-                throwable.printStackTrace();
-            } finally {
-                if (null != resourcePartZipOutputStream) {
-                    resourcePartZipOutputStream.close()
+            //copy ap file
+            ZipFile resourcePartZipFile = new ZipFile(resourcePartFile)
+            final Enumeration<? extends ZipEntry> entries = resourcePartZipFile.entries();
+            while (entries.hasMoreElements()) {
+                //ZipEntry zipEntry = entries.nextElement();//保守
+                ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
+                if (null != zipEntry ) {
+                    FileUtil.addZipEntry(mergeZipOutputStream, zipEntry, resourcePartZipFile.getInputStream(zipEntry))
                 }
-                dexPartZipFile.close()
             }
 
-            resourcePartFile.renameTo(dexPartFile.absolutePath)
+            dexPartZipFile.close()
+            resourcePartZipFile.close()
+            if (null != mergeZipOutputStream) {
+                mergeZipOutputStream.close()
+            }
+            if (dexPartFile.exists()){
+                dexPartFile.delete()
+            }
+            mergeFile.renameTo(dexPartFile.absolutePath)
         } else {
             if (hasDex) {
             }
@@ -87,22 +97,4 @@ public class RobustPatchMerger {
         }
     }
 
-    private
-    static void zipEntry2ZipOutputStream(ZipFile zipFile, ZipEntry zipEntry, ZipOutputStream outputStream) throws IOException {
-        InputStream inputStream = null;
-        try {
-            inputStream = zipFile.getInputStream(zipEntry);
-            outputStream.putNextEntry(new ZipEntry(zipEntry));
-            byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
-
-            for (int length = inputStream.read(buffer); length != -1; length = inputStream.read(buffer)) {
-                outputStream.write(buffer, 0, length);
-            }
-            outputStream.closeEntry();
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
-    }
 }
