@@ -143,7 +143,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         SmaliTool.getInstance().dealObscureInSmali();
         executeCommand(smali2DexCommand)
         //package patch.dex to patch.jar
-        packagePatchDex2Jar()
+        packagePatchDex2Apk()
         deleteTmpFiles()
     }
     def  zipPatchClassesFile(){
@@ -282,7 +282,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         new File(patchPath).deleteDir();
     }
 
-    def  packagePatchDex2Jar() throws IOException {
+    def packagePatchDex2Apk() throws IOException {
         File inputFile=new File(Config.robustGenerateDirectory, Constants.PATACH_DEX_NAME);
         if (!inputFile.exists() || !inputFile.canRead()) {
             throw new RuntimeException("patch.dex is not exists or readable")

@@ -55,14 +55,14 @@ public class RobustResourceConfig {
 
 
     public RobustResourceConfig(RobustXmlResourceInfo robustXmlResourceInfo) {
-        resIncludePatterns = strings2Patterns(robustXmlResourceInfo.resIncludeStrings);
-        resExcludePatterns = strings2Patterns(robustXmlResourceInfo.resExcludeStrings);
+        resIncludePatterns = resStrings2Patterns(robustXmlResourceInfo.resIncludeStrings);
+        resExcludePatterns = resStrings2Patterns(robustXmlResourceInfo.resExcludeStrings);
 
-        libIncludePatterns = strings2Patterns(robustXmlResourceInfo.libIncludeStrings);
-        libExcludePatterns = strings2Patterns(robustXmlResourceInfo.libExcludeStrings);
+        libIncludePatterns = libStrings2Patterns(robustXmlResourceInfo.libIncludeStrings);
+        libExcludePatterns = libStrings2Patterns(robustXmlResourceInfo.libExcludeStrings);
 
-        assetsIncludePatterns = strings2Patterns(robustXmlResourceInfo.assetsIncludeStrings);
-        assetsExcludePatterns = strings2Patterns(robustXmlResourceInfo.assetsExcludeStrings);
+        assetsIncludePatterns = assetsStrings2Patterns(robustXmlResourceInfo.assetsIncludeStrings);
+        assetsExcludePatterns = assetsStrings2Patterns(robustXmlResourceInfo.assetsExcludeStrings);
 
         bigFileSizeAtLeast = robustXmlResourceInfo.bigFileSizeAtLeast;
 
@@ -74,6 +74,42 @@ public class RobustResourceConfig {
         robustOutputsFolder = robustXmlResourceInfo.robustOutputDirPath;
         FileUtil.deleteAllFile(robustOutputsFolder);
         configOutputDirectory();
+    }
+
+    private static HashSet<Pattern> resStrings2Patterns(HashSet<String> strings) {
+        if (null == strings) {
+            return strings2Patterns(strings);
+        } else {
+            HashSet<String> resStrings = new HashSet<>(strings.size());
+            for (String str : strings) {
+                resStrings.add(APKStructure.Res_Type + File.separator + str);
+            }
+            return strings2Patterns(resStrings);
+        }
+    }
+
+    private static HashSet<Pattern> libStrings2Patterns(HashSet<String> strings) {
+        if (null == strings) {
+            return strings2Patterns(strings);
+        } else {
+            HashSet<String> libStrings = new HashSet<>(strings.size());
+            for (String str : strings) {
+                libStrings.add(APKStructure.Lib_Type + File.separator + str);
+            }
+            return strings2Patterns(libStrings);
+        }
+    }
+
+    private static HashSet<Pattern> assetsStrings2Patterns(HashSet<String> strings) {
+        if (null == strings) {
+            return strings2Patterns(strings);
+        } else {
+            HashSet<String> assetsStrings = new HashSet<>(strings.size());
+            for (String str : strings) {
+                assetsStrings.add(APKStructure.Assets_Type + File.separator + str);
+            }
+            return strings2Patterns(assetsStrings);
+        }
     }
 
     private void configOutputDirectory() {
@@ -133,15 +169,15 @@ public class RobustResourceConfig {
         String oldApkPath = "/Users/hedingxu/Downloads/aimeituan-stage-6661.apk";
         String newApkPath = "/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk";
         HashSet<String> assetsExcludeStrings = new HashSet<>();
-        assetsExcludeStrings.add(APKStructure.Assets_Type + "/robust.apkhash");
+        assetsExcludeStrings.add("robust.apkhash");
         HashSet<String> assetsIncludeStrings = new HashSet<>();
-        assetsIncludeStrings.add(APKStructure.Assets_Type + "/*");
+        assetsIncludeStrings.add("*");
         HashSet<String> resExcludeStrings = new HashSet<>();
         HashSet<String> resIncludeStrings = new HashSet<>();
-        resIncludeStrings.add(APKStructure.Res_Type + "/*");
+        resIncludeStrings.add("*");
         HashSet<String> libExcludeStrings = new HashSet<>();
         HashSet<String> libIncludeStrings = new HashSet<>();
-        libIncludeStrings.add(APKStructure.Lib_Type + "/*");
+        libIncludeStrings.add("*");
 
         xmlResourceInfo.oldApkPath = oldApkPath;
         xmlResourceInfo.newApkPath = newApkPath;

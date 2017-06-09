@@ -32,6 +32,10 @@
         <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
         <useAsm>true</useAsm>
         <!--<useAsm>false</useAsm>-->
+
+        <!--资源Fix开关-->
+        <!--<fixResources>true</fixResources>-->
+        <fixResources>false</fixResources>
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
@@ -62,5 +66,34 @@
 
 
     <!--resources fix -->
-    <
+    <resourceFix>
+        <assets>
+            <include name="include">
+                <!--support pattern, adapt windows , mac and linux file system-->
+
+                <!-- * 表示匹配assets目录下的所有文件 -->
+                <name>*</name>
+            </include>
+            <!--exclude patterns has a higher priority  than the include patterns-->
+            <exclude name="exclude">
+                <!--support pattern-->
+            </exclude>
+        </assets>
+
+        <res>
+            <include name="include">
+                <name>*</name>
+            </include>
+            <!--exclude patterns has a higher priority  than the include patterns-->
+            <exclude name="exclude"></exclude>
+        </res>
+
+        <lib>
+            <include name="include">
+                <name>*</name>
+            </include>
+            <!--exclude patterns has a higher priority  than the include patterns-->
+            <exclude name="exclude"></exclude>
+        </lib>
+    </resourceFix>
 </resources>
