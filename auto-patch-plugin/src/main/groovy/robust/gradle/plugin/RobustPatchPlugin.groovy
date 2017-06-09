@@ -83,7 +83,7 @@ public class RobustPatchPlugin implements Plugin<Project> {
                 keepResourceIdTask.RDotTxtPath = resRDotTxtPath
                 variantOutput.processResources.dependsOn keepResourceIdTask
 
-                RobustResourcePatchTask resourcesPatch = new RobustResourcePatchTask()
+                RobustResourcePatchAction resourcesPatch = new RobustResourcePatchAction()
 
                 RobustXmlResourceInfo xmlResourceInfo = new RobustXmlResourceInfo()
 

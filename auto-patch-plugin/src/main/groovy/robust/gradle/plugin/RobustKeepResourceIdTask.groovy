@@ -1,11 +1,13 @@
 package robust.gradle.plugin
 
+import com.meituan.robust.autopatch.Config
 import com.meituan.robust.common.FileUtil
 import com.meituan.robust.tools.aapt.AaptResourceCollector
 import com.meituan.robust.tools.aapt.AaptUtil
 import com.meituan.robust.tools.aapt.PatchUtil
 import com.meituan.robust.tools.aapt.RDotTxtEntry
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 /**
  * Created by hedex on 17/2/21.
@@ -14,8 +16,8 @@ public class RobustKeepResourceIdTask extends DefaultTask {
     static final String RESOURCE_PUBLIC_XML = RobustPatchPlugin.ROBUST_BUILD_OUTPUTS + "public.xml"
     static final String RESOURCE_IDX_XML = RobustPatchPlugin.ROBUST_BUILD_OUTPUTS + "idx.xml"
 
+    @Input
     String resourcesDir
-    String RDotTxtPath
 
     RobustKeepResourceIdTask() {
     }
@@ -23,9 +25,13 @@ public class RobustKeepResourceIdTask extends DefaultTask {
     @TaskAction
     def keepResourceId() {
 
-        if (null == resRDotTxtPath || "".equals(resRDotTxtPath)){
-            File file = new File(resRDotTxtPath)
-            if (!file.exists() || file.length() == 0){
+        if (!Config.isResourceFix) {
+            return
+        }
+        String RDotTxtPath = Config.RDotTxtFilePath
+        if (null == RDotTxtPath || "".equals(RDotTxtPath)) {
+            File file = new File(RDotTxtPath)
+            if (!file.exists() || file.length() == 0) {
                 project.logger.error("apply R.txt file ${RDotTxtPath} is failed")
                 return
             }
@@ -33,12 +39,12 @@ public class RobustKeepResourceIdTask extends DefaultTask {
         String idsXml = resourcesDir + File.separator + "values" + File.separator + "ids.xml"
         String publicXml = resourcesDir + File.separator + "values" + File.separator + "public.xml"
         File oldIdsXmlFile = new File(idsXml)
-        if (oldIdsXmlFile.exists()){
+        if (oldIdsXmlFile.exists()) {
             oldIdsXmlFile.delete()
         }
 
         File oldPublicXml = new File(publicXml)
-        if (oldPublicXml.exists()){
+        if (oldPublicXml.exists()) {
             oldPublicXml.delete()
         }
 
@@ -53,11 +59,11 @@ public class RobustKeepResourceIdTask extends DefaultTask {
 
         File publicFile = new File(publicXml)
         if (publicFile.exists()) {
-            FileUtil.copyFile(publicFile, project.file(RESOURCE_PUBLIC_XML))
+            FileUtil.copyFile(publicFile, new File(RESOURCE_PUBLIC_XML))
         }
         File idxFile = new File(idsXml)
         if (idxFile.exists()) {
-            FileUtil.copyFile(idxFile, project.file(RESOURCE_IDX_XML))
+            FileUtil.copyFile(idxFile, new File(RESOURCE_IDX_XML))
         }
     }
 }

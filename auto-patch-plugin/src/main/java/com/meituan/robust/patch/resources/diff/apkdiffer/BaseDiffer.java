@@ -252,7 +252,7 @@ public class BaseDiffer {
 
         File diffFile = getApkDiffOutPath(newFile).toFile();
 
-        //todo lib(so) do not use diff-tool
+        //todo support lib(so) use diff-tool
         boolean isLibFile = getRelativePathStringToNewFile(newFile).startsWith(APKStructure.Lib_Type);
 
         if (false == isLibFile && isNeedDiff(newFile)) {
