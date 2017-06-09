@@ -77,9 +77,10 @@ public class PatchExecutor extends Thread {
             if (patchManipulate.ensurePatchExist(p)) {
 
                 if (patchManipulate.verifyPatch(context, p)) {
-                    robustCallBack.logNotify("verifyPatch failure, patch info:" + "id = " + p.getName() + ",md5 = " + p.getMd5(), "class:PatchExecutor method:patch line:107");
 
-                    if (PatchTypeUtil.isDexAndResourceType(p)) {
+                    int patchType = PatchTypeUtil.getPatchType(p);
+
+                    if (PatchTypeUtil.isDexAndResourceType(patchType)) {
                         if (ApkRecover.isRecovered(context, p.getName(), p.getMd5())) {
                             dexAndResourcesPatches.add(p);
                         } else {
@@ -91,12 +92,12 @@ public class PatchExecutor extends Thread {
                         continue;
                     }
 
-                    if (PatchTypeUtil.isDexType(p)) {
+                    if (PatchTypeUtil.isDexType(patchType)) {
                         dexPatches.add(p);
                         continue;
                     }
 
-                    if (PatchTypeUtil.isResourceType(p)) {
+                    if (PatchTypeUtil.isResourceType(patchType)) {
                         if (ApkRecover.isRecovered(context, p.getName(), p.getMd5())) {
                             resourcesPatches.add(p);
                         } else {
@@ -109,6 +110,8 @@ public class PatchExecutor extends Thread {
                         continue;
                     }
 
+                } else {
+                    robustCallBack.logNotify("verifyPatch failure, patch info:" + "id = " + p.getName() + ",md5 = " + p.getMd5(), "class:PatchExecutor method:patch line:107");
                 }
             }
         }

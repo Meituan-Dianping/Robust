@@ -4,9 +4,6 @@ buildscript {
     repositories {
         mavenLocal()
         jcenter()
-        maven {
-            url "http://depot.sankuai.com/nexus/content/groups/public/"
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'

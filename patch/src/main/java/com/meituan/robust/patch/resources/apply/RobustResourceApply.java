@@ -127,8 +127,8 @@ public class RobustResourceApply {
         } catch (ClassNotFoundException e) {
             loadedApkClass = Class.forName("android.app.ActivityThread$PackageInfo");
         }
-        Field mApplication = loadedApkClass.getDeclaredField("mApplication");
-        mApplication.setAccessible(true);
+//        Field mApplication = loadedApkClass.getDeclaredField("mApplication");
+//        mApplication.setAccessible(true);
         Field mResDir = loadedApkClass.getDeclaredField("mResDir");
         mResDir.setAccessible(true);
 
@@ -147,7 +147,6 @@ public class RobustResourceApply {
 
         // Enumerate all LoadedApk (or PackageInfo) fields in ActivityThread#mPackages and
         // ActivityThread#mResourcePackages and do two things:
-        //   - Replace the Application instance in its mApplication field with the real one
         //   - Replace mResDir to point to the external resource file instead of the .apk. This is
         //     used as the asset path for new Resources objects.
         //   - Set Application#mLoadedApk to the found LoadedApk instance
@@ -427,9 +426,9 @@ public class RobustResourceApply {
             Method method = manager.getClass().getDeclaredMethod("getStringBlockCount");
             method.setAccessible(true);
             int assetsPathCount = (Integer) method.invoke(manager);
-            for (int x = 0; x < assetsPathCount; x++) {
+            for (int index = 0; index < assetsPathCount; index++) {
                 // Cookies map to string blocks starting at 1
-                String assetsPath = (String) manager.getClass().getMethod("getCookieName", int.class).invoke(manager, x + 1);
+                String assetsPath = (String) manager.getClass().getMethod("getCookieName", int.class).invoke(manager, index + 1);
                 if (!TextUtils.isEmpty(assetsPath)) {
                     assetPaths.add(assetsPath);
                 }
