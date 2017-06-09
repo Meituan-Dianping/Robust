@@ -77,7 +77,7 @@
             <!--可选，一次只能填一个-->
             <!--如果已经有new apk了，可以使用该选项-->
             <!--如果此项为空，则会默认使用build出来的apk作为newApk-->
-            <!--<name>/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk</name>-->
+            <!--<name>/Users/hedingxu/robust-github/Robust/app/new.apk</name>-->
         <!--</newApkPath>-->
         <!--线上apk的R.txt文件路径(一般位于app/build/intermediates/symbols/${flavor}/release/R.txt），可以不填写，默认会去工程目录下robust/R.txt目录寻找：app/robust-->
         <!--<RDotTxtFile>-->
