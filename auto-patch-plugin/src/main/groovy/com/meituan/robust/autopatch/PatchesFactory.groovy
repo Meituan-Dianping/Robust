@@ -4,6 +4,7 @@ import com.meituan.robust.Constants
 import com.meituan.robust.utils.JavaUtils
 import javassist.*
 import javassist.bytecode.AccessFlag
+import javassist.bytecode.ClassFile
 import javassist.expr.ExprEditor
 import javassist.expr.FieldAccess
 import javassist.expr.MethodCall
@@ -164,6 +165,7 @@ class PatchesFactory {
             targetClass.defrost();
         }
         targetClass = Config.classPool.makeClass(patchName);
+        targetClass.getClassFile().setMajorVersion(ClassFile.JAVA_7);
         //warning 所有的super问题均在assist class来处理,
         targetClass.setSuperclass(sourceClass.getSuperclass());
         for (CtField field : sourceClass.getDeclaredFields()) {
