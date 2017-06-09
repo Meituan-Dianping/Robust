@@ -165,7 +165,6 @@ public class RobustResourceConfig {
 
         RobustXmlResourceInfo xmlResourceInfo = new RobustXmlResourceInfo();
 
-        //todo
 //        String oldApkPath = "/Users/hedingxu/Downloads/aimeituan_513_huawei.apk";
         String oldApkPath = "/Users/hedingxu/Downloads/aimeituan-stage-6661.apk";
         String newApkPath = "/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk";

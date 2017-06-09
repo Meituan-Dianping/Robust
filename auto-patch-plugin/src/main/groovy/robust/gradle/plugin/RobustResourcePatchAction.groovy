@@ -1,5 +1,6 @@
 package robust.gradle.plugin
 
+import com.meituan.robust.Constants
 import com.meituan.robust.autopatch.Config
 import com.meituan.robust.patch.resources.config.RobustResourceConfig
 import com.meituan.robust.patch.resources.config.RobustXmlResourceInfo
@@ -68,23 +69,45 @@ public class RobustResourcePatchAction implements Action<Project> {
                     variant.outputs.each { output ->
                         xmlResourceInfo.newApkPath = output.outputFile
                     }
+
+                    def assembleTask = project.tasks.findByName("assemble${variant.name.capitalize()}")
+                    assembleTask.doLast {
+                        //diff apk
+                        project.logger.debug("robust: resource fix start")
+                        try {
+                            execute(xmlResourceInfo)
+                        } catch (Exception e) {
+                            project.logger.debug("robust: An Error Has Occurred")
+                            throw RuntimeException(e)
+                        }
+                        project.logger.debug("robust: resource fix end")
+                        Config.patchHasResource = true
+
+                        //todo call merge dex part and resource part
+                        throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
+                    }
+
                 } else {
                     xmlResourceInfo.newApkPath = configNewApkPath
-                }
 
-                def assembleTask = project.tasks.findByName("assemble${variant.name.capitalize()}")
-                assembleTask.doLast {
-                    //diff apk
-                    project.logger.debug("robust: resource fix start")
-                    try {
-                        execute(xmlResourceInfo)
-                    } catch (Exception e) {
-                        throw RuntimeException(e)
+                    def transformClassesWithRobustTask = project.tasks.findByName("transformClassesWithRobustFor${variant.name.capitalize()}")
+                    transformClassesWithRobustTask.doLast {
+                        //diff apk
+                        project.logger.debug("robust: resource fix start")
+                        try {
+                            execute(xmlResourceInfo)
+                        } catch (Exception e) {
+                            project.logger.debug("robust: An Error Has Occurred")
+                            throw RuntimeException(e)
+                        }
+                        project.logger.debug("robust: resource fix end")
+                        Config.patchHasResource = true
+
+                        //todo call merge dex part and resource part
+
+                        throw new RuntimeException("auto patch end successfully, patch path is :" + new File(Config.robustGenerateDirectory, Constants.PATACH_APK_NAME).toPath())
                     }
-                    project.logger.debug("robust: resource fix end")
-                    Config.patchHasResource = true
                 }
-
             }
         } else {
             project.logger.debug("robust: resource fix switch is off")
