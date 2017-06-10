@@ -8,11 +8,7 @@ import com.meituan.robust.common.TxtFileReaderAndWriter;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
 import com.meituan.robust.patch.resources.diff.data.DataUnit;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -30,9 +26,7 @@ public class ApkDiffDataReaderAndWriter {
             return null;
         }
 
-
-
-        String json = content;
+        String json = TxtFileReaderAndWriter.readFileAsString(file);
         if (null == json || json.length() == 0) {
             return gson.fromJson(json, TYPE);
         }
@@ -62,7 +56,7 @@ public class ApkDiffDataReaderAndWriter {
 //        writeDiffData(new File(diif_data_path),oldDiffdata);
         String gsonDiffData = gson.toJson(oldDiffdata, TYPE);
 
-        TxtFileReaderAndWriter.writeFile(new File(diif_data_path),gsonDiffData);
+        TxtFileReaderAndWriter.writeFile(new File(diif_data_path), gsonDiffData);
 
         gsonDiffData = TxtFileReaderAndWriter.readFileAsString(new File(diif_data_path));
         APKDiffData gsonDta = gson.fromJson(gsonDiffData, TYPE);
@@ -71,10 +65,6 @@ public class ApkDiffDataReaderAndWriter {
         if (gsonDta == null) {
             System.err.println("blank ");
         }
-
-//        json = "{\"oldResourcesArscCrc\":3372233974,\"diffTypeName\":\"apk\",\"addSet\":[],\"modSet\":[],\"delSet\":[{\"name\":\"assets/robust.apkhash\",\"oldMd5\":\"8c3024b3cbab134b6d2275611825da0c\",\"newMd5\":\"\",\"diffMd5\":\"\",\"newCrc\":0}],\"diffModSet\":[{\"name\":\"resources.arsc\",\"oldMd5\":\"2a30f769a904a4d103939b83f295de6e\",\"newMd5\":\"e2a7e2d8469e1b5c2d4b5688bba80bc2\",\"diffMd5\":\"a8e134e31c06122cfd651989f7759e30\",\"newCrc\":2912363016}]}";
-//        json = "{\"oldResourcesArscCrc\":3372233974,\"diffTypeName\":\"apk\",\"addSet\":[],\"modSet\":[],\"delSet\":[{\"name\":\"assets/robust.apkhash\",\"oldMd5\":\"8c3024b3cbab134b6d2275611825da0c\",\"newMd5\":\"\",\"diffMd5\":\"\",\"newCrc\":0}],\"diffModSet\":[{\"name\":\"resources.arsc\",\"oldMd5\":\"2a30f769a904a4d103939b83f295de6e\",\"newMd5\":\"e2a7e2d8469e1b5c2d4b5688bba80bc2\",\"diffMd5\":\"a8e134e31c06122cfd651989f7759e30\",\"newCrc\":2912363016}]}";
-
     }
 
 
@@ -91,20 +81,8 @@ public class ApkDiffDataReaderAndWriter {
             return false;
         }
         FileUtil.createFile(file.getAbsolutePath());
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter(file);
-            fileWriter.write(content);
-        } catch (IOException e) {
-            return false;
-        } finally {
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e) {
-                }
-            }
-        }
+
+        TxtFileReaderAndWriter.writeFile(file, content);
         return true;
     }
 }
