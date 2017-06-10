@@ -25,7 +25,7 @@ public class Patch implements Cloneable {
     }
     //原始补丁文件的路径，推荐放到私有目录
     public String getLocalPath() {
-        return localPath + ".jar";
+        return localPath + ".apk";
     }
 
     public void setLocalPath(String localPath) {
@@ -105,7 +105,7 @@ public class Patch implements Cloneable {
     }
     //解密之后的补丁文件，可以直接运行的补丁文件，建议加载之后立刻删除，保证安全性
     public String getTempPath() {
-        return tempPath + "_temp" + ".jar";
+        return tempPath + "_temp" + ".apk";
     }
 
     public void setTempPath(String tempPath) {

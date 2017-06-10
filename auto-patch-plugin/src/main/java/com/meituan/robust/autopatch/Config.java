@@ -33,12 +33,29 @@ public final class Config {
     public static List<String> modifiedClassNameList = new ArrayList<String>();
     public static List<String> hotfixPackageList = new ArrayList<>();
     public static HashMap<String, Integer> methodMap = new HashMap();
-    public static  String robustGenerateDirectory;
+    public static String robustGenerateDirectory;
     public static Map<String, List<CtMethod>> invokeSuperMethodMap = new HashMap<>();
     public static ClassPool classPool = new ClassPool();
     public static Set methodNeedPatchSet = new HashSet();
     public static List<CtMethod> addedSuperMethodList = new ArrayList<>();
     public static Set<String> noNeedReflectClassSet = new HashSet<>();
+
+    public static boolean patchHasDex = false;
+    public static boolean patchHasResource = false;
+    public static boolean isResourceFix = false;
+    public static String RDotTxtFilePath;
+    public static String oldApkPath;
+    public static String newApkPath;
+    public static int bigFileSizeAtLeast;
+    //assets
+    public static HashSet<String> assetsInclude = new HashSet<>();
+    public static HashSet<String> assetsExclude = new HashSet<>();
+    //res
+    public static HashSet<String> resInclude = new HashSet<>();
+    public static HashSet<String> resExclude = new HashSet<>();
+    //lib
+    public static HashSet<String> libInclude = new HashSet<>();
+    public static HashSet<String> libExclude = new HashSet<>();
 
 
     public static void init() {
@@ -58,7 +75,7 @@ public final class Config {
         addedSuperMethodList = new ArrayList<>();
         noNeedReflectClassSet = new HashSet<>();
         noNeedReflectClassSet.addAll(Constants.NO_NEED_REFLECT_CLASS);
-        supportProGuard=true;
+        supportProGuard = true;
     }
 
 }

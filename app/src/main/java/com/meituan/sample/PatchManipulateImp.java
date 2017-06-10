@@ -2,16 +2,15 @@ package com.meituan.sample;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchManipulate;
+import com.meituan.robust.RobustApkHashUtils;
+import com.meituan.robust.common.FileUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ import java.util.List;
 public class PatchManipulateImp extends PatchManipulate {
     /***
      * connect to the network ,get the latest patches
-     * l联网获取最新的补丁
+     * 联网获取最新的补丁
      * @param context
      *
      * @return
@@ -44,7 +43,8 @@ public class PatchManipulateImp extends PatchManipulate {
     protected List<Patch> fetchPatchList(Context context) {
         //将app自己的robustApkHash上报给服务端，服务端根据robustApkHash来区分每一次apk build来给app下发补丁
         //apkhash is the unique identifier for  apk,so you cannnot patch wrong apk.
-        //String robustApkHash = RobustApkHashUtils.readRobustApkHash(context);
+        String robustApkHash = RobustApkHashUtils.readRobustApkHash(context);
+        Log.e("robustApkHash",robustApkHash);
         //connect to network to get patch list on servers
         //在这里去联网获取补丁列表
         Patch patch = new Patch();
@@ -95,22 +95,7 @@ public class PatchManipulateImp extends PatchManipulate {
         if(!dst.getParentFile().exists()){
             dst.getParentFile().mkdirs();
         }
-        InputStream in = new FileInputStream(src);
-        try {
-            OutputStream out = new FileOutputStream(dst);
-            try {
-                // Transfer bytes from in to out
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-            } finally {
-                out.close();
-            }
-        } finally {
-            in.close();
-        }
+        FileUtil.copyFile(src,dst);
     }
     /**
      *

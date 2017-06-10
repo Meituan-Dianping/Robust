@@ -2,3 +2,6 @@ apply plugin: 'java'
 apply from: '../gradle_mvn_push.gradle'
 sourceCompatibility= 1.7
 targetCompatibility= 1.7
+dependencies {
+    compile 'com.google.code.gson:gson:2.4'
+}

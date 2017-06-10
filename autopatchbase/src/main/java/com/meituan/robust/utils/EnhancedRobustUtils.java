@@ -312,4 +312,15 @@ public class EnhancedRobustUtils {
         }
         throw new NoSuchFieldException("Field " + name + " not found in " + clazz);
     }
+
+    public static Field getReflectStaticFieldRecursive(String name, Class cls) throws NoSuchFieldException {
+        Field field = null;
+        for (Class<?> clazz = cls; clazz != null; clazz = clazz.getSuperclass()) {
+            try {
+                return getReflectStaticField(name,clazz);
+            } catch (NoSuchFieldException e){
+            }
+        }
+        throw new NoSuchFieldException("Field " + name + " not found in " + cls + " recursive");
+    }
 }

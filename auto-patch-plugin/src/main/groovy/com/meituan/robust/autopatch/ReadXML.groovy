@@ -24,7 +24,7 @@ class ReadXML {
             Config.mappingFilePath = "${path}${Constants.DEFAULT_MAPPING_FILE}"
         }
 
-        if (Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
+        if (Config.supportProGuard && (Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
             throw new RuntimeException("Not found ${Config.mappingFilePath}, please put it on your project's robust dir or change your robust.xml !");
         }
 
@@ -54,7 +54,47 @@ class ReadXML {
             Config.noNeedReflectClassSet.add(name.text());
         }
 
+        if (robust.switch.fixResources.text() != null && !"".equals(robust.switch.fixResources.text())) {
+            Config.isResourceFix = Boolean.valueOf(robust.switch.fixResources.text()).booleanValue();
+        }
 
+        if (robust.resourceFix.RDotTxtFile.name.text() != null && !"".equals(robust.resourceFix.RDotTxtFile.name.text())) {
+            Config.RDotTxtFilePath = robust.resourceFix.RDotTxtFile.name.text()
+        } else {
+            Config.RDotTxtFilePath = "${path}${Constants.DEFAULT_R_DOT_TXT_FILE}"
+        }
+
+        if (robust.resourceFix.oldApkPath.name.text() != null && !"".equals(robust.resourceFix.oldApkPath.name.text())) {
+            Config.oldApkPath = robust.resourceFix.oldApkPath.name.text()
+        }
+
+        if (robust.resourceFix.newApkPath.name.text() != null && !"".equals(robust.resourceFix.newApkPath.name.text())) {
+            Config.newApkPath = robust.resourceFix.newApkPath.name.text()
+        }
+
+        for (name in robust.resourceFix.assets.include.name) {
+            Config.assetsInclude.add(name.text());
+        }
+
+        for (name in robust.resourceFix.assets.exclude.name) {
+            Config.assetsExclude.add(name.text());
+        }
+
+        for (name in robust.resourceFix.res.include.name) {
+            Config.resInclude.add(name.text());
+        }
+
+        for (name in robust.resourceFix.res.exclude.name) {
+            Config.resExclude.add(name.text());
+        }
+
+        for (name in robust.resourceFix.lib.include.name) {
+            Config.libInclude.add(name.text());
+        }
+
+        for (name in robust.resourceFix.lib.exclude.name) {
+            Config.libExclude.add(name.text());
+        }
 
     }
 }

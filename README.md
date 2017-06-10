@@ -102,7 +102,7 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 	         }
 	    }
 	```
-4. After those steps,you need to run the same gradle command as you build the apk,then you will get patches in directory **app/build/outputs/robust/patch.jar**.
+4. After those steps,you need to run the same gradle command as you build the apk,then you will get patches in directory **app/build/outputs/robust/patch.apk**.
 5. Generating patches always end like this,which means patches is done
 ![Success in generating patch](images/patchsuccess_en.png)
 
@@ -125,11 +125,11 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 7. Copy patch to your phone：
 
 	```java
-	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.apk /sdcard/robust/patch.apk
 	```
 	patch directory can be configured in ``PatchManipulateImp``.
 8. Open app,and click **Patch** button,patch is used.
-9. Also you can use our sample patch in **app/robust/sample_patch.jar** ,this dex change text after you click **Jump_second_Activity** Button.
+9. Also you can use our sample patch in **app/robust/sample_patch.apk** ,this dex change text after you click **Jump_second_Activity** Button.
 10. In the demo ,we change the text showed on the second activity which is configured in the method ```getTextInfo(String meituan)``` in class ```SecondActivity``` 
 
 # Attentions

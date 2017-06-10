@@ -25,7 +25,7 @@ public class Constants {
     public static final String ZIP_FILE_NAME = "meituan.jar";
     public static final String PATACH_DEX_NAME = "patch.dex";
     public static final String CLASSES_DEX_NAME = "classes.dex";
-    public static final String PATACH_JAR_NAME = "patch.jar";
+    public static final String PATACH_APK_NAME = "patch.apk";
     public static final String PATCH_SUFFIX = "Patch";
     public static final String PATCH_CONTROL_SUFFIX = "Control";
     public static final String INLINE_PATCH_SUFFIX = "InLinePatch";
@@ -40,6 +40,7 @@ public class Constants {
     //FILE_MD5_PATH is a copy from RobustTransform.FILE_MD5_PATH ,please make sure the two is the same
     public static final String METHOD_MAP_PATH = "/robust/methodsMap.robust";
     public static final String DEFAULT_MAPPING_FILE = "/robust/mapping.txt";
+    public static final String DEFAULT_R_DOT_TXT_FILE = "/robust/R.txt";
 
     public static final String SMALI_INVOKE_SUPER_COMMAND = "invoke-super";
     public static final String SMALI_INVOKE_VIRTUAL_COMMAND = "invoke-virtual";
@@ -106,7 +107,7 @@ public class Constants {
     public static final String METHOD_MAP_OUT_PATH = "/outputs/robust/methodsMap.robust";
     public static final String INTERFACE_NAME = "com.meituan.robust.ChangeQuickRedirect";
     public static final String INSERT_FIELD_NAME = "changeQuickRedirect";
-    public static final List<String> NO_NEED_REFLECT_CLASS = Arrays.asList("android.os.Bundle","android.os.BaseBundle");
+    public static final List<String> NO_NEED_REFLECT_CLASS = Arrays.asList("android.os.Bundle", "android.os.BaseBundle");
 
     //robust apk hash : apk's unique id
     public static final String ROBUST_APK_HASH_FILE_NAME = "robust.apkhash";
@@ -114,5 +115,8 @@ public class Constants {
     public static final String PATCH_EXECUTE = "patch execute ,other extension will be ignore ";
 
 
-
+    //patch type
+    public static final int PATCH_DEX_TYPE = 0;
+    public static final int PATCH_RESOURCE_TYPE = 1;
+    public static final int PATCH_DEX_RESOURCE_TYPE = 2;
 }
