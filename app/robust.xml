@@ -34,8 +34,8 @@
         <!--<useAsm>false</useAsm>-->
 
         <!--资源Fix开关-->
-        <fixResources>true</fixResources>
-        <!--<fixResources>false</fixResources>-->
+        <!--<fixResources>true</fixResources>-->
+        <fixResources>false</fixResources>
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
