@@ -84,6 +84,33 @@ class RecoverUtils {
         return isExtractionSuccessful;
     }
 
+    public static boolean extract(ZipFile zipFile, ZipEntry entryFile, File extractTo) throws IOException {
+        int numAttempts = 0;
+        boolean isExtractionSuccessful = false;
+        while (numAttempts < 3 && !isExtractionSuccessful) {
+            numAttempts++;
+            BufferedInputStream bis = new BufferedInputStream(zipFile.getInputStream(entryFile));
+            FileOutputStream fos = new FileOutputStream(extractTo);
+            BufferedOutputStream out = new BufferedOutputStream(fos);
+
+            try {
+                byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
+                int length = bis.read(buffer);
+                while (length != -1) {
+                    out.write(buffer, 0, length);
+                    length = bis.read(buffer);
+                }
+            } finally {
+                closeQuietly(out);
+                closeQuietly(bis);
+            }
+
+            isExtractionSuccessful = true;
+        }
+
+        return isExtractionSuccessful;
+    }
+
     public static boolean handleDiffModSet(Context context, ZipFile baseApkFile, ZipFile diffApkFile, ZipFile resourcesApkFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile,
                                            APKDiffData apkDiffData) {
         try {
@@ -181,7 +208,7 @@ class RecoverUtils {
                     }
                 } else {
                     try {
-                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),diffApkZipFile.getInputStream(zipEntry));
+                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                         return false;
@@ -205,7 +232,7 @@ class RecoverUtils {
                     }
                 } else {
                     try {
-                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),diffApkZipFile.getInputStream(zipEntry));
+                        FileUtil.addZipEntry(robustResourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
                         throwable.printStackTrace();
                         return false;

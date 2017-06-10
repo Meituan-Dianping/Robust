@@ -72,7 +72,6 @@ public class RobustResourceConfig {
         newApkPath = robustXmlResourceInfo.newApkPath;
         newApkFile = new File(newApkPath);
         robustOutputsFolder = robustXmlResourceInfo.robustOutputDirPath;
-        FileUtil.deleteAllFile(robustOutputsFolder);
         configOutputDirectory();
     }
 

@@ -42,7 +42,7 @@ public class RobustPatchMerger {
             ZipFile dexPartZipFile = new ZipFile(dexPartFile)
 
             ZipEntry classesDexEntry = dexPartZipFile.getEntry("classes.dex")
-            FileUtil.addZipEntry(mergeZipOutputStream, classesDexEntry, dexPartZipFile.getInputStream(classesDexEntry))
+            FileUtil.addZipEntry(mergeZipOutputStream, new ZipEntry(classesDexEntry.name), dexPartZipFile.getInputStream(classesDexEntry))
 
             //copy ap file
             ZipFile resourcePartZipFile = new ZipFile(resourcePartFile)

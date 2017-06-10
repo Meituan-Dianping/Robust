@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
@@ -12,7 +13,6 @@ import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.diff.ApkDiffDataReaderAndWriter;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -115,25 +115,29 @@ public class ApkRecover {
         RecoverUtils.cleanDir(recoverResourceDirFile);
 
         File apkDiffDataFile = new File(recoverResourceDir, APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
+        FileUtil.createFile(apkDiffDataFile.getAbsolutePath());
         ZipFile diffApkZipFile = null;
         try {
             diffApkZipFile = new ZipFile(tempPatchPath);
             ZipEntry apkDiffDataEntry = diffApkZipFile.getEntry(APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
-            BufferedInputStream bis = new BufferedInputStream(diffApkZipFile.getInputStream(apkDiffDataEntry));
-            FileOutputStream fos = new FileOutputStream(apkDiffDataFile);
-            BufferedOutputStream out = new BufferedOutputStream(fos);
 
-            try {
-                byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
-                int length = bis.read(buffer);
-                while (length != -1) {
-                    out.write(buffer, 0, length);
-                    length = bis.read(buffer);
-                }
-            } finally {
-                closeQuietly(out);
-                closeQuietly(bis);
-            }
+            RecoverUtils.extract(diffApkZipFile,apkDiffDataEntry,apkDiffDataFile);
+//            BufferedInputStream bis = new BufferedInputStream(diffApkZipFile.getInputStream(apkDiffDataEntry));
+//            FileUtil.createFile(apkDiffDataFile.getAbsolutePath());
+//            FileOutputStream fos = new FileOutputStream(apkDiffDataFile);
+//            BufferedOutputStream out = new BufferedOutputStream(fos);
+//
+//            try {
+//                byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
+//                int length = bis.read(buffer);
+//                while (length != -1) {
+//                    out.write(buffer, 0, length);
+//                    length = bis.read(buffer);
+//                }
+//            } finally {
+//                closeQuietly(out);
+//                closeQuietly(bis);
+//            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,7 +161,8 @@ public class ApkRecover {
             return false;
         }
 
-        if (apkDiffData.isEmpty()) {
+        if (null == apkDiffData || apkDiffData.isEmpty()) {
+            Log.e("Robust","apkDiffData is blank");
             return false;
         }
 
