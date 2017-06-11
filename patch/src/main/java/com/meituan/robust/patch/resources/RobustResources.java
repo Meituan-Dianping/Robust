@@ -21,7 +21,7 @@ public class RobustResources {
 
     //only execute one times
     public static boolean resFix(Context context, String patchName, String patchMd5/*, String patchPath*/) {
-        if (null == context || TextUtils.isEmpty(patchName) || TextUtils.isEmpty(patchMd5) /*|| TextUtils.isEmpty(patchPath)*/) {
+        if (null == context || TextUtils.isEmpty(patchName) /*|| TextUtils.isEmpty(patchMd5) || TextUtils.isEmpty(patchPath)*/) {
             return false;
         }
         context = context.getApplicationContext();

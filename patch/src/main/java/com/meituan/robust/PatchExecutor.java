@@ -174,7 +174,12 @@ public class PatchExecutor extends Thread {
 
         {
             Patch patchResApply = patches.get(0);
-            RobustResources.resFix(context, patchResApply.getName(), patchResApply.getMd5());
+            boolean resFixResult = RobustResources.resFix(context, patchResApply.getName(), patchResApply.getMd5());
+            if (resFixResult){
+
+            } else {
+
+            }
         }
 
         for (Patch p : patches) {

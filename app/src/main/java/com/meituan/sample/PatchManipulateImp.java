@@ -10,7 +10,6 @@ import com.meituan.robust.RobustApkHashUtils;
 import com.meituan.robust.common.FileUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +48,7 @@ public class PatchManipulateImp extends PatchManipulate {
         //在这里去联网获取补丁列表
         Patch patch = new Patch();
         patch.setName("123");
+        patch.setMd5("md5c894fcb36212782c2b9c6932013a7");
         //we recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
         //LocalPath是存储原始的补丁文件，这个文件应该是加密过的，TempPath是加密之后的，TempPath下的补丁加载完毕就删除，保证安全性
         //这里面需要设置一些补丁的信息，主要是联网的获取的补丁信息。重要的如MD5，进行原始补丁文件的简单校验，以及补丁存储的位置，这边推荐把补丁的储存位置放置到应用的私有目录下，保证安全性
@@ -76,27 +76,9 @@ public class PatchManipulateImp extends PatchManipulate {
         //do your verification, put the real patch to patch
         //放到app的私有目录
         patch.setTempPath(context.getCacheDir()+ File.separator+"robust"+File.separator + "patch");
-        //in the sample we just copy the file
-        try {
-            copy(patch.getLocalPath(), patch.getTempPath());
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new RuntimeException("copy source patch to local patch error, no patch execute in path "+patch.getTempPath());
-        }
-
         return true;
     }
-    public void copy(String srcPath,String dstPath) throws IOException {
-        File src=new File(srcPath);
-        if(!src.exists()){
-            throw new RuntimeException("source patch does not exist ");
-        }
-        File dst=new File(dstPath);
-        if(!dst.getParentFile().exists()){
-            dst.getParentFile().mkdirs();
-        }
-        FileUtil.copyFile(src,dst);
-    }
+
     /**
      *
      * @param patch
@@ -106,6 +88,13 @@ public class PatchManipulateImp extends PatchManipulate {
      */
     @Override
     protected boolean ensurePatchExist(Patch patch) {
+        //in the sample we just copy the file
+        try {
+            FileUtil.copyFile(patch.getLocalPath(),patch.getTempPath());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("copy source patch to local patch error, no patch exists in path "+patch.getTempPath());
+        }
         return true;
     }
 }
