@@ -120,7 +120,7 @@ class RecoverUtils {
             }
             long baseArscCrc = resourcesArscEntry.getCrc();
             if (baseArscCrc != apkDiffData.oldResourcesArscCrc) {
-                System.err.println("arsc :" + baseArscCrc +", patch base arsc: " + apkDiffData.oldResourcesArscCrc);
+//                System.err.println("arsc :" + baseArscCrc +", patch base arsc: " + apkDiffData.oldResourcesArscCrc);
                 return false;
             }
 
