@@ -1,6 +1,8 @@
 package com.meituan.robust.patch.resources.config;
 
+import com.meituan.robust.Constants;
 import com.meituan.robust.common.FileUtil;
+import com.meituan.robust.common.ResourceConstant;
 import com.meituan.robust.common.StringUtil;
 import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.diff.APKDiffUtils;
@@ -163,11 +165,12 @@ public class RobustResourceConfig {
 
         RobustXmlResourceInfo xmlResourceInfo = new RobustXmlResourceInfo();
 
-//        String oldApkPath = "/Users/hedingxu/Downloads/aimeituan_513_huawei.apk";
-        String oldApkPath = "/Users/hedingxu/Downloads/aimeituan-stage-6661.apk";
-        String newApkPath = "/Users/hedingxu/Downloads/aimeituan_513_lenovo.apk";
+        String oldApkPath = "/Users/hedingxu/robust-github/Robust/app/old.apk";
+        String newApkPath = "/Users/hedingxu/robust-github/Robust/app/build/outputs/apk/app-release.apk";
         HashSet<String> assetsExcludeStrings = new HashSet<>();
-        assetsExcludeStrings.add("robust.apkhash");
+        //排除掉robust自身产生的一些文件
+        assetsExcludeStrings.add(Constants.ROBUST_APK_HASH_FILE_NAME);
+        assetsExcludeStrings.add(ResourceConstant.ROBUST_RESOURCES_DIFF);
         HashSet<String> assetsIncludeStrings = new HashSet<>();
         assetsIncludeStrings.add("*");
         HashSet<String> resExcludeStrings = new HashSet<>();
@@ -179,7 +182,7 @@ public class RobustResourceConfig {
 
         xmlResourceInfo.oldApkPath = oldApkPath;
         xmlResourceInfo.newApkPath = newApkPath;
-        xmlResourceInfo.robustOutputDirPath = "/Users/hedingxu/robust-github/Robust/app/build/outputs/robust";
+        xmlResourceInfo.robustOutputDirPath = "/Users/hedingxu/robust-github/Robust/app/build/outputs/robust_tmp";
         xmlResourceInfo.assetsExcludeStrings = assetsExcludeStrings;
         xmlResourceInfo.assetsIncludeStrings = assetsIncludeStrings;
         xmlResourceInfo.resExcludeStrings = resExcludeStrings;

@@ -2,6 +2,7 @@ package robust.gradle.plugin
 
 import com.meituan.robust.Constants
 import com.meituan.robust.autopatch.Config
+import com.meituan.robust.common.ResourceConstant
 import com.meituan.robust.patch.resources.config.RobustResourceConfig
 import com.meituan.robust.patch.resources.config.RobustXmlResourceInfo
 import com.meituan.robust.patch.resources.diff.APKDiffUtils
@@ -50,6 +51,10 @@ public class RobustResourcePatchAction implements Action<Project> {
 
 
                 xmlResourceInfo.assetsExcludeStrings = Config.assetsExclude
+                //排除掉robust自身产生的一些文件
+                xmlResourceInfo.assetsExcludeStrings.add(Constants.ROBUST_APK_HASH_FILE_NAME);
+                xmlResourceInfo.assetsExcludeStrings.add(ResourceConstant.ROBUST_RESOURCES_DIFF);
+
                 xmlResourceInfo.assetsIncludeStrings = Config.assetsInclude
                 xmlResourceInfo.resExcludeStrings = Config.resExclude
                 xmlResourceInfo.resIncludeStrings = Config.resInclude

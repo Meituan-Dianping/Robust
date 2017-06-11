@@ -87,7 +87,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         //test for bundle
         Bundle bundle=new Bundle();
         bundle.putInt("asd",1);
-        bundle.getFloat("asd");
         //test array
         BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
         listView.setAdapter(adapter);
