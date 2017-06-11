@@ -36,6 +36,8 @@
         <!--资源Fix开关-->
         <fixResources>true</fixResources>
         <!--<fixResources>false</fixResources>-->
+
+        <!--<debug>true</debug>-->
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
@@ -67,22 +69,26 @@
 
     <!--resources fix -->
     <resourceFix>
-        <!--线上的apk的完整本地路径-->
-        <oldApkPath>
-            <!--必填,一次只能填一个-->
-            <name>/Users/hedingxu/robust-github/Robust/app/old.apk</name>
-        </oldApkPath>
+        <!--线上的apk的完整本地路径，oldApk默认会去robust目录下找old.apk-->
+        <!--<oldApkPath>-->
+            <!--一次只能填一个-->
+            <!--<name>/Users/hedingxu/robust-github/Robust/app/old.apk</name>-->
+        <!--</oldApkPath>-->
+
         <!--新的apk的完整本地路径-->
         <!--<newApkPath>-->
-            <!--可选，一次只能填一个-->
-            <!--如果已经有new apk了，可以使用该选项-->
+            <!--一次只能填一个-->
+            <!--如果已经打出new apk了，可以使用该选项-->
             <!--如果此项为空，则会默认使用build出来的apk作为newApk-->
             <!--<name>/Users/hedingxu/robust-github/Robust/app/new.apk</name>-->
         <!--</newApkPath>-->
+
         <!--线上apk的R.txt文件路径(一般位于app/build/intermediates/symbols/${flavor}/release/R.txt），可以不填写，默认会去工程目录下robust/R.txt目录寻找：app/robust-->
+        <!--默认会去robust目录下找R.txt-->
         <!--<RDotTxtFile>-->
             <!--<name></name>-->
         <!--</RDotTxtFile>-->
+
         <assets>
             <include name="include">
                 <!--support pattern, adapt windows , mac and linux file system-->

@@ -1,5 +1,6 @@
 package com.meituan.robust;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Constants {
     public static final String PATCH_TEMPLATE_FULL_NAME = "com.meituan.robust.utils.PatchTemplate";
 
 
+    public static final String File_SEPARATOR = File.separator;
     public static final String ZIP_FILE_NAME = "meituan.jar";
     public static final String PATACH_DEX_NAME = "patch.dex";
     public static final String CLASSES_DEX_NAME = "classes.dex";
@@ -35,12 +37,13 @@ public class Constants {
     public static final String GET_REAL_PARAMETER = "getRealParameter";
     public static final String ROBUST_UTILS_FULL_NAME = "com.meituan.robust.utils.EnhancedRobustUtils";
 
-    public static final String ROBUST_GENERATE_DIRECTORY = "outputs/robust";
+    public static final String ROBUST_GENERATE_DIRECTORY = "outputs/robust".replace("/",File_SEPARATOR);
 
     //FILE_MD5_PATH is a copy from RobustTransform.FILE_MD5_PATH ,please make sure the two is the same
-    public static final String METHOD_MAP_PATH = "/robust/methodsMap.robust";
-    public static final String DEFAULT_MAPPING_FILE = "/robust/mapping.txt";
-    public static final String DEFAULT_R_DOT_TXT_FILE = "/robust/R.txt";
+    public static final String METHOD_MAP_PATH = "/robust/methodsMap.robust".replace("/",File_SEPARATOR);
+    public static final String DEFAULT_MAPPING_FILE = "/robust/mapping.txt".replace("/",File_SEPARATOR);
+    public static final String DEFAULT_R_DOT_TXT_FILE = "/robust/R.txt".replace("/",File_SEPARATOR);
+    public static final String DEFAULT_OLD_APK_PATH = "/robust/old.apk".replace("/",File_SEPARATOR);
 
     public static final String SMALI_INVOKE_SUPER_COMMAND = "invoke-super";
     public static final String SMALI_INVOKE_VIRTUAL_COMMAND = "invoke-virtual";
@@ -104,7 +107,7 @@ public class Constants {
     public static final String LANG_CHARACTER = "Character";
     public static final String CHAR = "char";
 
-    public static final String METHOD_MAP_OUT_PATH = "/outputs/robust/methodsMap.robust";
+    public static final String METHOD_MAP_OUT_PATH = "/outputs/robust/methodsMap.robust".replace("/",File_SEPARATOR);
     public static final String INTERFACE_NAME = "com.meituan.robust.ChangeQuickRedirect";
     public static final String INSERT_FIELD_NAME = "changeQuickRedirect";
     public static final List<String> NO_NEED_REFLECT_CLASS = Arrays.asList("android.os.Bundle", "android.os.BaseBundle");

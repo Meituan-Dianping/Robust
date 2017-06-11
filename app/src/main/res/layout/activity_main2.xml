@@ -31,6 +31,11 @@
         android:layout_margin="@dimen/fab_margin"
         android:src="@android:drawable/ic_dialog_email" />
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@mipmap/me"/>
+
     <ListView
         android:layout_width="318dp"
         android:layout_height="381dp"

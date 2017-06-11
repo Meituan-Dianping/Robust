@@ -72,12 +72,14 @@ public class RobustPatchMerger {
             }
         }
 
-        //todo deleteTmpFiles when online
-//        deleteTmpFiles()
+        deleteTmpFiles()
     }
 
 
-    def deleteTmpFiles() {
+    public def static deleteTmpFiles() {
+        if (Config.debug){
+            return
+        }
         File diretcory = new File(Config.robustGenerateDirectory);
         if (!diretcory.isDirectory()) {
             throw new RuntimeException("patch directry " + Config.robustGenerateDirectory + " dones not exist");
