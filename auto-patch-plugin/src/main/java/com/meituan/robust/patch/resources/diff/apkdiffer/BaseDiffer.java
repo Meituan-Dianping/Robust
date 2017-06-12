@@ -69,8 +69,8 @@ public class BaseDiffer {
         return config.newApkUnZipDir.toPath().relativize(file.toPath());
     }
 
-    public Path getApkDiffOutPath(File file) {
-        return config.apkDiffOutDir.toPath().resolve(getRelativePath(file));
+    private Path getApkDiffOutPathFromNewFile(File newFile) {
+        return config.apkDiffOutDir.toPath().resolve(getRelativePath(newFile));
     }
 
     public String getRelativePathStringToOldFile(File oldFile) {
@@ -221,11 +221,11 @@ public class BaseDiffer {
         //new file is added
         if (null == oldFile || !oldFile.exists() || oldFile.isDirectory()) {
             //copy new file to resources diff dir
-            File diffFile = getApkDiffOutPath(newFile).toFile();
+            File diffFile = getApkDiffOutPathFromNewFile(newFile).toFile();
             FileUtil.copyFile(newFile, diffFile);
 
             DataUnit dataUnit = new DataUnit();
-            dataUnit.name = getRelativePathStringToNewFile((diffFile));
+            dataUnit.name = getRelativePathStringToNewFile(newFile);
             dataUnit.oldMd5 = "";
             dataUnit.newMd5 = MD5.getHashString(diffFile);
             dataUnit.diffMd5 = MD5.getHashString(diffFile);
@@ -250,7 +250,7 @@ public class BaseDiffer {
             return false;
         }
 
-        File diffFile = getApkDiffOutPath(newFile).toFile();
+        File diffFile = getApkDiffOutPathFromNewFile(newFile).toFile();
 
         //todo support lib(so) use diff-tool
         boolean isLibFile = getRelativePathStringToNewFile(newFile).startsWith(APKStructure.Lib_Type);

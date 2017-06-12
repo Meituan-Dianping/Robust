@@ -58,6 +58,10 @@ class ReadXML {
             Config.isResourceFix = Boolean.valueOf(robust.switch.fixResources.text()).booleanValue();
         }
 
+        if (robust.switch.debug.text() != null && !"".equals(robust.switch.debug.text())) {
+            Boolean.valueOf(robust.switch.debug.text()).booleanValue();
+        }
+
         if (robust.resourceFix.RDotTxtFile.name.text() != null && !"".equals(robust.resourceFix.RDotTxtFile.name.text())) {
             Config.RDotTxtFilePath = robust.resourceFix.RDotTxtFile.name.text()
         } else {
@@ -66,6 +70,8 @@ class ReadXML {
 
         if (robust.resourceFix.oldApkPath.name.text() != null && !"".equals(robust.resourceFix.oldApkPath.name.text())) {
             Config.oldApkPath = robust.resourceFix.oldApkPath.name.text()
+        } else {
+            Config.oldApkPath = "${path}${Constants.DEFAULT_OLD_APK_PATH}"
         }
 
         if (robust.resourceFix.newApkPath.name.text() != null && !"".equals(robust.resourceFix.newApkPath.name.text())) {

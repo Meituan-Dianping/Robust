@@ -3,8 +3,6 @@ package com.meituan.robust.patch.resources.service;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.meituan.robust.patch.resources.recover.ApkRecover;
@@ -27,7 +25,6 @@ public class RobustRecoverService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.w("Recover", "intent onHandleIntent");
         final Context context = getApplicationContext();
         if (intent == null) {
             return;
@@ -40,11 +37,12 @@ public class RobustRecoverService extends IntentService {
             @Override
             public void run() {
                 boolean result = ApkRecover.recover(context, name, md5, path);
-                Log.w("Recover", "result :" + result);
+                Log.w("robust", "ApkRecover result: " + result);
                 if (result) {
 
                 } else {
-
+                    result = ApkRecover.recover(context, name, md5, path);
+                    Log.w("robust", "ApkRecover2 result: " + result);
                 }
             }
         });
@@ -52,34 +50,12 @@ public class RobustRecoverService extends IntentService {
     }
 
     public static void startRobustRecoverService(final Context context, final String patchName, final String patchMd5, final String patchPath) {
-
         try {
-            boolean isUiThread = Looper.getMainLooper() == Looper.myLooper();
-            if (isUiThread) {
-                Intent intent = new Intent(context, RobustRecoverService.class);
-                intent.putExtra(PATCH_NAME_EXTRA, patchName);
-                intent.putExtra(PATCH_MD5_EXTRA, patchMd5);
-                intent.putExtra(PATCH_PATH_EXTRA, patchPath);
-                //// TODO: 17/6/10 挪到patch进程
-                boolean result = ApkRecover.recover(context, patchName, patchMd5, patchPath);
-                context.startService(intent);
-            } else {
-                Handler handler = new Handler(Looper.getMainLooper());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(context, RobustRecoverService.class);
-                        intent.putExtra(PATCH_NAME_EXTRA, patchName);
-                        intent.putExtra(PATCH_MD5_EXTRA, patchMd5);
-                        intent.putExtra(PATCH_PATH_EXTRA, patchPath);
-                        //// TODO: 17/6/10 挪到patch进程
-                        boolean result = ApkRecover.recover(context, patchName, patchMd5, patchPath);
-                        context.startService(intent);
-                    }
-                });
-
-            }
-
+            Intent intent = new Intent(context, RobustRecoverService.class);
+            intent.putExtra(PATCH_NAME_EXTRA, patchName);
+            intent.putExtra(PATCH_MD5_EXTRA, patchMd5);
+            intent.putExtra(PATCH_PATH_EXTRA, patchPath);
+            context.startService(intent);
         } catch (Throwable t) {
         }
     }

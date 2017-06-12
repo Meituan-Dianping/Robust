@@ -28,9 +28,9 @@ public class ApkDiffDataReaderAndWriter {
 
         String json = TxtFileReaderAndWriter.readFileAsString(file);
         if (null == json || json.length() == 0) {
-            return gson.fromJson(json, TYPE);
+            return null;
         }
-        return null;
+        return gson.fromJson(json, TYPE);
     }
 
     /**
@@ -53,16 +53,10 @@ public class ApkDiffDataReaderAndWriter {
         dd.oldMd5 = "2a30f769a904a4d103939b83f295de6e";
         oldDiffdata.diffModSet.add(dd);
 
-//        writeDiffData(new File(diif_data_path),oldDiffdata);
-        String gsonDiffData = gson.toJson(oldDiffdata, TYPE);
+        writeDiffData(new File(diif_data_path), oldDiffdata);
 
-        TxtFileReaderAndWriter.writeFile(new File(diif_data_path), gsonDiffData);
-
-        gsonDiffData = TxtFileReaderAndWriter.readFileAsString(new File(diif_data_path));
-        APKDiffData gsonDta = gson.fromJson(gsonDiffData, TYPE);
-
-//        APKDiffData diffData = readDiffData(new File(diif_data_path));
-        if (gsonDta == null) {
+        APKDiffData diffData = readDiffData(new File(diif_data_path));
+        if (diffData == null) {
             System.err.println("blank ");
         }
     }

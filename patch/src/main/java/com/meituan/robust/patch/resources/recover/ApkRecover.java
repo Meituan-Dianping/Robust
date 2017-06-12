@@ -9,6 +9,7 @@ import android.util.Log;
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
 import com.meituan.robust.common.ResourceConstant;
+import com.meituan.robust.common.TxtFileReaderAndWriter;
 import com.meituan.robust.patch.resources.APKStructure;
 import com.meituan.robust.patch.resources.diff.ApkDiffDataReaderAndWriter;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
@@ -51,10 +52,10 @@ public class ApkRecover {
         if (!robustResourcesApkFile.exists() || !robustResourcesApkMd5File.exists()) {
             return false;
         }
-        String wantedMd5 = ResourcesApkVerifyUtils.readResourcesApkMd5(robustResourcesApkMd5File);
+        String wantedMd5 = TxtFileReaderAndWriter.readFileAsString(robustResourcesApkMd5File);
         try {
             String realMd5 = MD5.getHashString(robustResourcesApkFile);
-            if (TextUtils.equals(wantedMd5, realMd5)) {
+            if (wantedMd5.startsWith(realMd5)) {
                 return true;
             }
         } catch (IOException e) {
@@ -121,7 +122,7 @@ public class ApkRecover {
             diffApkZipFile = new ZipFile(tempPatchPath);
             ZipEntry apkDiffDataEntry = diffApkZipFile.getEntry(APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
 
-            RecoverUtils.extract(diffApkZipFile,apkDiffDataEntry,apkDiffDataFile);
+            RecoverUtils.extract(diffApkZipFile, apkDiffDataEntry, apkDiffDataFile);
 //            BufferedInputStream bis = new BufferedInputStream(diffApkZipFile.getInputStream(apkDiffDataEntry));
 //            FileUtil.createFile(apkDiffDataFile.getAbsolutePath());
 //            FileOutputStream fos = new FileOutputStream(apkDiffDataFile);
@@ -162,7 +163,7 @@ public class ApkRecover {
         }
 
         if (null == apkDiffData || apkDiffData.isEmpty()) {
-            Log.e("Robust","apkDiffData is blank");
+            Log.e("Robust", "apkDiffData is blank");
             return false;
         }
 
@@ -179,12 +180,7 @@ public class ApkRecover {
             robustResourcesApkFile.delete();
         }
 
-        ZipFile robustResourcesApkZipFile = null;
-        try {
-            robustResourcesApkZipFile = new ZipFile(robustResourcesApkFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        FileUtil.createFile(robustResourcesApkFile.getAbsolutePath());
 
         ZipOutputStream resourcesApkZipOutputStream = null;
         try {
@@ -195,13 +191,13 @@ public class ApkRecover {
         }
 
         //merge diff mod file ,and zip diff mod file to resources apk
-        boolean resultDiffModSet = RecoverUtils.handleDiffModSet(context, baseApkZipFile, diffApkZipFile, robustResourcesApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
+        boolean resultDiffModSet = RecoverUtils.handleDiffModSet(context, baseApkZipFile, diffApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
         if (!resultDiffModSet) {
             return false;
         }
 
         //zip mod file to resources apk
-        boolean resultModSet = RecoverUtils.handleOtherSet(context, baseApkZipFile, diffApkZipFile, robustResourcesApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
+        boolean resultModSet = RecoverUtils.handleOtherSet(context, baseApkZipFile, diffApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
         if (!resultModSet) {
             return false;
         }
@@ -209,7 +205,7 @@ public class ApkRecover {
         //zip diff data file to resources apk
         ZipEntry diffDataZipEntry = diffApkZipFile.getEntry(ResourceConstant.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
         try {
-            FileUtil.addZipEntry(resourcesApkZipOutputStream,new ZipEntry(diffDataZipEntry.getName()),diffApkZipFile.getInputStream(diffDataZipEntry));
+            FileUtil.addZipEntry(resourcesApkZipOutputStream, new ZipEntry(diffDataZipEntry.getName()), diffApkZipFile.getInputStream(diffDataZipEntry));
         } catch (Throwable throwable) {
             throwable.printStackTrace();
             return false;
@@ -230,7 +226,7 @@ public class ApkRecover {
             //classes/d{0,}.dex is no need
             if (!name.startsWith(APKStructure.Dex_Type) && !apkDiffData.isContains(name)) {
                 try {
-                    FileUtil.addZipEntry(resourcesApkZipOutputStream,new ZipEntry(zipEntry.getName()),baseApkZipFile.getInputStream(zipEntry));
+                    FileUtil.addZipEntry(resourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), baseApkZipFile.getInputStream(zipEntry));
                 } catch (Throwable throwable) {
                     return false;
                 }
@@ -253,17 +249,14 @@ public class ApkRecover {
 
         closeZip(baseApkZipFile);
         closeZip(diffApkZipFile);
-        closeZip(robustResourcesApkZipFile);
 
         try {
             String robustResourcesApkZipFileMd5 = MD5.getHashString(robustResourcesApkFile);
 
             if (!TextUtils.isEmpty(robustResourcesApkZipFileMd5)) {
                 File robustResourcesApkMd5File = new File(robustResourcesApkMd5Path);
-                boolean writeResult = ResourcesApkVerifyUtils.writeResourcesApkMd5(robustResourcesApkMd5File, robustResourcesApkZipFileMd5);
-                if (writeResult) {
-                    return writeResult;
-                }
+                TxtFileReaderAndWriter.writeFile(robustResourcesApkMd5File, robustResourcesApkZipFileMd5);
+                return true;
             }
         } catch (IOException e) {
             e.printStackTrace();

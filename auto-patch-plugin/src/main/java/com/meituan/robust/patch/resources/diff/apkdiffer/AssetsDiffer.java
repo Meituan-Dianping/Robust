@@ -5,6 +5,7 @@ import com.meituan.robust.patch.resources.config.RobustResourceConfig;
 import com.meituan.robust.patch.resources.diff.data.APKDiffData;
 import com.meituan.robust.patch.resources.diff.data.AssetsDiffData;
 
+import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -35,7 +36,7 @@ public class AssetsDiffer extends BaseDiffer {
     }
 
     private boolean isRobustApkHashFile(Path filePath) {
-        if (filePath.equals(APKStructure.Assets_Type + "/robust.apkhash")) {
+        if (filePath.equals(APKStructure.Assets_Type + File.separator + "robust.apkhash")) {
             return true;
         }
         return false;

@@ -47,6 +47,7 @@ public final class Config {
     public static String oldApkPath;
     public static String newApkPath;
     public static int bigFileSizeAtLeast;
+    public static boolean debug = false;
     //assets
     public static HashSet<String> assetsInclude = new HashSet<>();
     public static HashSet<String> assetsExclude = new HashSet<>();

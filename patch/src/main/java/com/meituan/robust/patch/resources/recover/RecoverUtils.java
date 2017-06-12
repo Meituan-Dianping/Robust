@@ -111,15 +111,16 @@ class RecoverUtils {
         return isExtractionSuccessful;
     }
 
-    public static boolean handleDiffModSet(Context context, ZipFile baseApkFile, ZipFile diffApkFile, ZipFile resourcesApkFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile,
+    public static boolean handleDiffModSet(Context context, ZipFile baseApkFile, ZipFile diffApkFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile,
                                            APKDiffData apkDiffData) {
         try {
             ZipEntry resourcesArscEntry = baseApkFile.getEntry(APKStructure.ResourcesArsc_Type);
             if (resourcesArscEntry == null) {
                 return false;
             }
-            String baseArscCrc = String.valueOf(resourcesArscEntry.getCrc());
-            if (!baseArscCrc.equals(apkDiffData.oldResourcesArscCrc)) {
+            long baseArscCrc = resourcesArscEntry.getCrc();
+            if (baseArscCrc != apkDiffData.oldResourcesArscCrc) {
+//                System.err.println("arsc :" + baseArscCrc +", patch base arsc: " + apkDiffData.oldResourcesArscCrc);
                 return false;
             }
 
@@ -193,7 +194,7 @@ class RecoverUtils {
     }
 
 
-    public static boolean handleOtherSet(Context context, ZipFile baseApkZipFile, ZipFile diffApkZipFile, ZipFile robustResourcesApkZipFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile, APKDiffData apkDiffData) {
+    public static boolean handleOtherSet(Context context, ZipFile baseApkZipFile, ZipFile diffApkZipFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile, APKDiffData apkDiffData) {
         if (!apkDiffData.addSet.isEmpty()) {
             for (DataUnit data : apkDiffData.addSet) {
                 String name = data.name;

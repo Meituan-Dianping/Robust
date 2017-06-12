@@ -224,23 +224,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
     }
 
     def deleteTmpFiles() {
-        File diretcory = new File(Config.robustGenerateDirectory);
-        if (!diretcory.isDirectory()) {
-            throw new RuntimeException("patch directry " + Config.robustGenerateDirectory + " dones not exist");
-        } else {
-            diretcory.listFiles(new FilenameFilter() {
-                @Override
-                boolean accept(File file, String s) {
-                    return !(Constants.PATACH_APK_NAME.equals(s))
-                }
-            }).each {
-                if (it.isDirectory()) {
-                    it.deleteDir()
-                } else {
-                    it.delete()
-                }
-            }
-        }
+        RobustPatchMerger.deleteTmpFiles()
     }
 
     def autoPatchManually(List<CtClass> box, String patchPath) {

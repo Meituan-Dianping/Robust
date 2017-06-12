@@ -10,7 +10,6 @@ import com.meituan.robust.RobustApkHashUtils;
 import com.meituan.robust.common.FileUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ import java.util.List;
  *   Pay attention to the difference of patch's LocalPath and patch's TempPath
  *
  *     <br>
- *    We recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
+ *    We recommend LocalPath store the origin patch.apk which may be encrypted,while TempPath is the true runnable apk
  *<br>
  *<br>
  *    我们推荐继承PatchManipulate实现你们App独特的A补丁加载策略，其中setLocalPath设置补丁的原始路径，这个路径存储的补丁是加密过得，setTempPath存储解密之后的补丁，是可以执行的jar文件
@@ -49,14 +48,18 @@ public class PatchManipulateImp extends PatchManipulate {
         //在这里去联网获取补丁列表
         Patch patch = new Patch();
         patch.setName("123");
-        //we recommend LocalPath store the origin patch.jar which may be encrypted,while TempPath is the true runnable jar
+        patch.setMd5("md5c894fcb36212782c2b9c6932013a7");
+        //we recommend LocalPath store the origin patch.apk which may be encrypted,while TempPath is the true runnable apk
         //LocalPath是存储原始的补丁文件，这个文件应该是加密过的，TempPath是加密之后的，TempPath下的补丁加载完毕就删除，保证安全性
         //这里面需要设置一些补丁的信息，主要是联网的获取的补丁信息。重要的如MD5，进行原始补丁文件的简单校验，以及补丁存储的位置，这边推荐把补丁的储存位置放置到应用的私有目录下，保证安全性
         patch.setLocalPath(Environment.getExternalStorageDirectory().getPath()+ File.separator+"robust"+File.separator + "patch");
+        //设置临时目录
+        patch.setTempPath(context.getCacheDir()+ File.separator+"robust"+File.separator + "patch");
 
         //setPatchesInfoImplClassFullName 设置项各个App可以独立定制，需要确保的是setPatchesInfoImplClassFullName设置的包名是和xml配置项patchPackname保持一致，而且类名必须是：PatchesInfoImpl
         //请注意这里的设置
         patch.setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl");
+
         List  patches = new ArrayList<Patch>();
         patches.add(patch);
         return patches;
@@ -74,29 +77,9 @@ public class PatchManipulateImp extends PatchManipulate {
 
     protected boolean verifyPatch(Context context, Patch patch) {
         //do your verification, put the real patch to patch
-        //放到app的私有目录
-        patch.setTempPath(context.getCacheDir()+ File.separator+"robust"+File.separator + "patch");
-        //in the sample we just copy the file
-        try {
-            copy(patch.getLocalPath(), patch.getTempPath());
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new RuntimeException("copy source patch to local patch error, no patch execute in path "+patch.getTempPath());
-        }
-
         return true;
     }
-    public void copy(String srcPath,String dstPath) throws IOException {
-        File src=new File(srcPath);
-        if(!src.exists()){
-            throw new RuntimeException("source patch does not exist ");
-        }
-        File dst=new File(dstPath);
-        if(!dst.getParentFile().exists()){
-            dst.getParentFile().mkdirs();
-        }
-        FileUtil.copyFile(src,dst);
-    }
+
     /**
      *
      * @param patch
@@ -106,6 +89,13 @@ public class PatchManipulateImp extends PatchManipulate {
      */
     @Override
     protected boolean ensurePatchExist(Patch patch) {
+        //in the sample we just copy the file
+        try {
+            FileUtil.copyFile(patch.getLocalPath(),patch.getTempPath());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new RuntimeException("copy source patch to local patch error, no patch exists in path "+patch.getTempPath());
+        }
         return true;
     }
 }
