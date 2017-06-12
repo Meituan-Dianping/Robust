@@ -1,10 +1,8 @@
 package robust.gradle.plugin
 
-import java.util.zip.Deflater
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
+import com.meituan.robust.Constants
 
+import java.util.zip.*
 /**
  * Created by hedex on 17/2/14.
  */
@@ -70,46 +68,79 @@ class RobustApkHashZipUtils {
         zos.closeEntry();
     }
 
-    def static void addFile2Zip(File zipFile, File robustHashFile) {
-        def tempZipFile = new File(zipFile.name + "temp", zipFile.parentFile);
+    def static void addApkHashFile2ApFile(File apFile, File robustHashFile) {
+        def tempZipFile = new File(apFile.name + "temp", apFile.parentFile);
         if (tempZipFile.exists()) {
             tempZipFile.delete();
         }
 
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(zipFile))
-        ZipOutputStream out = new ZipOutputStream(new FileOutputStream(tempZipFile))
+        ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(tempZipFile))
 
-        ZipEntry entry = zin.getNextEntry()
-        byte[] buf = new byte[1024 * 8]
-        while (entry != null) {
-            String name = entry.getName()
-
-            // Add ZIP entry to output stream.
-            ZipEntry zipEntry = new ZipEntry(name);
-
-            if (ZipEntry.STORED == entry.getMethod()) {
-                zipEntry.setMethod(entry.getMethod())
-                zipEntry.setSize(entry.getSize())
-                zipEntry.setCompressedSize(entry.getCompressedSize())
-                zipEntry.setCrc(entry.getCrc())
+        //copy ap file
+        ZipFile apZipFile = new ZipFile(apFile)
+        final Enumeration<? extends ZipEntry> entries = apZipFile.entries();
+        while (entries.hasMoreElements()) {
+//            ZipEntry zipEntry = entries.nextElement();//保守
+            ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
+            if (null != zipEntry ) {
+                addZipEntry(zipOutputStream, zipEntry, apZipFile.getInputStream(zipEntry))
             }
-
-            out.putNextEntry(zipEntry);
-
-            int len
-            while ((len = zin.read(buf)) > 0) {
-                out.write(buf, 0, len)
-            }
-            out.closeEntry()
-            entry = zin.getNextEntry()
         }
 
-        zin.close()
+        //add hash file
+        String entryName = "assets/" + Constants.ROBUST_APK_HASH_FILE_NAME;
+        ZipEntry zipEntry = new ZipEntry(entryName);
+        zipEntry.setMethod(ZipEntry.STORED);
+        zipEntry.setSize(robustHashFile.length());
+        zipEntry.setCompressedSize(robustHashFile.length());
+        zipEntry.setCrc(computeFileCrc32(robustHashFile));
 
-        RobustApkHashZipUtils.zipFile(out, "assets", robustHashFile)
-        out.close()
+        FileInputStream hashFileInputStream = new FileInputStream(robustHashFile);
 
-        zipFile.delete()
-        tempZipFile.renameTo(zipFile)
+        addZipEntry(zipOutputStream, zipEntry, hashFileInputStream)
+
+        hashFileInputStream.close();
+        zipOutputStream.close()
+
+        apFile.delete()
+        tempZipFile.renameTo(apFile.getAbsolutePath())
+    }
+
+    private static long computeFileCrc32(File file) throws IOException {
+        InputStream inputStream = new FileInputStream(file);
+        CRC32 crc = new CRC32();
+        int index;
+        while ((index = inputStream.read()) != -1) {
+            crc.update(index);
+        }
+        return crc.getValue();
+    }
+
+
+    /**
+     * add zip entry
+     *
+     * @param zipOutputStream
+     * @param zipEntry
+     * @param inputStream
+     * @throws Exception
+     */
+    private static void addZipEntry(ZipOutputStream zipOutputStream, ZipEntry zipEntry, InputStream inputStream) throws Exception {
+        try {
+            zipOutputStream.putNextEntry(zipEntry);
+            byte[] buffer = new byte[1024];
+            int length = -1;
+            while ((length = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                zipOutputStream.write(buffer, 0, length);
+                zipOutputStream.flush();
+            }
+        } catch (ZipException e) {
+            // do nothing
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            zipOutputStream.closeEntry();
+        }
     }
 }
