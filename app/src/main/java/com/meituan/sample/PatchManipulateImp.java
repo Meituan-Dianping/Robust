@@ -2,9 +2,11 @@ package com.meituan.sample;
 
 import android.content.Context;
 import android.os.Environment;
+import android.util.Log;
 
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchManipulate;
+import com.meituan.robust.RobustApkHashUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +46,8 @@ public class PatchManipulateImp extends PatchManipulate {
     protected List<Patch> fetchPatchList(Context context) {
         //将app自己的robustApkHash上报给服务端，服务端根据robustApkHash来区分每一次apk build来给app下发补丁
         //apkhash is the unique identifier for  apk,so you cannnot patch wrong apk.
-        //String robustApkHash = RobustApkHashUtils.readRobustApkHash(context);
+        String robustApkHash = RobustApkHashUtils.readRobustApkHash(context);
+        Log.w("robust","robustApkHash :" + robustApkHash);
         //connect to network to get patch list on servers
         //在这里去联网获取补丁列表
         Patch patch = new Patch();

@@ -85,7 +85,7 @@ class RobustApkHashAction implements Action<Project> {
                 } else {
                     // add robustHashFile to resourceFile
                     File robustHashFile = createHashFile(resourceFile.parentFile.absolutePath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
-                    RobustApkHashZipUtils.addFile2Zip(resourceFile, robustHashFile);
+                    RobustApkHashZipUtils.addApkHashFile2ApFile(resourceFile, robustHashFile);
                 }
 
                 String buildRubustDir = "${project.buildDir}" + File.separator + "$Constants.ROBUST_GENERATE_DIRECTORY" + File.separator

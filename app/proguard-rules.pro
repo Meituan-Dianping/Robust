@@ -15,7 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class com.meituan.sample.MainActivity2{*;}
 -dontwarn
 -keepattributes Signature,SourceFile,LineNumberTable
 -keepattributes *Annotation*
