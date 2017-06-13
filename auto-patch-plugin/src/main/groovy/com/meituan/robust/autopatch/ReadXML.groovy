@@ -59,7 +59,7 @@ class ReadXML {
         }
 
         if (robust.switch.debug.text() != null && !"".equals(robust.switch.debug.text())) {
-            Boolean.valueOf(robust.switch.debug.text()).booleanValue();
+            Config.debug = Boolean.valueOf(robust.switch.debug.text()).booleanValue();
         }
 
         if (robust.resourceFix.RDotTxtFile.name.text() != null && !"".equals(robust.resourceFix.RDotTxtFile.name.text())) {
