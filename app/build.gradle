@@ -1,7 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-//apply plugin: 'robust'
-apply plugin: 'auto-patch-plugin'
+apply plugin: 'robust'
+//apply plugin: 'auto-patch-plugin'
+apply plugin: 'keep-resource-id'
 
 android {
     compileSdkVersion 23
