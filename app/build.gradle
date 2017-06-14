@@ -1,3 +1,13 @@
+//import com.android.build.gradle.tasks.MergeResources
+//import com.intellij.util.ReflectionUtil
+//import com.meituan.robust.Constants
+//import com.meituan.robust.tools.aapt.AaptResourceCollector
+//import com.meituan.robust.tools.aapt.AaptUtil
+//import com.meituan.robust.tools.aapt.PatchUtil
+//import com.meituan.robust.tools.aapt.RDotTxtEntry
+//import groovy.util.slurpersupport.GPathResult
+//import robust.gradle.plugin.KeepResourceIdTask
+
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'robust'
@@ -67,3 +77,78 @@ dependencies {
     compile 'org.javassist:javassist:3.20.0-GA'
     compile project(path: ':patch')
 }
+//afterEvaluate{
+//    project.tasks.each { task ->
+//        Task mergeResourcesTask = tasks.findByName("mergeReleaseResources")
+//
+//        mergeResourcesTask.doLast {
+//            project.android.applicationVariants.each { variant ->
+//                def variantOutput = variant.outputs.first()
+//                def variantName = variant.name.capitalize()
+//                if (task instanceof MergeResources){
+//                    MergeResources mergeResources = (MergeResources)task
+//                    System.out.println("********" + mergeResources.publicFile)
+//                    System.out.println("--------" + mergeResources.outputDir)
+////            mergeResources.setPublicFile(new File("/Users/hedingxu/robust-github/Robust/app/robust/R.txt"))
+////                    File dirFile = variantOutput.processResources.resDir
+////                    String temDirFile = dirFile.getParentFile().absolutePath + File.separator + dirFile.name + "_temp" + File.separator
+////                    mergeResources.setOutputDir(new File(temDirFile))
+//                    System.out.println("--------" + mergeResources.outputDir)
+//                    mergeResources.getRawInputFolders().each {
+//                        System.out.println("====" + it.absolutePath)
+//                    }
+//                }
+//
+//
+//
+//                String RDotTxtPath = "/Users/hedingxu/robust-github/Robust/app/robust/R.txt"
+//
+//                String resDir = variantOutput.processResources.resDir
+////                String resDir = path + File.separator + "build/outputs/robust"
+////                String resDir = "/Users/hedingxu/robust-github/Robust/app/src/main/res"
+//
+//                if (null == RDotTxtPath || "".equals(RDotTxtPath.trim())) {
+//                    File file = new File(RDotTxtPath)
+//                    if (!file.exists() || file.length() == 0) {
+//                        project.logger.error("apply R.txt file ${RDotTxtPath} failed")
+//                        return
+//                    }
+//                }
+//                String idsXml = resDir + File.separator + "values" + File.separator + "ids.xml"
+//                String publicXml = resDir + File.separator + "values" + File.separator + "public.xml"
+//                File oldIdsXmlFile = new File(idsXml)
+//                if (oldIdsXmlFile.exists()) {
+//                    oldIdsXmlFile.delete()
+//                }
+//
+//                File oldPublicXml = new File(publicXml)
+//                if (oldPublicXml.exists()) {
+//                    oldPublicXml.delete()
+//                }
+//
+//                List<String> resourceDirectoryList = new ArrayList<String>()
+//                resourceDirectoryList.add(resDir)
+//
+//                project.logger.debug("idsXml path:" + idsXml)
+//                project.logger.debug("publicXml path:" + publicXml)
+//                Map<RDotTxtEntry.RType, Set<RDotTxtEntry>> rTypeResourceMap = PatchUtil.readRTxt(RDotTxtPath)
+//
+//                // use aapt util to parse rTypeResourceMap(R.txt),and get the public.xml and ids.xml
+//                AaptResourceCollector aaptResourceCollector = AaptUtil.collectResource(resourceDirectoryList, rTypeResourceMap)
+//                PatchUtil.generatePublicResourceXml(aaptResourceCollector, idsXml, publicXml)
+//
+//
+//            }
+//
+//        }
+//        if(task.name.startsWith('mergeReleaseResources')){
+////            task.doFirst {
+////                throw new RuntimeException("mergeReleaseResources finish")
+////            }
+//            task.doLast {
+//
+////                throw new RuntimeException("mergeReleaseResources finish")
+//            }
+//        }
+//    }
+//}
