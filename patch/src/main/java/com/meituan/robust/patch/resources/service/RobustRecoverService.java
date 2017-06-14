@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.meituan.robust.patch.resources.recover.ApkRecover;
+import com.meituan.robust.patch.resources.util.ProcessUtil;
 
 /**
  * Created by hedingxu on 17/6/7.
@@ -37,6 +38,8 @@ public class RobustRecoverService extends IntentService {
             @Override
             public void run() {
                 boolean result = ApkRecover.recover(context, name, md5, path);
+                Log.w("robust", "current process name :" + ProcessUtil.getProcessName(context));
+                //current process name : com.meituan.robust.sample:robust
                 Log.w("robust", "ApkRecover result: " + result);
                 if (result) {
 

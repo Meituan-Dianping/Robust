@@ -7,6 +7,7 @@ import android.util.Log;
 import com.meituan.robust.patch.resources.RobustResources;
 import com.meituan.robust.patch.resources.recover.ApkRecover;
 import com.meituan.robust.patch.resources.service.RobustRecoverService;
+import com.meituan.robust.patch.resources.util.ProcessUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -158,6 +159,9 @@ public class PatchExecutor extends Thread {
     }
 
     private void applyOtherPatches(List<Patch> resourcesPatches, List<Patch> dexAndResourcesPatches) {
+        if (ProcessUtil.isRobustProcess(context)) {
+            return;
+        }
         List<Patch> patches = new ArrayList<>();
         patches.addAll(resourcesPatches);
         patches.addAll(dexAndResourcesPatches);
@@ -175,7 +179,7 @@ public class PatchExecutor extends Thread {
         {
             Patch patchResApply = patches.get(0);
             boolean resFixResult = RobustResources.resFix(context, patchResApply.getName(), patchResApply.getMd5());
-            if (resFixResult){
+            if (resFixResult) {
 
             } else {
 

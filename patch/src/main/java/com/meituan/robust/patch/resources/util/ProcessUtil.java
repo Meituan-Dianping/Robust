@@ -5,9 +5,25 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.FileInputStream;
-
+/**
+ * Created by hedingxu on 17/3/10.
+ */
 public class ProcessUtil {
+    private static final String ROBUST_PROCESS_NAME = ":robust";
     private static String processName;
+
+    public static boolean isRobustProcess(Context context) {
+        String pkgName = context.getPackageName();
+        String processName = getProcessName(context);
+        if (processName == null || processName.length() == 0) {
+            processName = "";
+        }
+        if (processName.startsWith(pkgName) && processName.endsWith(ROBUST_PROCESS_NAME)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public static boolean isMainProcess(Context context) {
         String pkgName = context.getPackageName();

@@ -76,6 +76,8 @@ class ReadXML {
 
         if (robust.resourceFix.newApkPath.name.text() != null && !"".equals(robust.resourceFix.newApkPath.name.text())) {
             Config.newApkPath = robust.resourceFix.newApkPath.name.text()
+        } else {
+            Config.newApkPath = "${path}${Constants.DEFAULT_NEW_APK_PATH}"
         }
 
         for (name in robust.resourceFix.assets.include.name) {
