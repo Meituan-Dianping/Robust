@@ -1,6 +1,7 @@
 package com.meituan.robust.patch.resources.recover;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
@@ -120,6 +121,7 @@ class RecoverUtils {
             }
             long baseArscCrc = resourcesArscEntry.getCrc();
             if (baseArscCrc != apkDiffData.oldResourcesArscCrc) {
+                Log.e("Robust", "RecoverUtils handleDiffModSet 124 arsc :" + baseArscCrc +", patch base arsc: " + apkDiffData.oldResourcesArscCrc);
 //                System.err.println("arsc :" + baseArscCrc +", patch base arsc: " + apkDiffData.oldResourcesArscCrc);
                 return false;
             }
@@ -157,6 +159,7 @@ class RecoverUtils {
 
                 if (recoverFile.exists() && MD5.getHashString(recoverFile).equals(dataUnit.newMd5)) {
                     //write to resourcesApkFile
+                    Log.d("Robust", "RecoverUtils zipBigFile2ApkOutputStream 161 name: " + dataUnit.name);
                     zipBigFile2ApkOutputStream(dataUnit.name, recoverFile, dataUnit.newCrc, robustResourcesApkZipOutputStream);
                     return true;
                 } else {
@@ -164,6 +167,7 @@ class RecoverUtils {
                 }
             }
         } catch (Throwable e) {
+            Log.d("Robust", "RecoverUtils zipBigFile2ApkOutputStream Throwable 161 : " + e.toString());
         }
         return true;
     }
@@ -195,15 +199,18 @@ class RecoverUtils {
 
 
     public static boolean handleOtherSet(Context context, ZipFile baseApkZipFile, ZipFile diffApkZipFile, ZipOutputStream robustResourcesApkZipOutputStream, File recoverResourceDirFile, APKDiffData apkDiffData) {
+        Log.d("Robust", "RecoverUtils handleOtherSet 202 ");
         if (!apkDiffData.addSet.isEmpty()) {
             for (DataUnit data : apkDiffData.addSet) {
                 String name = data.name;
+                Log.d("Robust", "RecoverUtils apkDiffData.addSet 205 name: " + name);
                 ZipEntry zipEntry = diffApkZipFile.getEntry(name);
                 if (name.startsWith(APKStructure.Lib_Type)) {
                     File newLibFile = new File(recoverResourceDirFile, name);
                     try {
                         RecoverUtils.extract(diffApkZipFile, zipEntry, newLibFile, data.newMd5);
                     } catch (Throwable throwable) {
+                        Log.e("Robust", "RecoverUtils apkDiffData.addSet 213 Throwable: " + throwable.toString());
                         throwable.printStackTrace();
                         return false;
                     }
@@ -211,6 +218,7 @@ class RecoverUtils {
                     try {
                         FileUtil.addZipEntry(robustResourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
+                        Log.e("Robust", "RecoverUtils apkDiffData.addSet 221 Throwable: " + throwable.toString());
                         throwable.printStackTrace();
                         return false;
                     }
@@ -222,12 +230,14 @@ class RecoverUtils {
         if (!apkDiffData.modSet.isEmpty()) {
             for (DataUnit data : apkDiffData.modSet) {
                 String name = data.name;
+                Log.d("Robust", "RecoverUtils apkDiffData.modSet 233 name: " + name);
                 ZipEntry zipEntry = diffApkZipFile.getEntry(name);
                 if (name.startsWith(APKStructure.Lib_Type)) {
                     File newLibFile = new File(recoverResourceDirFile, name);
                     try {
                         RecoverUtils.extract(diffApkZipFile, zipEntry, newLibFile, data.newMd5);
                     } catch (Throwable throwable) {
+                        Log.e("Robust", "RecoverUtils apkDiffData.modSet 240 Throwable: " + throwable.toString());
                         throwable.printStackTrace();
                         return false;
                     }
@@ -235,6 +245,7 @@ class RecoverUtils {
                     try {
                         FileUtil.addZipEntry(robustResourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), diffApkZipFile.getInputStream(zipEntry));
                     } catch (Throwable throwable) {
+                        Log.e("Robust", "RecoverUtils apkDiffData.modSet 248 Throwable: " + throwable.toString());
                         throwable.printStackTrace();
                         return false;
                     }

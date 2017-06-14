@@ -159,15 +159,19 @@ public class PatchExecutor extends Thread {
     }
 
     private void applyOtherPatches(List<Patch> resourcesPatches, List<Patch> dexAndResourcesPatches) {
+        Log.d("robust", "applyOtherPatches 162");
         if (ProcessUtil.isRobustProcess(context)) {
+            Log.d("robust", "applyOtherPatches isRobustProcess 164");
             return;
         }
         List<Patch> patches = new ArrayList<>();
         patches.addAll(resourcesPatches);
         patches.addAll(dexAndResourcesPatches);
         if (patches.isEmpty()) {
+            Log.d("robust", "applyOtherPatches resourcesPatches isEmpty 171");
             return;
         }
+        Log.d("robust", "applyOtherPatches order by name desc 174");
         //order by name desc
         Collections.sort(patches, new Comparator<Patch>() {
             @Override
@@ -178,19 +182,23 @@ public class PatchExecutor extends Thread {
 
         {
             Patch patchResApply = patches.get(0);
+            Log.d("robust", "applyOtherPatches resFix by name : " + patchResApply.getName());
             boolean resFixResult = RobustResources.resFix(context, patchResApply.getName(), patchResApply.getMd5());
             if (resFixResult) {
-
+                Log.d("robust", "applyOtherPatches resFix result 188: " + resFixResult);
             } else {
-
+                Log.d("robust", "applyOtherPatches resFix result 190: " + resFixResult);
             }
         }
 
         for (Patch p : patches) {
-            RobustResources.libFix(context, p.getName(), p.getMd5());
+            Log.d("robust", "applyOtherPatches libFix by name 195: " + p.getName());
+            boolean libFixResult = RobustResources.libFix(context, p.getName(), p.getMd5());
+            Log.d("robust", "applyOtherPatches libFix result 197: " + libFixResult);
         }
 
         //apply dex
+        Log.d("robust", "applyOtherPatches applyDexTypePatches 201");
         applyDexTypePatches(dexAndResourcesPatches);
 
     }
