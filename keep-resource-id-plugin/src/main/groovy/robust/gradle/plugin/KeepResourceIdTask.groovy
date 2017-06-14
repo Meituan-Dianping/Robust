@@ -44,6 +44,8 @@ class KeepResourceIdTask extends DefaultTask {
         List<String> resourceDirectoryList = new ArrayList<String>()
         resourceDirectoryList.add(resDir)
 
+        project.logger.debug("idsXml path:" + idsXml)
+        project.logger.debug("publicXml path:" + publicXml)
         Map<RDotTxtEntry.RType, Set<RDotTxtEntry>> rTypeResourceMap = PatchUtil.readRTxt(RDotTxtPath)
 
         // use aapt util to parse rTypeResourceMap(R.txt),and get the public.xml and ids.xml

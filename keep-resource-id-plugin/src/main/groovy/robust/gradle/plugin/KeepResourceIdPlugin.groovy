@@ -29,7 +29,7 @@ public class KeepResourceIdPlugin implements Plugin<Project> {
             def variantOutput = variant.outputs.first()
             def variantName = variant.name.capitalize()
             //keep resource id
-            KeepResourceIdTask keepResourceIdTask = project.tasks.create("keep${variantName}ResourceId", KeepResourceIdTask)
+            KeepResourceIdTask keepResourceIdTask = project.tasks.create("robustKeep${variantName}ResourceId", KeepResourceIdTask)
             keepResourceIdTask.resDir = variantOutput.processResources.resDir
             keepResourceIdTask.RDotTxtPath = RDotTxtPath
             variantOutput.processResources.dependsOn keepResourceIdTask
