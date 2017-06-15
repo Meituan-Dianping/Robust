@@ -103,42 +103,31 @@ public class ApkRecover {
 
     //recover : 资源patch + base.apk -> resources.apk
     public static synchronized boolean recover(Context context, String patchName, String patchMd5, String tempPatchPath) {
+        Log.d("robust", "apkRecover recover 106");
         String resourcesDirPathString = getResourceDirPathString(context, patchName, patchMd5);
         String robustResourcesApkPath = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK;
         String robustResourcesApkMd5Path = resourcesDirPathString + File.separator + ROBUST_RESOURCES_APK_MD5;
         boolean isRecovered = isRecovered(robustResourcesApkPath, robustResourcesApkMd5Path);
         if (isRecovered) {
+            Log.d("robust", "recover isRecovered 112:" + isRecovered);
             return true;
         }
 
         String recoverResourceDir = resourcesDirPathString + File.separator + ROBUST_RESOURCE_DIR;
         File recoverResourceDirFile = new File(recoverResourceDir);
+        Log.d("robust", "recover cleanDir 118:" + recoverResourceDirFile);
         RecoverUtils.cleanDir(recoverResourceDirFile);
+
 
         File apkDiffDataFile = new File(recoverResourceDir, APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
         FileUtil.createFile(apkDiffDataFile.getAbsolutePath());
         ZipFile diffApkZipFile = null;
         try {
             diffApkZipFile = new ZipFile(tempPatchPath);
+            Log.d("robust", "recover diffApkZipFile 126:" + tempPatchPath);
             ZipEntry apkDiffDataEntry = diffApkZipFile.getEntry(APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
-
+            Log.d("robust", "recover apkDiffDataEntry 129:" + apkDiffDataEntry.getName());
             RecoverUtils.extract(diffApkZipFile, apkDiffDataEntry, apkDiffDataFile);
-//            BufferedInputStream bis = new BufferedInputStream(diffApkZipFile.getInputStream(apkDiffDataEntry));
-//            FileUtil.createFile(apkDiffDataFile.getAbsolutePath());
-//            FileOutputStream fos = new FileOutputStream(apkDiffDataFile);
-//            BufferedOutputStream out = new BufferedOutputStream(fos);
-//
-//            try {
-//                byte[] buffer = new byte[ResourceConstant.BUFFER_SIZE];
-//                int length = bis.read(buffer);
-//                while (length != -1) {
-//                    out.write(buffer, 0, length);
-//                    length = bis.read(buffer);
-//                }
-//            } finally {
-//                closeQuietly(out);
-//                closeQuietly(bis);
-//            }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -146,6 +135,7 @@ public class ApkRecover {
         }
 
         if (!apkDiffDataFile.exists()) {
+            Log.d("robust", "recover apkDiffDataFile exists 138:" + apkDiffDataFile.exists());
             return false;
         }
 
@@ -159,8 +149,11 @@ public class ApkRecover {
         String baseApkFilePath = applicationInfo.sourceDir;
 
         if (TextUtils.isEmpty(baseApkFilePath)) {
+            Log.e("robust", "recover baseApkFilePath  is isEmpty 152");
             return false;
         }
+
+        Log.d("robust", "recover baseApkFilePath  155:" + baseApkFilePath);
 
         if (null == apkDiffData || apkDiffData.isEmpty()) {
             Log.e("Robust", "apkDiffData is blank");
@@ -171,6 +164,7 @@ public class ApkRecover {
         try {
             baseApkZipFile = new ZipFile(baseApkFilePath);
         } catch (IOException e) {
+            Log.e("Robust", "baseApkZipFile 167 IOException: " + e.toString());
             e.printStackTrace();
         }
 
@@ -186,31 +180,37 @@ public class ApkRecover {
         try {
             resourcesApkZipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(robustResourcesApkFile)));
         } catch (FileNotFoundException e) {
+            Log.e("Robust", "FileNotFoundException 183 FileNotFoundException: " + e.toString());
             e.printStackTrace();
             return false;
         }
 
         //merge diff mod file ,and zip diff mod file to resources apk
         boolean resultDiffModSet = RecoverUtils.handleDiffModSet(context, baseApkZipFile, diffApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
+        Log.d("Robust", "handleDiffModSet 190 resultDiffModSet: " + resultDiffModSet);
         if (!resultDiffModSet) {
             return false;
         }
 
         //zip mod file to resources apk
         boolean resultModSet = RecoverUtils.handleOtherSet(context, baseApkZipFile, diffApkZipFile, resourcesApkZipOutputStream, recoverResourceDirFile, apkDiffData);
+        Log.d("Robust", "handleOtherSet 197 resultModSet: " + resultModSet);
         if (!resultModSet) {
             return false;
         }
 
+        Log.d("Robust", "zip diff data file to resources apk 201 ");
         //zip diff data file to resources apk
         ZipEntry diffDataZipEntry = diffApkZipFile.getEntry(ResourceConstant.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
         try {
             FileUtil.addZipEntry(resourcesApkZipOutputStream, new ZipEntry(diffDataZipEntry.getName()), diffApkZipFile.getInputStream(diffDataZipEntry));
         } catch (Throwable throwable) {
+            Log.e("Robust", "addZipEntry 208 Throwable: " + throwable.toString());
             throwable.printStackTrace();
             return false;
         }
 
+        Log.d("Robust", "zip other old files to resources apk 213 ");
         //zip other old files to resources apk
         final Enumeration<? extends ZipEntry> entries = baseApkZipFile.entries();
         while (entries.hasMoreElements()) {
@@ -225,14 +225,17 @@ public class ApkRecover {
 
             //classes/d{0,}.dex is no need
             if (!name.startsWith(APKStructure.Dex_Type) && !apkDiffData.isContains(name)) {
+                Log.d("Robust", "FileUtil.addZipEntry to resources apk 228 : " + name);
                 try {
                     FileUtil.addZipEntry(resourcesApkZipOutputStream, new ZipEntry(zipEntry.getName()), baseApkZipFile.getInputStream(zipEntry));
                 } catch (Throwable throwable) {
+                    Log.e("Robust", "addZipEntry throwable 231: " + throwable.toString());
                     return false;
                 }
             }
         }
 
+        Log.d("Robust", "copy comment(maybe contains channel info) to resources apk 237 ");
         // copy comment(maybe contains channel info) to resources apk
         String comment = "";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -252,13 +255,15 @@ public class ApkRecover {
 
         try {
             String robustResourcesApkZipFileMd5 = MD5.getHashString(robustResourcesApkFile);
-
+            Log.d("Robust", "MD5.getHashString(robustResourcesApkFile) 258 : " + robustResourcesApkZipFileMd5);
             if (!TextUtils.isEmpty(robustResourcesApkZipFileMd5)) {
                 File robustResourcesApkMd5File = new File(robustResourcesApkMd5Path);
+                Log.d("Robust", "writeFile(robustResourcesApkMd5File, robustResourcesApkZipFileMd5) 261 : " + robustResourcesApkZipFileMd5);
                 TxtFileReaderAndWriter.writeFile(robustResourcesApkMd5File, robustResourcesApkZipFileMd5);
                 return true;
             }
         } catch (IOException e) {
+            Log.e("Robust", "write Md5 IOException 266 :  " + e.toString());
             e.printStackTrace();
             return false;
         }

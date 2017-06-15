@@ -34,7 +34,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@mipmap/me"/>
+        android:src="@mipmap/favorite"/>
 
     <ListView
         android:layout_width="318dp"

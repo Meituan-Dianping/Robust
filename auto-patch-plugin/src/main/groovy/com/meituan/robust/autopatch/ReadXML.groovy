@@ -59,7 +59,7 @@ class ReadXML {
         }
 
         if (robust.switch.debug.text() != null && !"".equals(robust.switch.debug.text())) {
-            Boolean.valueOf(robust.switch.debug.text()).booleanValue();
+            Config.debug = Boolean.valueOf(robust.switch.debug.text()).booleanValue();
         }
 
         if (robust.resourceFix.RDotTxtFile.name.text() != null && !"".equals(robust.resourceFix.RDotTxtFile.name.text())) {
@@ -76,6 +76,11 @@ class ReadXML {
 
         if (robust.resourceFix.newApkPath.name.text() != null && !"".equals(robust.resourceFix.newApkPath.name.text())) {
             Config.newApkPath = robust.resourceFix.newApkPath.name.text()
+        } else {
+            Config.newApkPath = "${path}${Constants.DEFAULT_NEW_APK_PATH}"
+            if (!new File(Config.newApkPath).exists()){
+                Config.newApkPath = ""
+            }
         }
 
         for (name in robust.resourceFix.assets.include.name) {

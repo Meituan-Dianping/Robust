@@ -36,10 +36,13 @@ public class RobustRecoverService extends IntentService {
         RobustRecoverHelper.getInstance().postRunnable(new Runnable() {
             @Override
             public void run() {
+                long currentTime = System.currentTimeMillis();
                 boolean result = ApkRecover.recover(context, name, md5, path);
-                Log.w("robust", "ApkRecover result: " + result);
+//                Log.w("robust", "current process name :" + ProcessUtil.getProcessName(context));
+                //current process name : com.meituan.robust.sample:robust
+                Log.w("robust", "ApkRecover spend time: " + (System.currentTimeMillis() - currentTime));
                 if (result) {
-
+                    Log.w("robust", "ApkRecover result: " + result);
                 } else {
                     result = ApkRecover.recover(context, name, md5, path);
                     Log.w("robust", "ApkRecover2 result: " + result);
