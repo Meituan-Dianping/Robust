@@ -82,6 +82,8 @@ public class RobustResourceApply {
         if (TextUtils.isEmpty(resourcesApkFilePath)) {
             return false;
         }
+        //参考 https://android.googlesource.com/platform/tools/base/+/gradle_2.0.0/instant-run/instant-run-server/src/main/java/com/android/tools/fd/runtime/MonkeyPatcher.java
+
         //   - Replace mResDir to point to the external resource file instead of the .apk. This is
         //     used as the asset path for new Resources objects.
 
@@ -139,10 +141,11 @@ public class RobustResourceApply {
         ArrayList<String> assets = getAssetPath(context.getAssets());
         ArrayList<String> assetsWithoutBaseApk = new ArrayList<>();//frame work path + hydra pathes
         String baseApkPath = context.getApplicationInfo().sourceDir;
+        Log.d("robust", "context.getApplicationInfo().sourceDir 144: " + baseApkPath);
         for (String assetPath : assets) {
             if (!TextUtils.equals(baseApkPath, assetPath)) {
                 String newAssetPath = new String(assetPath);
-                Log.d("robust", newAssetPath);
+                Log.d("robust", "assetsWithoutBaseApk add newAssetPath 148: " + newAssetPath);
                 assetsWithoutBaseApk.add(newAssetPath);
             }
         }
@@ -184,7 +187,8 @@ public class RobustResourceApply {
         mAddAssetPath.setAccessible(true);
         Log.d("robust", "newAssetManager add assetPath 192:" + resourcesApkFilePath);
         if (((Integer) mAddAssetPath.invoke(newAssetManager, resourcesApkFilePath)) == 0) {
-            throw new IllegalStateException("Could not create new AssetManager");
+            Log.e("robust","invoke newAssetManager 's mAddAssetPath method result : false");
+            return false;
         }
 
         ArrayList<String> newAssets = getAssetPath(newAssetManager);
@@ -192,7 +196,8 @@ public class RobustResourceApply {
             if (!newAssets.contains(assetPath)) {
                 Log.d("robust", "newAssetManager add assetPath 192:" + assetPath);
                 if (((Integer) mAddAssetPath.invoke(newAssetManager, assetPath)) == 0) {
-                    throw new IllegalStateException("Could not create new AssetManager");
+                    Log.e("robust","invoke newAssetManager 's mAddAssetPath method result : false");
+                    return false;
                 }
             }
         }
