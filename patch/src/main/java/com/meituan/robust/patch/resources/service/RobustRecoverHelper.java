@@ -1,8 +1,14 @@
 package com.meituan.robust.patch.resources.service;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.MessageQueue;
 import android.os.Process;
+import android.util.Log;
+
+import com.meituan.robust.patch.resources.util.ProcessUtil;
 
 /**
  * Created by hedingxu on 17/6/8.
@@ -29,4 +35,25 @@ public class RobustRecoverHelper {
     public void postRunnable(Runnable runnable) {
         handler.post(runnable);
     }
+
+    public void postRunnableDelay(Runnable runnable, long delayMillis) {
+        handler.postDelayed(runnable, delayMillis);
+    }
+
+    public void killRobustProcessWhenEmpty(final Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mTaskThread.getLooper().getQueue().addIdleHandler(new MessageQueue.IdleHandler() {
+                @Override
+                public boolean queueIdle() {
+                    if (ProcessUtil.isRobustProcess(context)){
+                        Log.d("robust","robust process is empty");
+                        Log.d("robust","kill robust process");
+                        ProcessUtil.killSelf();
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
 }

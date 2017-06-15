@@ -5,6 +5,7 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.FileInputStream;
+
 /**
  * Created by hedingxu on 17/3/10.
  */
@@ -48,6 +49,10 @@ public class ProcessUtil {
                 }
             }
         }
+    }
+
+    public static void killSelf() {
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     public static String getProcessName(final Context context) {
