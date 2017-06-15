@@ -183,7 +183,9 @@ public class PatchExecutor extends Thread {
         {
             Patch patchResApply = patches.get(0);
             Log.d("robust", "applyOtherPatches resFix by name : " + patchResApply.getName());
+            long currentTime = System.currentTimeMillis();
             boolean resFixResult = RobustResources.resFix(context, patchResApply.getName(), patchResApply.getMd5());
+            Log.d("robust", "applyOtherPatches resFix spend 188: " + (System.currentTimeMillis() - currentTime));
             if (resFixResult) {
                 Log.d("robust", "applyOtherPatches resFix result 188: " + resFixResult);
             } else {
@@ -193,8 +195,10 @@ public class PatchExecutor extends Thread {
 
         for (Patch p : patches) {
             Log.d("robust", "applyOtherPatches libFix by name 195: " + p.getName());
+            long currentTime = System.currentTimeMillis();
             boolean libFixResult = RobustResources.libFix(context, p.getName(), p.getMd5());
             Log.d("robust", "applyOtherPatches libFix result 197: " + libFixResult);
+            Log.d("robust", "applyOtherPatches libFix spend 199: " + (System.currentTimeMillis() - currentTime));
         }
 
         //apply dex

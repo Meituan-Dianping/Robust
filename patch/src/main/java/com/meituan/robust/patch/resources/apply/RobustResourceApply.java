@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
 
@@ -141,6 +142,7 @@ public class RobustResourceApply {
         for (String assetPath : assets) {
             if (!TextUtils.equals(baseApkPath, assetPath)) {
                 String newAssetPath = new String(assetPath);
+                Log.d("robust", newAssetPath);
                 assetsWithoutBaseApk.add(newAssetPath);
             }
         }
@@ -180,6 +182,7 @@ public class RobustResourceApply {
 
         Method mAddAssetPath = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
         mAddAssetPath.setAccessible(true);
+        Log.d("robust", "newAssetManager add assetPath 192:" + resourcesApkFilePath);
         if (((Integer) mAddAssetPath.invoke(newAssetManager, resourcesApkFilePath)) == 0) {
             throw new IllegalStateException("Could not create new AssetManager");
         }
@@ -187,7 +190,10 @@ public class RobustResourceApply {
         ArrayList<String> newAssets = getAssetPath(newAssetManager);
         for (String assetPath : assetsWithoutBaseApk) {
             if (!newAssets.contains(assetPath)) {
-                newAssets.add(assetPath);
+                Log.d("robust", "newAssetManager add assetPath 192:" + assetPath);
+                if (((Integer) mAddAssetPath.invoke(newAssetManager, assetPath)) == 0) {
+                    throw new IllegalStateException("Could not create new AssetManager");
+                }
             }
         }
 
