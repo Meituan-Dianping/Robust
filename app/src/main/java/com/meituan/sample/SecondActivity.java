@@ -202,7 +202,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         public void run() {
 
-            Toast.makeText(activityWeakReference.get(), "from PreloadWebviewRunnable PreloadWebviewRunnable ", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(activityWeakReference.get(), "from PreloadWebviewRunnable PreloadWebviewRunnable ", Toast.LENGTH_SHORT).show();
 
         }
     }

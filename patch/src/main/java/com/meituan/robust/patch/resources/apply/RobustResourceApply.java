@@ -1,5 +1,6 @@
 package com.meituan.robust.patch.resources.apply;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
@@ -12,6 +13,7 @@ import android.util.ArrayMap;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.SparseArray;
+import android.view.ContextThemeWrapper;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN;
+import static android.os.Build.VERSION_CODES.JELLY_BEAN_MR2;
 import static android.os.Build.VERSION_CODES.KITKAT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static android.os.Build.VERSION_CODES.M;
@@ -202,14 +205,69 @@ public class RobustResourceApply {
             }
         }
 
+//        AssetManager.getSystem();
+        //adapt hydra plugin
+//        boolean hasHydraPlugin = false;
+//        hasHydraPlugin = true;
+//
+
         // Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
         // in L, so we do it unconditionally.
         Method mEnsureStringBlocks = AssetManager.class.getDeclaredMethod("ensureStringBlocks");
         mEnsureStringBlocks.setAccessible(true);
         mEnsureStringBlocks.invoke(newAssetManager);
 
-        //ignore current activities 's mAssets , mTheme and caches
-        //TODO: 17/6/6 hedex  support
+        //handle current activities 's mAssets , mTheme and caches
+        List<Activity> activities = Restarter.getAllCurrentActivities(context);
+        if (activities != null) {
+            for (Activity activity : activities) {
+                Resources resources = activity.getResources();
+                try {
+                    Field mAssets = Resources.class.getDeclaredField("mAssets");
+                    mAssets.setAccessible(true);
+                    mAssets.set(resources, newAssetManager);
+                } catch (Throwable ignore) {
+                    Field mResourcesImpl = Resources.class.getDeclaredField("mResourcesImpl");
+                    mResourcesImpl.setAccessible(true);
+                    Object resourceImpl = mResourcesImpl.get(resources);
+                    Field implAssets = resourceImpl.getClass().getDeclaredField("mAssets");
+                    implAssets.setAccessible(true);
+                    implAssets.set(resourceImpl, newAssetManager);
+                }
+                Resources.Theme theme = activity.getTheme();
+                try {
+                    try {
+                        Field ma = Resources.Theme.class.getDeclaredField("mAssets");
+                        ma.setAccessible(true);
+                        ma.set(theme, newAssetManager);
+                    } catch (NoSuchFieldException ignore) {
+                        Field themeField = Resources.Theme.class.getDeclaredField("mThemeImpl");
+                        themeField.setAccessible(true);
+                        Object impl = themeField.get(theme);
+                        Field ma = impl.getClass().getDeclaredField("mAssets");
+                        ma.setAccessible(true);
+                        ma.set(impl, newAssetManager);
+                    }
+                    Field mt = ContextThemeWrapper.class.getDeclaredField("mTheme");
+                    mt.setAccessible(true);
+                    mt.set(activity, null);
+                    Method mtm = ContextThemeWrapper.class.getDeclaredMethod("initializeTheme");
+                    mtm.setAccessible(true);
+                    mtm.invoke(activity);
+                    Method mCreateTheme = AssetManager.class.getDeclaredMethod("createTheme");
+                    mCreateTheme.setAccessible(true);
+                    Object internalTheme = mCreateTheme.invoke(newAssetManager);
+                    Field mTheme = Resources.Theme.class.getDeclaredField("mTheme");
+                    mTheme.setAccessible(true);
+                    mTheme.set(theme, internalTheme);
+                } catch (Throwable e) {
+                    Log.e("robust", "Failed to update existing theme for activity " + activity,
+                            e);
+                }
+                pruneResourceCaches(resources);
+            }
+        }
+
 
         // Iterate over all known Resources objects
         Collection<WeakReference<Resources>> references;
@@ -314,49 +372,49 @@ public class RobustResourceApply {
             }
         }
 
-        // TODO: hedex support
-//        if (SDK_INT >= M) {
-//            // Really should only be N; fix this as soon as it has its own API level
-//            try {
-//                Field mResourcesImpl = Resources.class.getDeclaredField("mResourcesImpl");
-//                mResourcesImpl.setAccessible(true);
-//                // For the remainder, use the ResourcesImpl instead, where all the fields
-//                // now live
-//                resources = mResourcesImpl.get(resources);
-//            } catch (Throwable ignore) {
-//            }
-//        }
-//        // Prune bitmap and color state lists etc caches
-//        Object lock = null;
-//        if (SDK_INT >= JELLY_BEAN_MR2) {
-//            try {
-//                Field field = resources.getClass().getDeclaredField("mAccessLock");
-//                field.setAccessible(true);
-//                lock = field.get(resources);
-//            } catch (Throwable ignore) {
-//            }
-//        } else {
-//            try {
-//                Field field = Resources.class.getDeclaredField("mTmpValue");
-//                field.setAccessible(true);
-//                lock = field.get(resources);
-//            } catch (Throwable ignore) {
-//            }
-//        }
-//        if (lock == null) {
-//            lock = RobustResourceReflect.class;
-//        }
-//        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-//        synchronized (lock) {
-//            // Prune bitmap and color caches
-//            pruneResourceCache(resources, "mDrawableCache");
-//            pruneResourceCache(resources, "mColorDrawableCache");
-//            pruneResourceCache(resources, "mColorStateListCache");
-//            if (SDK_INT >= M) {
-//                pruneResourceCache(resources, "mAnimatorCache");
-//                pruneResourceCache(resources, "mStateListAnimatorCache");
-//            }
-//        }
+        // handle
+        if (SDK_INT >= M) {
+            // Really should only be N; fix this as soon as it has its own API level
+            try {
+                Field mResourcesImpl = Resources.class.getDeclaredField("mResourcesImpl");
+                mResourcesImpl.setAccessible(true);
+                // For the remainder, use the ResourcesImpl instead, where all the fields
+                // now live
+                resources = mResourcesImpl.get(resources);
+            } catch (Throwable ignore) {
+            }
+        }
+        // Prune bitmap and color state lists etc caches
+        Object lock = null;
+        if (SDK_INT >= JELLY_BEAN_MR2) {
+            try {
+                Field field = resources.getClass().getDeclaredField("mAccessLock");
+                field.setAccessible(true);
+                lock = field.get(resources);
+            } catch (Throwable ignore) {
+            }
+        } else {
+            try {
+                Field field = Resources.class.getDeclaredField("mTmpValue");
+                field.setAccessible(true);
+                lock = field.get(resources);
+            } catch (Throwable ignore) {
+            }
+        }
+        if (lock == null) {
+            lock = RobustResourceReflect.class;
+        }
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (lock) {
+            // Prune bitmap and color caches
+            pruneResourceCache(resources, "mDrawableCache");
+            pruneResourceCache(resources, "mColorDrawableCache");
+            pruneResourceCache(resources, "mColorStateListCache");
+            if (SDK_INT >= M) {
+                pruneResourceCache(resources, "mAnimatorCache");
+                pruneResourceCache(resources, "mStateListAnimatorCache");
+            }
+        }
         return;
     }
 
@@ -449,4 +507,8 @@ public class RobustResourceApply {
         }
         return assetPaths;
     }
+
+    //fix
+    // 06-16 13:55:01.220 5621-7738/? E/dalvikvm: Could not find class 'android.util.ArrayMap', referenced from method com.meituan.robust.patch.resources.apply.RobustResourceApply.patchExistingResources
+    // 06-16 13:55:01.220 5621-7738/? E/dalvikvm: Could not find class 'android.util.ArrayMap', referenced from method com.meituan.robust.patch.resources.apply.RobustResourceApply.pruneResourceCache
 }

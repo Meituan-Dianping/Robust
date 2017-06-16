@@ -20,7 +20,6 @@ import com.meituan.sample.robusttest.NoField;
 import com.meituan.sample.robusttest.People;
 import com.meituan.sample.robusttest.SampleClass;
 import com.meituan.sample.robusttest.State;
-import com.meituan.sample.robusttest.Super;
 import com.meituan.sample.robusttest.other.Hll;
 
 import java.util.List;
@@ -43,8 +42,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView textView;
-    Button button;
+    TextView tipsTextView;
     State<Integer> state;
 
     Hll hll = new Hll(false);
@@ -55,8 +53,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         PatchProxy.register(new LogExtension());
 
-        button = (Button) findViewById(R.id.button);
-        textView = (TextView) findViewById(R.id.textView);
+        tipsTextView = (TextView) findViewById(R.id.tips_text);
+        StringBuilder tipsStringBuilder = new StringBuilder();
+        tipsStringBuilder.append("tips:");
+        tipsStringBuilder.append("\n1.please click JUMP_PATCH_ACTIVITY button to see the origin and go back here");
+        tipsStringBuilder.append("\n2.please click patch button to apply patch");
+        tipsStringBuilder.append("\n3.please click JUMP_PATCH_ACTIVITY button to see how effective");
+
+        tipsTextView.setText(tipsStringBuilder.toString());
         state = new State<>(hll);
         Button patch = (Button) findViewById(R.id.patch);
         //beigin to patch
@@ -83,32 +87,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.jump_patch_activity).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
-                state.setIndex(hll, 1, 1l, new Object());
-                Log.d("robust", "state.get()  " + state.get().toString());
-                Log.d("robust", " state.getIndex()  " + state.getIndex());
-                Super s = new Super();
-                Log.d("robust", "patch result before :" + s.check());
-                Log.d("robust", "patch result after:" + s.protextedMethod());
-                textView.setText(s.getText());
-                s.getinstance();
+                Intent intent = new Intent(MainActivity.this, TestPatchActivity.class);
+                startActivity(intent);
             }
         });
-        //test situation,
-        try {
-            ImageQualityUtil.loadImage(null, null, null, 1, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        System.out.println(" run(String x) "+run("robust ",123));
-        System.out.println("  run(People x) "+run(new People(),123d));
-        System.out.println("  run(float x) "+run(123f));
-        System.out.println("  double run() "+run());
-        System.out.println("in MainActivity end ");
+        //test situation,
+//        try {
+//            ImageQualityUtil.loadImage(null, null, null, 1, null);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(" run(String x) "+run("robust ",123));
+//        System.out.println("  run(People x) "+run(new People(),123d));
+//        System.out.println("  run(float x) "+run(123f));
+//        System.out.println("  double run() "+run());
+//        System.out.println("in MainActivity end ");
     }
 
 
@@ -143,8 +141,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPatchApplied(boolean result, Patch patch) {
-            System.out.println(" robust arrived in onPatchApplied ");
-
+//            System.out.println(" robust arrived in onPatchApplied ");
+            if (result){
+                Toast.makeText(getApplicationContext(),"patch applied success",Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getApplicationContext(),"patch applied failed",Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
