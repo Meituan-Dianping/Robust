@@ -88,7 +88,7 @@ public class RobustResourceApply {
             return false;
         }
 
-        if (TextUtils.isEmpty(baseApkPath)){
+        if (TextUtils.isEmpty(baseApkPath)) {
             baseApkPath = new String(context.getApplicationInfo().sourceDir);
             Log.d("robust", "context.getApplicationInfo().sourceDir 144: " + baseApkPath);
         }
@@ -185,28 +185,28 @@ public class RobustResourceApply {
         // Create a new AssetManager instance and point it to the robust patch resources
         AssetManager newAssetManager = null;
 
-        AssetManager assetManager = context.getAssets();
+        AssetManager oldAssetManager = context.getAssets();
 
         //todo 测试addOverlayPath方法可行，使用该方法就不用再替换assetManager,可以更加稳定
         try {
             Method addOverlayPathMethod = AssetManager.class.getDeclaredMethod("addOverlayPath", String.class);
             Log.d("robust", "AssetManager has addOverlayPath method in " + Build.VERSION.SDK_INT);
-            addOverlayPathMethod.invoke(assetManager, resourcesApkFilePath);
+            addOverlayPathMethod.invoke(oldAssetManager, resourcesApkFilePath);
             addOverlayPathMethod.setAccessible(true);
             //这里就不用new一个实例出来了
-            newAssetManager = assetManager;
+            newAssetManager = oldAssetManager;
         } catch (NoSuchMethodException e) {
             Log.d("robust", "AssetManager do not has addOverlayPath method in " + Build.VERSION.SDK_INT);
         } catch (SecurityException e) {
             Log.e("robust", "AssetManager reflect addOverlayPath method SecurityException in " + Build.VERSION.SDK_INT);
-            Log.e("robust", "RobustResourceApply SecurityException 195: " + e.toString());
+            Log.e("robust", "RobustResourceApply SecurityException 195: " + e.toString() + ", " + Build.VERSION.SDK_INT);
         }
 
         Method addAssetPathMethod = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
         addAssetPathMethod.setAccessible(true);
         if (null == newAssetManager) {
             //new instance
-            if (assetManager.getClass().getName().equals(BAIDU_ASSET_MANAGER)) {
+            if (oldAssetManager.getClass().getName().equals(BAIDU_ASSET_MANAGER)) {
                 //adapt baiduAssetManager
                 newAssetManager = (AssetManager) Class.forName(BAIDU_ASSET_MANAGER).getConstructor().newInstance();
             } else {
