@@ -1,7 +1,5 @@
 package com.meituan.sample.robusttest;
 
-import com.meituan.robust.patch.annotaion.Modify;
-
 /**
  * Created by mivanzhang on 17/2/20.
  */
@@ -14,7 +12,6 @@ public class SampleClass {
     public String getName() {
         return name;
     }
-    @Modify
     public  int multiple(int number) {
         Children pair=new Children();
         pair.setFirst("asdad");

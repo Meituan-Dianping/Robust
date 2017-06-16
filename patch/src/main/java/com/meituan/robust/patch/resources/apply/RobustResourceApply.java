@@ -42,6 +42,8 @@ public class RobustResourceApply {
 
     private static final String BAIDU_ASSET_MANAGER = "android.content.res.BAIDU_ASSET_MANAGER";
 
+    private static String baseApkPath;
+
     public static boolean patchExistingResourcesOnUiThread(final Context context, final String resourcesApkFilePath) {
         final List<Boolean> results = new ArrayList<>(1);
         boolean isUiThread = Looper.getMainLooper() == Looper.myLooper();
@@ -84,6 +86,11 @@ public class RobustResourceApply {
     private static boolean patchExistingResources(Context context, String resourcesApkFilePath) throws Throwable {
         if (TextUtils.isEmpty(resourcesApkFilePath)) {
             return false;
+        }
+
+        if (TextUtils.isEmpty(baseApkPath)){
+            baseApkPath = new String(context.getApplicationInfo().sourceDir);
+            Log.d("robust", "context.getApplicationInfo().sourceDir 144: " + baseApkPath);
         }
         //参考 https://android.googlesource.com/platform/tools/base/+/gradle_2.0.0/instant-run/instant-run-server/src/main/java/com/android/tools/fd/runtime/MonkeyPatcher.java
 
@@ -139,19 +146,20 @@ public class RobustResourceApply {
         mResDir.setAccessible(true);
 
 
-        //adapt hydra
         //getAssetPath: /system/framework/framework-res.apk;/data/app/com.meituan.robust.sample-1.apk;(有可能包含hydra的assetPath，需要保留）
-        ArrayList<String> assets = getAssetPath(context.getAssets());
-        ArrayList<String> assetsWithoutBaseApk = new ArrayList<>();//frame work path + hydra pathes
-        String baseApkPath = context.getApplicationInfo().sourceDir;
-        Log.d("robust", "context.getApplicationInfo().sourceDir 144: " + baseApkPath);
-        for (String assetPath : assets) {
-            if (!TextUtils.equals(baseApkPath, assetPath)) {
-                String newAssetPath = new String(assetPath);
-                Log.d("robust", "assetsWithoutBaseApk add newAssetPath 148: " + newAssetPath);
-                assetsWithoutBaseApk.add(newAssetPath);
-            }
-        }
+        //contains : frame work path + hydra pathes + sourceDir(apk)
+        ArrayList<String> oldAssetPaths = getAssetPath(context.getAssets());
+
+//        ArrayList<String> assetsWithoutBaseApk = new ArrayList<>();
+//
+//        for (String assetPath : oldAssetPaths) {
+//            Log.d("robust", "old assets 's AssetPath : " + assetPath);
+//            if (!TextUtils.equals(baseApkPath, assetPath)) {
+//                String newAssetPath = new String(assetPath);
+//                Log.d("robust", "assetsWithoutBaseApk add newAssetPath 148: " + newAssetPath);
+//                assetsWithoutBaseApk.add(newAssetPath);
+//            }
+//        }
 
         // Enumerate all LoadedApk (or PackageInfo) fields in ActivityThread#mPackages and
         // ActivityThread#mResourcePackages and do two things:
@@ -175,41 +183,63 @@ public class RobustResourceApply {
         }
 
         // Create a new AssetManager instance and point it to the robust patch resources
-        AssetManager newAssetManager;
+        AssetManager newAssetManager = null;
 
         AssetManager assetManager = context.getAssets();
 
-        //adapt baiduAssetManager
-        if (assetManager.getClass().getName().equals(BAIDU_ASSET_MANAGER)) {
-            newAssetManager = (AssetManager) Class.forName(BAIDU_ASSET_MANAGER).getConstructor().newInstance();
-        } else {
-            newAssetManager = AssetManager.class.getConstructor().newInstance();
+        //todo 测试addOverlayPath方法可行，使用该方法就不用再替换assetManager,可以更加稳定
+        try {
+            Method addOverlayPathMethod = AssetManager.class.getDeclaredMethod("addOverlayPath", String.class);
+            Log.d("robust", "AssetManager has addOverlayPath method in " + Build.VERSION.SDK_INT);
+            addOverlayPathMethod.invoke(assetManager, resourcesApkFilePath);
+            addOverlayPathMethod.setAccessible(true);
+            //这里就不用new一个实例出来了
+            newAssetManager = assetManager;
+        } catch (NoSuchMethodException e) {
+            Log.d("robust", "AssetManager do not has addOverlayPath method in " + Build.VERSION.SDK_INT);
+        } catch (SecurityException e) {
+            Log.e("robust", "AssetManager reflect addOverlayPath method SecurityException in " + Build.VERSION.SDK_INT);
+            Log.e("robust", "RobustResourceApply SecurityException 195: " + e.toString());
         }
 
-        Method mAddAssetPath = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
-        mAddAssetPath.setAccessible(true);
-        Log.d("robust", "newAssetManager add assetPath 192:" + resourcesApkFilePath);
-        if (((Integer) mAddAssetPath.invoke(newAssetManager, resourcesApkFilePath)) == 0) {
-            Log.e("robust","invoke newAssetManager 's mAddAssetPath method result : false");
-            return false;
-        }
-
-        ArrayList<String> newAssets = getAssetPath(newAssetManager);
-        for (String assetPath : assetsWithoutBaseApk) {
-            if (!newAssets.contains(assetPath)) {
-                Log.d("robust", "newAssetManager add assetPath 192:" + assetPath);
-                if (((Integer) mAddAssetPath.invoke(newAssetManager, assetPath)) == 0) {
-                    Log.e("robust","invoke newAssetManager 's mAddAssetPath method result : false");
-                    return false;
-                }
+        Method addAssetPathMethod = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
+        addAssetPathMethod.setAccessible(true);
+        if (null == newAssetManager) {
+            //new instance
+            if (assetManager.getClass().getName().equals(BAIDU_ASSET_MANAGER)) {
+                //adapt baiduAssetManager
+                newAssetManager = (AssetManager) Class.forName(BAIDU_ASSET_MANAGER).getConstructor().newInstance();
+            } else {
+                newAssetManager = AssetManager.class.getConstructor().newInstance();
             }
+
+            Log.d("robust", "newAssetManager add assetPath 192:" + resourcesApkFilePath);
+            if (((Integer) addAssetPathMethod.invoke(newAssetManager, resourcesApkFilePath)) == 0) {
+                Log.e("robust", "invoke newAssetManager 's mAddAssetPath method result : false");
+                return false;
+            }
+
         }
 
 //        AssetManager.getSystem();
         //adapt hydra plugin
 //        boolean hasHydraPlugin = false;
 //        hasHydraPlugin = true;
-//
+
+        //adapt hydra
+        ArrayList<String> newAssets = getAssetPath(newAssetManager);
+        //记录hydra 的assets路径
+        for (String assetPath : oldAssetPaths) {
+            Log.d("robust", "old assets 's AssetPath : " + assetPath);
+
+            //过滤掉已经在newAssetManager的assetPath & 过滤掉baseApkPath
+            if (!newAssets.contains(assetPath) || !TextUtils.equals(baseApkPath, assetPath)) {
+                Log.d("robust", "newAssetManager add assetPath 192:" + assetPath);
+                if (((Integer) addAssetPathMethod.invoke(newAssetManager, assetPath)) == 0) {
+                    Log.e("robust", "invoke newAssetManager 's mAddAssetPath method result : false");
+                }
+            }
+        }
 
         // Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
         // in L, so we do it unconditionally.
@@ -507,8 +537,4 @@ public class RobustResourceApply {
         }
         return assetPaths;
     }
-
-    //fix
-    // 06-16 13:55:01.220 5621-7738/? E/dalvikvm: Could not find class 'android.util.ArrayMap', referenced from method com.meituan.robust.patch.resources.apply.RobustResourceApply.patchExistingResources
-    // 06-16 13:55:01.220 5621-7738/? E/dalvikvm: Could not find class 'android.util.ArrayMap', referenced from method com.meituan.robust.patch.resources.apply.RobustResourceApply.pruneResourceCache
 }

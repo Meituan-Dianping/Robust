@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="original text"
+        android:text="original text patched"
         android:id="@+id/patch_text"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
@@ -20,6 +20,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scaleType="centerInside"
         android:src="@mipmap/ic_launcher"/>
 
 </android.support.design.widget.CoordinatorLayout>
