@@ -187,7 +187,11 @@ public class RobustResourceApply {
 
         AssetManager oldAssetManager = context.getAssets();
 
+        // 由于替换AssetManager在android高版本容易出现兼容性，比如Theme与webview等兼容性
+        // 考虑采用不替换AssetManager的办法解决兼容性的问题
         //todo 测试addOverlayPath方法可行，使用该方法就不用再替换assetManager,可以更加稳定
+        // AssetManager#addOverlayPath 从android_5.0.0_r1开始支持，已经能够覆盖90%以上的用户了
+        // http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/5.0.0_r1/android/content/res/AssetManager.java?av=f
         try {
             Method addOverlayPathMethod = AssetManager.class.getDeclaredMethod("addOverlayPath", String.class);
             Log.d("robust", "AssetManager has addOverlayPath method in " + Build.VERSION.SDK_INT);
@@ -221,24 +225,25 @@ public class RobustResourceApply {
 
         }
 
-//        AssetManager.getSystem();
-        //adapt hydra plugin
-//        boolean hasHydraPlugin = false;
-//        hasHydraPlugin = true;
-
         //adapt hydra
         ArrayList<String> newAssets = getAssetPath(newAssetManager);
         //记录hydra 的assets路径
         for (String assetPath : oldAssetPaths) {
             Log.d("robust", "old assets 's AssetPath : " + assetPath);
-
             //过滤掉已经在newAssetManager的assetPath & 过滤掉baseApkPath
-            if (!newAssets.contains(assetPath) || !TextUtils.equals(baseApkPath, assetPath)) {
-                Log.d("robust", "newAssetManager add assetPath 192:" + assetPath);
+            if (newAssets.contains(assetPath) || TextUtils.equals(baseApkPath, assetPath)) {
+                Log.d("robust", "newAssetManager not add assetPath 241:" + assetPath);
+            } else {
+                Log.d("robust", "newAssetManager add assetPath 243:" + assetPath);
                 if (((Integer) addAssetPathMethod.invoke(newAssetManager, assetPath)) == 0) {
                     Log.e("robust", "invoke newAssetManager 's mAddAssetPath method result : false");
                 }
             }
+        }
+
+        // todo : only debug, need to be deleted
+        for (String assetPath : getAssetPath(newAssetManager)){
+            Log.d("robust","newAssetManager asset path 251: " + assetPath);
         }
 
         // Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
@@ -264,6 +269,12 @@ public class RobustResourceApply {
                     implAssets.setAccessible(true);
                     implAssets.set(resourceImpl, newAssetManager);
                 }
+                // appcompat-v7 package:
+                // AppCompatActivity
+                // AppCompatDelegateImplV9
+                // AppCompatDelegateImplV11
+                // AppCompatDelegateImplV14
+                // AppCompatDelegateImplN
                 Resources.Theme theme = activity.getTheme();
                 try {
                     try {
