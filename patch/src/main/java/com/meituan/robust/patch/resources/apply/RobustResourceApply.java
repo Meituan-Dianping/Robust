@@ -37,6 +37,8 @@ import static android.os.Build.VERSION_CODES.M;
 
 /**
  * Created by hedingxu on 17/6/7.
+ * android.content.res.AssetManager.java
+ * frameworks/base/libs/utils/AssetManager.cpp
  */
 public class RobustResourceApply {
 
@@ -92,6 +94,8 @@ public class RobustResourceApply {
             baseApkPath = new String(context.getApplicationInfo().sourceDir);
             Log.d("robust", "context.getApplicationInfo().sourceDir 144: " + baseApkPath);
         }
+
+        //mResources = mainThread.getTopLevelResources(mResDir, mSplitResDirs, mOverlayDirs,mApplicationInfo.sharedLibraryFiles, Display.DEFAULT_DISPLAY, null, this);
         //参考 https://android.googlesource.com/platform/tools/base/+/gradle_2.0.0/instant-run/instant-run-server/src/main/java/com/android/tools/fd/runtime/MonkeyPatcher.java
 
         //   - Replace mResDir to point to the external resource file instead of the .apk. This is
@@ -123,12 +127,6 @@ public class RobustResourceApply {
         // new asset manager!)
         */
 
-//        // First get on ui thread
-//        Object currentActivityThread = RobustResourceReflect.getCurrentActivityThread(context);
-//        if (null == currentActivityThread) {
-//            return false;
-//        }
-
         // Find the ActivityThread instance for the current thread
         Class<?> activityThread = Class.forName("android.app.ActivityThread");
 
@@ -145,27 +143,12 @@ public class RobustResourceApply {
         Field mResDir = loadedApkClass.getDeclaredField("mResDir");
         mResDir.setAccessible(true);
 
-
-        //getAssetPath: /system/framework/framework-res.apk;/data/app/com.meituan.robust.sample-1.apk;(有可能包含hydra的assetPath，需要保留）
-        //contains : frame work path + hydra pathes + sourceDir(apk)
-        ArrayList<String> oldAssetPaths = getAssetPath(context.getAssets());
-
-//        ArrayList<String> assetsWithoutBaseApk = new ArrayList<>();
-//
-//        for (String assetPath : oldAssetPaths) {
-//            Log.d("robust", "old assets 's AssetPath : " + assetPath);
-//            if (!TextUtils.equals(baseApkPath, assetPath)) {
-//                String newAssetPath = new String(assetPath);
-//                Log.d("robust", "assetsWithoutBaseApk add newAssetPath 148: " + newAssetPath);
-//                assetsWithoutBaseApk.add(newAssetPath);
-//            }
-//        }
-
         // Enumerate all LoadedApk (or PackageInfo) fields in ActivityThread#mPackages and
         // ActivityThread#mResourcePackages and do two things:
         //   - Replace mResDir to point to the external resource file instead of the .apk. This is
         //     used as the asset path for new Resources objects.
         //   - Set Application#mLoadedApk to the found LoadedApk instance
+        // LoadedApk source code: http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/5.1.1_r1/android/app/LoadedApk.java#LoadedApk
         for (String fieldName : new String[]{"mPackages", "mResourcePackages"}) {
             Field field = activityThread.getDeclaredField(fieldName);
             field.setAccessible(true);
@@ -177,34 +160,46 @@ public class RobustResourceApply {
                     continue;
                 }
                 if (!TextUtils.isEmpty(resourcesApkFilePath)) {
+                    Object resDirObj = mResDir.get(loadedApk);
+                    if (resDirObj instanceof String) {
+                        Log.w("robust", "mResDir value is 187:" + (String) resDirObj);
+                    }
                     mResDir.set(loadedApk, resourcesApkFilePath);
                 }
             }
         }
 
+        AssetManager oldAssetManager = context.getAssets();
+        //getAssetPath: /system/framework/framework-res.apk;/data/app/com.meituan.robust.sample-1.apk;(有可能包含hydra的assetPath，需要保留）
+        //contains : frame work path + hydra pathes + sourceDir(apk)
+        ArrayList<String> oldAssetPaths = getAssetPath(context.getAssets());
+
+        // todo : only debug, need to be deleted
+        for (String assetPath : oldAssetPaths) {
+            Log.d("robust", "oldAssetManager asset path 153: " + assetPath);
+        }
+
         // Create a new AssetManager instance and point it to the robust patch resources
         AssetManager newAssetManager = null;
 
-        AssetManager oldAssetManager = context.getAssets();
-
         // 由于替换AssetManager在android高版本容易出现兼容性，比如Theme与webview等兼容性
         // 考虑采用不替换AssetManager的办法解决兼容性的问题
-        //todo 测试addOverlayPath方法可行，使用该方法就不用再替换assetManager,可以更加稳定
+        // addOverlayPath用来添加系统资源路径的
         // AssetManager#addOverlayPath 从android_5.0.0_r1开始支持，已经能够覆盖90%以上的用户了
         // http://grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/5.0.0_r1/android/content/res/AssetManager.java?av=f
-        try {
-            Method addOverlayPathMethod = AssetManager.class.getDeclaredMethod("addOverlayPath", String.class);
-            Log.d("robust", "AssetManager has addOverlayPath method in " + Build.VERSION.SDK_INT);
-            addOverlayPathMethod.invoke(oldAssetManager, resourcesApkFilePath);
-            addOverlayPathMethod.setAccessible(true);
-            //这里就不用new一个实例出来了
-            newAssetManager = oldAssetManager;
-        } catch (NoSuchMethodException e) {
-            Log.d("robust", "AssetManager do not has addOverlayPath method in " + Build.VERSION.SDK_INT);
-        } catch (SecurityException e) {
-            Log.e("robust", "AssetManager reflect addOverlayPath method SecurityException in " + Build.VERSION.SDK_INT);
-            Log.e("robust", "RobustResourceApply SecurityException 195: " + e.toString() + ", " + Build.VERSION.SDK_INT);
-        }
+//        try {
+//            Method addOverlayPathMethod = AssetManager.class.getDeclaredMethod("addOverlayPath", String.class);
+//            Log.d("robust", "AssetManager has addOverlayPath method in " + Build.VERSION.SDK_INT);
+//            addOverlayPathMethod.invoke(oldAssetManager, resourcesApkFilePath);
+//            addOverlayPathMethod.setAccessible(true);
+//            //这里就不用new一个实例出来了
+//            newAssetManager = oldAssetManager;
+//        } catch (NoSuchMethodException e) {
+//            Log.d("robust", "AssetManager do not has addOverlayPath method in " + Build.VERSION.SDK_INT);
+//        } catch (SecurityException e) {
+//            Log.e("robust", "AssetManager reflect addOverlayPath method SecurityException in " + Build.VERSION.SDK_INT);
+//            Log.e("robust", "RobustResourceApply SecurityException 195: " + e.toString() + ", " + Build.VERSION.SDK_INT);
+//        }
 
         Method addAssetPathMethod = AssetManager.class.getDeclaredMethod("addAssetPath", String.class);
         addAssetPathMethod.setAccessible(true);
@@ -227,6 +222,10 @@ public class RobustResourceApply {
 
         //adapt hydra
         ArrayList<String> newAssets = getAssetPath(newAssetManager);
+        // todo : only debug, need to be deleted
+        for (String assetPath : newAssets) {
+            Log.d("robust", "before add hydra ,newAssetManager asset path 227: " + assetPath);
+        }
         //记录hydra 的assets路径
         for (String assetPath : oldAssetPaths) {
             Log.d("robust", "old assets 's AssetPath : " + assetPath);
@@ -242,8 +241,8 @@ public class RobustResourceApply {
         }
 
         // todo : only debug, need to be deleted
-        for (String assetPath : getAssetPath(newAssetManager)){
-            Log.d("robust","newAssetManager asset path 251: " + assetPath);
+        for (String assetPath : getAssetPath(newAssetManager)) {
+            Log.d("robust", "after add hydra ,newAssetManager asset path 251: " + assetPath);
         }
 
         // Kitkat needs this method call, Lollipop doesn't. However, it doesn't seem to cause any harm
