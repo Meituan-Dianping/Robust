@@ -164,6 +164,11 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
     }
 
     def zipPatchClassesFile() {
+        File dexPatchFile = new File(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME);
+        if (!dexPatchFile.exists()){
+            logger.quiet "dex patch file is not exists"
+            return
+        }
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME));
         zipAllPatchClasses(Config.robustGenerateDirectory + Config.patchPackageName.substring(0, Config.patchPackageName.indexOf(".")), "", zipOut);
         zipOut.close();

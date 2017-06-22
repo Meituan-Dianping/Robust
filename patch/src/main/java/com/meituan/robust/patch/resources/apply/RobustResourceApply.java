@@ -38,7 +38,7 @@ import static android.os.Build.VERSION_CODES.M;
 /**
  * Created by hedingxu on 17/6/7.
  * android.content.res.AssetManager.java
- * frameworks/base/libs/utils/AssetManager.cpp
+ * frameworks/base/libs/androidfw/AssetManager.cpp
  */
 public class RobustResourceApply {
 
