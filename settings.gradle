@@ -1,4 +1,4 @@
-include ':app'
+//include ':app'
 include ':autopatchbase'
 include ':gradle-plugin'
 include ':patch'
