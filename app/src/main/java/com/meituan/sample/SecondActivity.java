@@ -103,8 +103,9 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         getArray(meituan);
         //打开这部分注释，查看修复效果
 //        Arrays.fill(multiArr,"修复后的数据");
-        return  "资源修复测试 ：补丁修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
-//        return "error occur " + concreateClass.getA();
+//        return  "Fixed :资源修复测试 ：补丁修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+        return  "Fixed success";
+//        return "error occur ";
 
     }
 
@@ -117,6 +118,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
 // another usage of Modify anntation
 //    @Modify(value = "com.meituan.sample.SecondActivity.onCreate(android.os.Bundle)")
+    @Modify
     private String getInfo(State stae, Super s, long l) {
         String json = "[1,2,3,4,5]";
         Gson gson = new Gson();
@@ -129,7 +131,8 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 }
         );
 
-        return "you make it!!   " + getTextI1(flag) + myObject;
+//        return "you make it!!   " + getTextI1(flag) + myObject;
+        return "patch_test";
     }
 
 
@@ -202,7 +205,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         @Override
         public void run() {
 
-            Toast.makeText(activityWeakReference.get(), "from PreloadWebviewRunnable PreloadWebviewRunnable ", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(activityWeakReference.get(), "from PreloadWebviewRunnable PreloadWebviewRunnable ", Toast.LENGTH_SHORT).show();
 
         }
     }

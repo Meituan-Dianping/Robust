@@ -25,7 +25,7 @@ public abstract class InsertcodeStrategy {
     protected  boolean isHotfixMethodLevel = false;
     protected  boolean isExceptMethodLevel = false;
     protected AtomicInteger insertMethodCount = new AtomicInteger(0);
-    public HashMap<String, Integer> methodMap = new HashMap();
+    public HashMap<String, String> methodMap = new HashMap<String, String>();
 
     public InsertcodeStrategy(List<String> hotfixPackageList, List<String> hotfixMethodList, List<String> exceptPackageList, List<String> exceptMethodList, boolean isHotfixMethodLevel, boolean isExceptMethodLevel) {
         this.hotfixPackageList = hotfixPackageList;

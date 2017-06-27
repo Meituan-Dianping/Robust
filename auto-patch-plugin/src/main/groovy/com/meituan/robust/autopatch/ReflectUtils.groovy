@@ -417,7 +417,7 @@ class ReflectUtils {
             }
 
         } else {
-            throw new RuntimeException("getInLineMemberString cannot find inline class ,origin class is  " + method.declaringClass.name)
+//            throw new RuntimeException("getInLineMemberString cannot find inline class ,origin class is  " + method.declaringClass.name)
         }
         if (Constants.isLogging) {
             stringBuilder.append("  android.util.Log.d(\"robust\",\"deal inline method   ${getCoutNumber()}   \" +\"" + method.name + "\");");

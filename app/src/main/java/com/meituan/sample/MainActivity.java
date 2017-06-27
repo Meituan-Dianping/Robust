@@ -1,9 +1,11 @@
 package com.meituan.sample;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,13 +17,6 @@ import com.meituan.robust.PatchExecutor;
 import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
 import com.meituan.sample.extension.LogExtension;
-import com.meituan.sample.robusttest.ImageQualityUtil;
-import com.meituan.sample.robusttest.NoField;
-import com.meituan.sample.robusttest.People;
-import com.meituan.sample.robusttest.SampleClass;
-import com.meituan.sample.robusttest.State;
-import com.meituan.sample.robusttest.Super;
-import com.meituan.sample.robusttest.other.Hll;
 
 import java.util.List;
 
@@ -43,26 +38,26 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    TextView textView;
-    Button button;
-    State<Integer> state;
-
-    Hll hll = new Hll(false);
-
+    TextView tipsTextView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         PatchProxy.register(new LogExtension());
 
-        button = (Button) findViewById(R.id.button);
-        textView = (TextView) findViewById(R.id.textView);
-        state = new State<>(hll);
+        tipsTextView = (TextView) findViewById(R.id.tips_text);
+        StringBuilder tipsStringBuilder = new StringBuilder();
+        tipsStringBuilder.append("Tips:");
+        tipsStringBuilder.append("\n1.please click JUMP_PATCH_ACTIVITY button to see the origin and go back here");
+        tipsStringBuilder.append("\n2.please click patch button to apply patch");
+        tipsStringBuilder.append("\n3.please click JUMP_PATCH_ACTIVITY button to see how effective");
+
+        tipsTextView.setText(tipsStringBuilder.toString());
         Button patch = (Button) findViewById(R.id.patch);
-        //beigin to patch
         patch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "patch start...", Toast.LENGTH_SHORT).show();
                 if (isGrantSDCardReadPermission()) {
                     runRobust();
                 } else {
@@ -76,56 +71,52 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
                 startActivity(intent);
-                Log.d("robusttest", (new NoField()).toString());
-                Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
-                SampleClass sampleClass = new SampleClass();
-                sampleClass.multiple(-1);
+
+                //========just add complexity =========
+                boolean isMainThread = false;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getApplicationContext().getMainLooper().isCurrentThread()) {
+                        isMainThread = true;
+                    }
+                } else {
+                    String currentThreadName = Thread.currentThread().getName();
+                    String mainThreadName = getApplicationContext().getMainLooper().getThread().getName();
+                    if (TextUtils.equals(currentThreadName, mainThreadName)) {
+                        isMainThread = true;
+                    }
+                }
+
+                Log.d("robust", "isMainThread :" + isMainThread);
+                //=================
             }
         });
 
-        button.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.jump_patch_activity).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
-                state.setIndex(hll, 1, 1l, new Object());
-                Log.d("robust", "state.get()  " + state.get().toString());
-                Log.d("robust", " state.getIndex()  " + state.getIndex());
-                Super s = new Super();
-                Log.d("robust", "patch result before :" + s.check());
-                Log.d("robust", "patch result after:" + s.protextedMethod());
-                textView.setText(s.getText());
-                s.getinstance();
+                Intent intent = new Intent(MainActivity.this, TestPatchActivity.class);
+                startActivity(intent);
+                //========just add complexity =========
+                boolean isMainThread = false;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (getApplicationContext().getMainLooper().isCurrentThread()) {
+                        isMainThread = true;
+                    }
+                } else {
+                    String currentThreadName = Thread.currentThread().getName();
+                    String mainThreadName = getApplicationContext().getMainLooper().getThread().getName();
+                    if (TextUtils.equals(currentThreadName, mainThreadName)) {
+                        isMainThread = true;
+                    }
+                }
+
+                Log.d("robust", "isMainThread :" + isMainThread);
+                //=================
             }
         });
-        //test situation,
-        try {
-            ImageQualityUtil.loadImage(null, null, null, 1, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        System.out.println(" run(String x) "+run("robust ",123));
-        System.out.println("  run(People x) "+run(new People(),123d));
-        System.out.println("  run(float x) "+run(123f));
-        System.out.println("  double run() "+run());
-        System.out.println("in MainActivity end ");
-    }
-
-
-
-    private String run(String x,int p){
-        return x+"meituan";
-    }
-    private String run(People x,double d){
-        x.setAddr("meituan");
-        return x.getAddr();
-    }
-    private int run(float x){
-        return (int)x;
-    }
-
-    private double run(){
-        return 1d;
     }
 
     //patch  data report
@@ -143,8 +134,16 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPatchApplied(boolean result, Patch patch) {
-            System.out.println(" robust arrived in onPatchApplied ");
-
+            tipsTextView.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (result) {
+                        Toast.makeText(getApplicationContext(), "patch applied success", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "patch applied failed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
 
         @Override
