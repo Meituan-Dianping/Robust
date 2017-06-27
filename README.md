@@ -134,7 +134,7 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 
 # Attentions
 
-1. You should modify inner classes' priavte constructors to public modifier.
+1. You should modify inner classes' private constructors to public modifier.
 2. AutoPatch cannot handle situations which method returns **this**,you may need to wrap it like belows:
 
 	```java
