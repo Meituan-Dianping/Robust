@@ -32,7 +32,7 @@ public final class Config {
     public static Set newlyAddedMethodSet = new HashSet<String>();
     public static List<String> modifiedClassNameList = new ArrayList<String>();
     public static List<String> hotfixPackageList = new ArrayList<>();
-    public static HashMap<String, Integer> methodMap = new HashMap();
+    public static HashMap<String, String> methodMap = new HashMap<String, String>();
     public static String robustGenerateDirectory;
     public static Map<String, List<CtMethod>> invokeSuperMethodMap = new HashMap<>();
     public static ClassPool classPool = new ClassPool();

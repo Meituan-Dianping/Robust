@@ -1,6 +1,7 @@
 package robust.gradle.plugin.javaassist;
 
 import com.meituan.robust.Constants;
+import com.meituan.robust.RobustMethodId;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,7 +65,10 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
                             continue;
                         }
                         //here comes the method will be inserted code
-                        methodMap.put(ctBehavior.getLongName(), insertMethodCount.incrementAndGet());
+
+                        String key = ctBehavior.getLongName();
+                        String methodId = RobustMethodId.getMethodId(key);
+                        methodMap.put(key, methodId);
                         try {
                             if (ctBehavior.getMethodInfo().isMethod()) {
                                 CtMethod ctMethod=(CtMethod)ctBehavior;
@@ -76,6 +80,9 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
                                      body += "argThis = $0;";
                                 }
                                 String parametersClassType=getParametersClassType(ctMethod);
+
+                                //固定method id
+
 //                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
                                 body += "   if (com.meituan.robust.PatchProxy.isSupport($args, argThis, "+Constants.INSERT_FIELD_NAME+", "+isStatic+
                                         ", " + methodMap.get(ctBehavior.getLongName()) + ","+parametersClassType+","+returnTypeString+".class)) {";
@@ -239,7 +246,7 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
      * @param methodNumber 方法数
      * @return 返回return语句
      */
-     private String getReturnStatement(String type, boolean isStatic, int methodNumber,String parametersClassType,String returnTypeString) {
+     private String getReturnStatement(String type, boolean isStatic, String methodNumber,String parametersClassType,String returnTypeString) {
         switch (type) {
             case Constants.CONSTRUCTOR:
                 return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, "+isStatic+", "+methodNumber+","+parametersClassType+","+returnTypeString+");  ";

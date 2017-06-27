@@ -3,6 +3,7 @@ package robust.gradle.plugin.asm;
 import com.android.utils.AsmUtils;
 import com.meituan.robust.ChangeQuickRedirect;
 import com.meituan.robust.Constants;
+import com.meituan.robust.RobustMethodId;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -97,8 +98,11 @@ public class AsmInsertImpl extends InsertcodeStrategy {
                 parameters.deleteCharAt(parameters.length()-1);
             }
 
-            methodMap.put(className.replace('/','.')+"."+name+"("+parameters.toString()+")", insertMethodCount.incrementAndGet());
-            return new MethodBodyInsertor(mv,className,desc,isStatic(access), String .valueOf(insertMethodCount.get()),name,access);
+            String key = className.replace('/','.')+"."+name+"("+parameters.toString()+")";
+            String methodId = RobustMethodId.getMethodId(key);
+            methodMap.put(key, methodId);
+
+            return new MethodBodyInsertor(mv,className,desc,isStatic(access), methodId,name,access);
         }
 
        private boolean isProtect(int access) {
