@@ -189,7 +189,7 @@ public class AsmInsertImpl extends InsertcodeStrategy {
 
             @Override
             public void visitCode() {
-                RobustAsmUtils.createInsertCode(this,className,paramsTypeClass, returnType,isStatic,Integer.valueOf(methodId));
+                RobustAsmUtils.createInsertCode(this,className,paramsTypeClass, returnType,isStatic,methodId);
             }
 
         }

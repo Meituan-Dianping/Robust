@@ -23,7 +23,7 @@ public final class RobustAsmUtils {
 	 * @param returnType
 	 * @param isStatic
 	 */
-	public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId){
+	public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, String methodId){
 
 		/**
 		 * 调用isSupport方法
@@ -69,7 +69,7 @@ public final class RobustAsmUtils {
 		mv.visitLabel(l1);
 	}
 
-	private static void prepareMethodParameters(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId) {
+	private static void prepareMethodParameters(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, String methodId) {
 		//第一个参数：new Object[]{...};,如果方法没有参数直接传入new Object[0]
 		if(args.size() == 0){
 			mv.visitInsn(Opcodes.ICONST_0);
