@@ -33,7 +33,7 @@ public final class RobustAsmUtils {
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				PROXYCLASSNAME,
 				"isSupport",
-				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZI[Ljava/lang/Class;Ljava/lang/Class;)Z");
+				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZLjava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Z");
 		Label l1 = new Label();
 		mv.visitJumpInsn(Opcodes.IFEQ, l1);
 		prepareMethodParameters(mv,className,args,returnType,isStatic,methodId);
@@ -41,7 +41,7 @@ public final class RobustAsmUtils {
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				PROXYCLASSNAME,
 				"accessDispatch",
-				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZI[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;");
+				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZLjava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;");
 
 		//判断是否有返回值，代码不同
 		if("V".equals(returnType.getDescriptor())){

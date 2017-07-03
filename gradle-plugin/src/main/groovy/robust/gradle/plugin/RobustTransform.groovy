@@ -187,6 +187,27 @@ class RobustTransform extends Transform implements Plugin<Project> {
         fileOut.flush()
         fileOut.close()
 
+        boolean  methodIdDuplicated = checkMethodIdDuplicated(map)
+        if (methodIdDuplicated){
+            throw RuntimeException("robust : method id is duplicated! (MD5 collision)")
+        }
+    }
+
+    //check MD5 collision
+    private static boolean checkMethodIdDuplicated(HashMap<String, String> robustMethodsMap) {
+        if (null == robustMethodsMap || robustMethodsMap.size() == 0) {
+            return false;
+        }
+        HashSet<String> md5s = new HashSet<>();
+        for (String key : robustMethodsMap.keySet()) {
+            String value = robustMethodsMap.get(key);
+            if (md5s.contains(value)) {
+                return true;
+            } else {
+                md5s.add(value);
+            }
+        }
+        return false;
     }
 
 }
