@@ -30,8 +30,8 @@
         <!--<proguard>false</proguard>-->
 
         <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
-        <!--<useAsm>true</useAsm>-->
-        <useAsm>false</useAsm>
+        <useAsm>true</useAsm>
+        <!--<useAsm>false</useAsm>-->
 
         <!--资源Fix开关-->
         <fixResources>true</fixResources>

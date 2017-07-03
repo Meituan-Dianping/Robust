@@ -80,13 +80,12 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
                                      body += "argThis = $0;";
                                 }
                                 String parametersClassType=getParametersClassType(ctMethod);
-
                                 //固定method id
-
+                                String methodIdProxy = "\""+methodId+"\"";
 //                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
                                 body += "   if (com.meituan.robust.PatchProxy.isSupport($args, argThis, "+Constants.INSERT_FIELD_NAME+", "+isStatic+
-                                        ", " + methodMap.get(ctBehavior.getLongName()) + ","+parametersClassType+","+returnTypeString+".class)) {";
-                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.getLongName()),parametersClassType,returnTypeString+".class");
+                                        ", " + methodIdProxy + ","+parametersClassType+","+returnTypeString+".class)) {";
+                                body += getReturnStatement(returnTypeString, isStatic, methodIdProxy,parametersClassType,returnTypeString+".class");
                                 body += "   }";
                                 ctBehavior.insertBefore(body);
                             }
