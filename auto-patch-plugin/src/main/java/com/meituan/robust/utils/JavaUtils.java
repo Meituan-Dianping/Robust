@@ -44,14 +44,14 @@ public class JavaUtils {
 //    }
 
     public static void main(String[] args) {
-        String path0 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0.robust";
-        String path1 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-11.robust";
-        String path2 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-12.robust";
-        HashMap<String, String> hashMap1 = getMapFromZippedFile(path1);
-        HashMap<String, String> hashMap2 = getMapFromZippedFile(path2);
-        System.err.println(hashMap1.equals(hashMap2));
+        String path0 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap.robust";
+//        String path1 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-11.robust";
+//        String path2 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-12.robust";
+//        HashMap<String, String> hashMap1 = getMapFromZippedFile(path1);
+//        HashMap<String, String> hashMap2 = getMapFromZippedFile(path2);
+//        System.err.println(hashMap1.equals(hashMap2));
 
-        parseRobustMethodsMap2File(path0,new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
+        parseRobustMethodsMap2File(path0, new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
     }
 
     public static void parseRobustMethodsMap2File(String robustMethodsMapPathStr, File targetFile) {
@@ -284,8 +284,9 @@ public class JavaUtils {
         if (memberMappingInfo == null) {
             return;
         }
-        for (String key : memberMappingInfo.keySet())
-            System.out.println("key is   " + key + "  value is    " + memberMappingInfo.get(key));
+        for (String key : memberMappingInfo.keySet()) {
+            System.out.println("key is   " + key + "  value is    " + String.valueOf(memberMappingInfo.get(key)));
+        }
         System.out.println("");
     }
 
