@@ -130,6 +130,13 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                     Log.d("robust", " getInfo onclick  in Listener");
                 }
         );
+        textView.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                Log.d("robust", " getInfo onclick  in Listener");
+            }
+        });
 
 //        return "you make it!!   " + getTextI1(flag) + myObject;
         return "patch_test";

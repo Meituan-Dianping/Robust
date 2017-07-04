@@ -8,6 +8,7 @@ import com.meituan.robust.patch.resources.config.RobustResourceConfig
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
+
 /**
  * Created by hedex on 17/2/21.
  */
@@ -36,7 +37,7 @@ public class RobustPatchMerger {
         if (hasDex & hasResource) {
             File mergeFile = new File(dexPartFile.absolutePath + "merge_temp")
 
-            ZipOutputStream mergeZipOutputStream  = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(mergeFile)));
+            ZipOutputStream mergeZipOutputStream = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(mergeFile)));
 
             //merge
             ZipFile dexPartZipFile = new ZipFile(dexPartFile)
@@ -50,7 +51,7 @@ public class RobustPatchMerger {
             while (entries.hasMoreElements()) {
                 //ZipEntry zipEntry = entries.nextElement();//保守
                 ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
-                if (null != zipEntry ) {
+                if (null != zipEntry) {
                     FileUtil.addZipEntry(mergeZipOutputStream, zipEntry, resourcePartZipFile.getInputStream(zipEntry))
                 }
             }
@@ -60,7 +61,7 @@ public class RobustPatchMerger {
             if (null != mergeZipOutputStream) {
                 mergeZipOutputStream.close()
             }
-            if (dexPartFile.exists()){
+            if (dexPartFile.exists()) {
                 dexPartFile.delete()
             }
             mergeFile.renameTo(dexPartFile.absolutePath)
@@ -77,12 +78,12 @@ public class RobustPatchMerger {
 
 
     public def static deleteTmpFiles() {
-        if (Config.debug){
+        if (Config.debug) {
             return
         }
         File diretcory = new File(Config.robustGenerateDirectory);
         if (!diretcory.isDirectory()) {
-            throw new RuntimeException("patch directry " + Config.robustGenerateDirectory + " dones not exist");
+            throw new RuntimeException("patch directory " + Config.robustGenerateDirectory + " does not exist");
         } else {
             diretcory.listFiles(new FilenameFilter() {
                 @Override

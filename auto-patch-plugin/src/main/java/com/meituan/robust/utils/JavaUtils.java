@@ -56,6 +56,10 @@ public class JavaUtils {
 
     public static void parseRobustMethodsMap2File(String robustMethodsMapPathStr, File targetFile) {
         HashMap<String, String> robustMethodsMap = getMapFromZippedFile(robustMethodsMapPathStr);
+        printMap2File(robustMethodsMap,targetFile);
+    }
+
+    public static void printMap2File(HashMap<String, String> robustMethodsMap, File targetFile){
         StringBuilder methodBuilder = new StringBuilder();
         for (String key : robustMethodsMap.keySet()) {
             methodBuilder.append("key is   " + key + "  value is    " + String.valueOf(robustMethodsMap.get(key)) + "\n");
