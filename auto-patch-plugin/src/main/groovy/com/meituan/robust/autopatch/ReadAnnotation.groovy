@@ -31,7 +31,7 @@ class ReadAnnotation {
             ctclass ->
                 try {
                     boolean isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);
-                    //newly add class donnot need scann for modify
+                    //newly add class do not need scan for modify
                     if (!isNewlyAddClass) {
                         patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));
                         scanClassForAddMethodAnnotation(ctclass);
@@ -48,9 +48,9 @@ class ReadAnnotation {
         JavaUtils.printList(Config.newlyAddedMethodSet.toList())
         println("new add classes list is ")
         JavaUtils.printList(Config.newlyAddedClassNameList)
-        println(" patchMethodSignureSet is printed below ")
+        println(" patchMethodSignatureSet is printed below ")
         JavaUtils.printList(patchMethodSignureSet.asList())
-        Config.patchMethodSignureSet.addAll(patchMethodSignureSet);
+        Config.patchMethodSignatureSet.addAll(patchMethodSignureSet);
     }
 
     public static boolean scanClassForAddClassAnnotation(CtClass ctclass) {

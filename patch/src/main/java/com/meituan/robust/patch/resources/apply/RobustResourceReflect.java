@@ -10,6 +10,9 @@ import java.lang.reflect.Method;
  */
 
 public class RobustResourceReflect {
+    private RobustResourceReflect(){
+
+    }
     private static Object sThreadLocal;
 
     //@UiThread

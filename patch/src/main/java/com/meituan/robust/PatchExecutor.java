@@ -61,10 +61,10 @@ public class PatchExecutor extends Thread {
         }
         Log.d("robust", " patchManipulate list size is " + patches.size());
 
-        //        1.patches dex + resources
-//        2.patches dex
-//        3.patches resources
-//1 + 3 .按照name从大到小排序 (dex都应用，但是资源只用第一个已经recover的）
+        //1.patches dex + resources
+        //2.patches dex
+        //3.patches resources
+        //4.按照1&3的name从大到小排序 (dex都应用，但是资源只用第一个已经recover的）
         List<Patch> dexPatches = new ArrayList<>();
         List<Patch> resourcesPatches = new ArrayList<>();
         List<Patch> dexAndResourcesPatches = new ArrayList<>();
@@ -123,17 +123,9 @@ public class PatchExecutor extends Thread {
     }
 
     private void applyDexTypePatches(List<Patch> patches) {
+
+        List<Patch> failedPatches = new ArrayList<Patch>();
         for (Patch p : patches) {
-//            if (p.isAppliedSuccess()) {
-//                Log.d("robust", "p.isAppliedSuccess() skip " + p.getLocalPath());
-//                continue;
-//            }
-//            if (patchManipulate.ensurePatchExist(p)) {
-//
-//                if (!patchManipulate.verifyPatch(context, p)) {
-//                    robustCallBack.logNotify("verifyPatch failure, patch info:" + "id = " + p.getName() + ",md5 = " + p.getMd5(), "class:PatchExecutor method:patch line:107");
-//                    continue;
-//                }
 
             boolean currentPatchResult = false;
             try {
@@ -148,13 +140,23 @@ public class PatchExecutor extends Thread {
                 robustCallBack.onPatchApplied(true, p);
 
             } else {
+                //case: class in plugin, and robust run quickly, retry
+                Log.e("robust", "patch need retry! ");
+                failedPatches.add(p);
                 //统计PATCH成功率 PATCH失败
                 robustCallBack.onPatchApplied(false, p);
             }
 
             Log.d("robust", "patch LocalPath:" + p.getLocalPath() + ",apply result " + currentPatchResult);
 
-//            }
+        }
+
+        if (failedPatches.size() > 0) {
+            //case: class in plugin, and robust run quickly, retry
+            // TODO: 17/6/20 什么时机重试呢？ 重试几次呢？
+            for (Patch patch : failedPatches) {
+                robustCallBack.logNotify("patch apply failed , patch name is : " + patch.getName(), "class:PatchExecutor method:applyDexTypePatches line:159");
+            }
         }
     }
 
@@ -241,6 +243,7 @@ public class PatchExecutor extends Thread {
             return false;
         }
 
+        boolean isClassNotFoundException = false;
         for (PatchedClassInfo patchedClassInfo : patchedClasses) {
             String patchedClassName = patchedClassInfo.patchedClassName;
             String patchClassName = patchedClassInfo.patchClassName;
@@ -250,7 +253,14 @@ public class PatchExecutor extends Thread {
             }
             Log.d("robust", "current path:" + patchedClassName);
             try {
-                oldClass = classLoader.loadClass(patchedClassName.trim());
+                try {
+                    oldClass = classLoader.loadClass(patchedClassName.trim());
+                } catch (ClassNotFoundException e) {
+                    isClassNotFoundException = true;
+                    robustCallBack.exceptionNotify(e, "class:PatchExecutor method:patch line:258");
+                    continue;
+                }
+
                 Field[] fields = oldClass.getDeclaredFields();
                 Log.d("robust", "oldClass :" + oldClass + "     fields " + fields.length);
                 Field changeQuickRedirectField = null;
@@ -284,6 +294,9 @@ public class PatchExecutor extends Thread {
             }
         }
         Log.d("robust", "patch finished ");
+        if (isClassNotFoundException) {
+            return false;
+        }
         return true;
     }
 

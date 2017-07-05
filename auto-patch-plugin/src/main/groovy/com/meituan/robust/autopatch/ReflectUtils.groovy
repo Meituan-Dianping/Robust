@@ -152,11 +152,11 @@ class ReflectUtils {
         return Constants.RFileClassSet.contains(s.substring(s.indexOf("R")));
     }
 
-    static String getmodifiedClassName(String patchName) {
+    static String getModifiedClassName(String patchName) {
         return NameManger.getInstance().getPatchNameMap().get(patchName);
     }
 
-    static String getParameterClassSignure(String signature, String pacthClassName) {
+    static String getParameterClassSignature(String signature, String patchClassName) {
         if (signature == null || signature.length() < 1) {
             return "";
         }
@@ -166,8 +166,8 @@ class ReflectUtils {
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
                 name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", ".")
-                if (name.equals(pacthClassName)) {
-                    signureBuilder.append(getmodifiedClassName(pacthClassName));
+                if (name.equals(patchClassName)) {
+                    signureBuilder.append(getModifiedClassName(patchClassName));
                 } else {
                     signureBuilder.append(name);
                 }
@@ -213,7 +213,7 @@ class ReflectUtils {
         if (e.signature == null) {
             return "{\$_=(\$r)\$proceed(\$\$);}";
         }
-        String signatureBuilder = getParameterClassSignure(e.signature, patchClassName);
+        String signatureBuilder = getParameterClassSignature(e.signature, patchClassName);
         stringBuilder.append("{");
         if (isStatic) {
             if (signatureBuilder.length() > 1)
@@ -241,7 +241,7 @@ class ReflectUtils {
     static String getNewInnerClassString(String signature, String patchClassName, boolean isStatic, String className) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{");
-        String signatureBuilder = getParameterClassSignure(signature, patchClassName);
+        String signatureBuilder = getParameterClassSignature(signature, patchClassName);
         if (isStatic) {
             if (signatureBuilder.length() > 1) {
                 stringBuilder.append("\$_= (\$r)" + Constants.ROBUST_UTILS_FULL_NAME + ".invokeReflectConstruct(\"" + className + "\",\$args,new Class[]{" + signatureBuilder + "});");
@@ -417,7 +417,7 @@ class ReflectUtils {
             }
 
         } else {
-            throw new RuntimeException("getInLineMemberString cannot find inline class ,origin class is  " + method.declaringClass.name)
+//            throw new RuntimeException("getInLineMemberString cannot find inline class ,origin class is  " + method.declaringClass.name)
         }
         if (Constants.isLogging) {
             stringBuilder.append("  android.util.Log.d(\"robust\",\"deal inline method   ${getCoutNumber()}   \" +\"" + method.name + "\");");

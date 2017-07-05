@@ -20,7 +20,7 @@ public class RobustResourcesSwitch {
 
     public static void setResourcesSwitch(Context context, boolean onOff) {
         SharedPreferences sp = context.getSharedPreferences(ROBUST_SP, Context.MODE_MULTI_PROCESS);
-        sp.edit().putBoolean(ROBUST_RESOURCES_SWITCH, onOff).commit();
+        sp.edit().putBoolean(ROBUST_RESOURCES_SWITCH, onOff).apply();
         resourcesSwitch = onOff;
     }
 }

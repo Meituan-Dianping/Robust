@@ -1,6 +1,7 @@
 package com.meituan.robust.utils;
 
 import com.meituan.robust.Constants;
+import com.meituan.robust.common.TxtFileReaderAndWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -41,9 +43,33 @@ public class JavaUtils {
 //        }
 //    }
 
-    public static Object getMapFromZippedFile(String path) {
+    public static void main(String[] args) {
+        String path0 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap.robust";
+//        String path1 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-11.robust";
+//        String path2 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-12.robust";
+//        HashMap<String, String> hashMap1 = getMapFromZippedFile(path1);
+//        HashMap<String, String> hashMap2 = getMapFromZippedFile(path2);
+//        System.err.println(hashMap1.equals(hashMap2));
+
+        parseRobustMethodsMap2File(path0, new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
+    }
+
+    public static void parseRobustMethodsMap2File(String robustMethodsMapPathStr, File targetFile) {
+        HashMap<String, String> robustMethodsMap = getMapFromZippedFile(robustMethodsMapPathStr);
+        printMap2File(robustMethodsMap,targetFile);
+    }
+
+    public static void printMap2File(HashMap<String, String> robustMethodsMap, File targetFile){
+        StringBuilder methodBuilder = new StringBuilder();
+        for (String key : robustMethodsMap.keySet()) {
+            methodBuilder.append("key is   " + key + "  value is    " + String.valueOf(robustMethodsMap.get(key)) + "\n");
+        }
+        TxtFileReaderAndWriter.writeFile(targetFile, methodBuilder.toString());
+    }
+
+    public static HashMap<String, String> getMapFromZippedFile(String path) {
         File file = new File(path);
-        Object result = null;
+        HashMap<String, String> result = null;
         try {
             if (file.exists()) {
                 FileInputStream fileIn = new FileInputStream(file);
@@ -56,7 +82,7 @@ public class JavaUtils {
                 }
                 ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
                 ObjectInputStream oi = new ObjectInputStream(byteIn);
-                result = oi.readObject();
+                result = (HashMap<String, String>) oi.readObject();
                 fileIn.close();
                 gzipIn.close();
                 oi.close();
@@ -262,8 +288,9 @@ public class JavaUtils {
         if (memberMappingInfo == null) {
             return;
         }
-        for (String key : memberMappingInfo.keySet())
-            System.out.println("key is   " + key + "  value is    " + memberMappingInfo.get(key));
+        for (String key : memberMappingInfo.keySet()) {
+            System.out.println("key is   " + key + "  value is    " + String.valueOf(memberMappingInfo.get(key)));
+        }
         System.out.println("");
     }
 

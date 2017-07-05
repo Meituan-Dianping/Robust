@@ -1,11 +1,16 @@
 package com.meituan.robust.patch.resources.service;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.IBinder;
 import android.util.Log;
 
 import com.meituan.robust.patch.resources.recover.ApkRecover;
+import com.meituan.robust.patch.resources.util.ProcessUtil;
 
 /**
  * Created by hedingxu on 17/6/7.
@@ -33,6 +38,21 @@ public class RobustRecoverService extends IntentService {
         final String md5 = intent.getStringExtra(PATCH_MD5_EXTRA);
         final String path = intent.getStringExtra(PATCH_PATH_EXTRA);
 
+        //robust process was killed before finished...
+        //29510-29568/? D/Robust: FileUtil.addZipEntry to resources apk 228 : res/layout/vy_massage_select_time_grid_item.xml
+        //4935-12025/? I/ActivityManager: Process com.sankuai.meituan:robust (pid 29510) has died
+        //set foreground
+        try {
+            Notification notification = new Notification();
+            if (Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                startForeground(notificationId, notification);
+            } else {
+                startForeground(notificationId, notification);
+                startService(new Intent(this, InnerService.class));
+            }
+        } catch (Throwable e) {
+
+        }
         RobustRecoverHelper.getInstance().postRunnable(new Runnable() {
             @Override
             public void run() {
@@ -50,6 +70,22 @@ public class RobustRecoverService extends IntentService {
             }
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            RobustRecoverHelper.getInstance().killRobustProcessWhenEmpty(context);
+        } else {
+            //60s后进程自杀
+            RobustRecoverHelper.getInstance().postRunnableDelay(new Runnable() {
+                @Override
+                public void run() {
+                    if (ProcessUtil.isRobustProcess(context)) {
+                        Log.d("robust", "robust process is empty");
+                        Log.d("robust", "kill robust process");
+                        ProcessUtil.killSelf();
+                    }
+                }
+            }, 60 * 1000);
+        }
+
     }
 
     public static void startRobustRecoverService(final Context context, final String patchName, final String patchMd5, final String patchPath) {
@@ -62,4 +98,32 @@ public class RobustRecoverService extends IntentService {
         } catch (Throwable t) {
         }
     }
+
+    //use InnerService
+    private static final int notificationId = (int) System.currentTimeMillis();
+
+    public static class InnerService extends Service {
+
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+
+        @Override
+        public void onCreate() {
+            super.onCreate();
+            try {
+                startForeground(notificationId, new Notification());
+            } catch (Throwable e) {
+            }
+            stopSelf();
+        }
+
+        @Override
+        public void onDestroy() {
+            stopForeground(true);
+            super.onDestroy();
+        }
+    }
+
 }

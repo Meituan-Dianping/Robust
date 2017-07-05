@@ -3,7 +3,7 @@ package com.meituan.robust.autopatch
 import com.meituan.robust.Constants
 import com.meituan.robust.utils.JavaUtils
 
-class ReadXML {
+public class ReadXML {
     private static robust;
 
     public static void readXMl(String path) {

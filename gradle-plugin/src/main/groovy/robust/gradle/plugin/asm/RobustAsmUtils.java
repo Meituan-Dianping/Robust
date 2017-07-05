@@ -23,7 +23,7 @@ public final class RobustAsmUtils {
 	 * @param returnType
 	 * @param isStatic
 	 */
-	public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId){
+	public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, String methodId){
 
 		/**
 		 * 调用isSupport方法
@@ -33,7 +33,7 @@ public final class RobustAsmUtils {
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				PROXYCLASSNAME,
 				"isSupport",
-				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZI[Ljava/lang/Class;Ljava/lang/Class;)Z");
+				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZLjava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Z");
 		Label l1 = new Label();
 		mv.visitJumpInsn(Opcodes.IFEQ, l1);
 		prepareMethodParameters(mv,className,args,returnType,isStatic,methodId);
@@ -41,7 +41,7 @@ public final class RobustAsmUtils {
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC,
 				PROXYCLASSNAME,
 				"accessDispatch",
-				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZI[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;");
+				"([Ljava/lang/Object;Ljava/lang/Object;"+REDIRECTCLASSNAME+"ZLjava/lang/String;[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;");
 
 		//判断是否有返回值，代码不同
 		if("V".equals(returnType.getDescriptor())){
@@ -69,7 +69,7 @@ public final class RobustAsmUtils {
 		mv.visitLabel(l1);
 	}
 
-	private static void prepareMethodParameters(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId) {
+	private static void prepareMethodParameters(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, String methodId) {
 		//第一个参数：new Object[]{...};,如果方法没有参数直接传入new Object[0]
 		if(args.size() == 0){
 			mv.visitInsn(Opcodes.ICONST_0);

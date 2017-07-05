@@ -97,8 +97,10 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         logger.quiet "check all class cost $cost second, class count: ${box.size()}"
         autoPatch(box)
 //        JavaUtils.removeJarFromLibs()
-        logger.quiet '================method singure to methodid is printed below================'
-        JavaUtils.printMap(Config.methodMap)
+        if (Config.debug){
+            JavaUtils.printMap2File(Config.methodMap,new File(project.projectDir.path + Constants.METHOD_MAP_PATH + ".txt"))
+            logger.quiet '================method signature to method id map unzip to file ================'
+        }
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "autoPatch cost $cost second"
         if (Config.isResourceFix){
@@ -164,6 +166,13 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
     }
 
     def zipPatchClassesFile() {
+        if (Config.isResourceFix){
+            File dexPatchFile = new File(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME);
+            if (!dexPatchFile.exists()){
+                logger.quiet "dex patch file is not exists"
+                return
+            }
+        }
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME));
         zipAllPatchClasses(Config.robustGenerateDirectory + Config.patchPackageName.substring(0, Config.patchPackageName.indexOf(".")), "", zipOut);
         zipOut.close();
@@ -195,20 +204,20 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
 
     def generatPatch(List<CtClass> box, String patchPath) {
         if (!Config.isManual) {
-            if (Config.patchMethodSignureSet.size() < 1) {
+            if (Config.patchMethodSignatureSet.size() < 1) {
                 if (Config.isResourceFix) {
                     logger.warn(" patch method is empty ,please check your Modify annotation or use RobustModify.modify() to mark modified methods")
                     return;
                 }
                 throw new RuntimeException(" patch method is empty ,please check your Modify annotation or use RobustModify.modify() to mark modified methods")
             }
-            Config.methodNeedPatchSet.addAll(Config.patchMethodSignureSet)
+            Config.methodNeedPatchSet.addAll(Config.patchMethodSignatureSet)
             InlineClassFactory.dealInLineClass(patchPath, Config.newlyAddedClassNameList)
             initSuperMethodInClass(Config.modifiedClassNameList);
             //auto generate all class
             for (String fullClassName : Config.modifiedClassNameList) {
                 CtClass ctClass = Config.classPool.get(fullClassName)
-                CtClass patchClass = PatchesFactory.createPatch(patchPath, ctClass, false, NameManger.getInstance().getPatchName(ctClass.name), Config.patchMethodSignureSet)
+                CtClass patchClass = PatchesFactory.createPatch(patchPath, ctClass, false, NameManger.getInstance().getPatchName(ctClass.name), Config.patchMethodSignatureSet)
                 patchClass.writeFile(patchPath)
                 patchClass.defrost();
                 createControlClass(patchPath, ctClass)
@@ -255,7 +264,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
             modifiedCtClass = Config.classPool.get(modifiedFullClassName);
             modifiedCtClass.defrost();
             modifiedCtClass.declaredMethods.findAll {
-                return Config.patchMethodSignureSet.contains(it.longName) || InlineClassFactory.allInLineMethodLongname.contains(it.longName);
+                return Config.patchMethodSignatureSet.contains(it.longName) || InlineClassFactory.allInLineMethodLongname.contains(it.longName);
             }.each { behavior ->
                 behavior.instrument(new ExprEditor() {
                     @Override

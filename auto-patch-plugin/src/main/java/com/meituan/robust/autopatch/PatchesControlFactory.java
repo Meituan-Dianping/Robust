@@ -80,7 +80,7 @@ public class PatchesControlFactory {
             CtClass[] parametertypes = method.getParameterTypes();
             String methodSignure = JavaUtils.getJavaMethodSignure(method).replaceAll(patchClass.getName(), modifiedClassName);
             String methodLongName = modifiedClassName + "." + methodSignure;
-            Integer methodNumber = Config.methodMap.get(methodLongName);
+            String methodNumber = Config.methodMap.get(methodLongName);
             //just Forward methods with methodNumber
             if (methodNumber != null) {
                 accessDispatchMethodBody.append(" if((\"" + methodNumber + "\").equals(methodNo)){\n");
@@ -154,7 +154,7 @@ public class PatchesControlFactory {
         for (CtMethod method : patchClass.getDeclaredMethods()) {
             String methodSignure = JavaUtils.getJavaMethodSignure(method).replaceAll(patchClass.getName(), modifiedClassName);
             String methodLongName = modifiedClassName + "." + methodSignure;
-            Integer methodNumber = Config.methodMap.get(methodLongName);
+            String methodNumber = Config.methodMap.get(methodLongName);
             //just Forward methods with methodNumber
             if (methodNumber != null) {
                 methodsIdBuilder.append(methodNumber + ":");

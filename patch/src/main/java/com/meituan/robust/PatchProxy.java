@@ -13,7 +13,7 @@ public class PatchProxy {
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
 
-    public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, String methodNumber,Class[] paramsClassTypes,Class returnType) {
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
@@ -41,7 +41,7 @@ public class PatchProxy {
     }
 
 
-    public static Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, String methodNumber,Class[] paramsClassTypes,Class returnType) {
 
         if (changeQuickRedirect == null) {
             RobustExtension robustExtension = robustExtensionThreadLocal.get();
@@ -61,7 +61,7 @@ public class PatchProxy {
         return  changeQuickRedirect.accessDispatch(classMethod, objects);
     }
 
-    public static void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+    public static void accessDispatchVoid(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, String methodNumber,Class[] paramsClassTypes,Class returnType) {
         if (changeQuickRedirect == null) {
             RobustExtension robustExtension = robustExtensionThreadLocal.get();
             robustExtensionThreadLocal.remove();
@@ -102,7 +102,7 @@ public class PatchProxy {
         return objects;
     }
 
-    private static String getClassMethod(boolean isStatic, int methodNumber) {
+    private static String getClassMethod(boolean isStatic, String methodNumber) {
         String classMethod = "";
         try {
             //可能过于耗时，这部分需要请自己调用函数

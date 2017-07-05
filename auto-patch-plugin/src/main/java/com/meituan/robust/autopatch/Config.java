@@ -27,12 +27,12 @@ public final class Config {
     public static boolean isManual = false;
     public static String patchPackageName = Constants.PATCH_PACKAGENAME;
     public static String mappingFilePath;
-    public static Set<String> patchMethodSignureSet = new HashSet<>();
+    public static Set<String> patchMethodSignatureSet = new HashSet<>();
     public static List<String> newlyAddedClassNameList = new ArrayList<String>();
     public static Set newlyAddedMethodSet = new HashSet<String>();
     public static List<String> modifiedClassNameList = new ArrayList<String>();
     public static List<String> hotfixPackageList = new ArrayList<>();
-    public static HashMap<String, Integer> methodMap = new HashMap();
+    public static HashMap<String, String> methodMap = new HashMap<String, String>();
     public static String robustGenerateDirectory;
     public static Map<String, List<CtMethod>> invokeSuperMethodMap = new HashMap<>();
     public static ClassPool classPool = new ClassPool();
@@ -65,7 +65,7 @@ public final class Config {
         isManual = false;
         patchPackageName = Constants.PATCH_PACKAGENAME;
         mappingFilePath = DEFAULT_MAPPING_FILE;
-        patchMethodSignureSet = new HashSet<>();
+        patchMethodSignatureSet = new HashSet<>();
         newlyAddedClassNameList = new ArrayList<String>();
         modifiedClassNameList = new ArrayList<String>();
         hotfixPackageList = new ArrayList<>();
