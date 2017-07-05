@@ -12,7 +12,6 @@ public class PatchProxy {
     private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
-
     public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, String methodNumber,Class[] paramsClassTypes,Class returnType) {
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
@@ -26,6 +25,10 @@ public class PatchProxy {
                     return true;
                 }
             }
+            return false;
+        }
+        //special check for android 7.0+
+        if(!(changeQuickRedirect instanceof ChangeQuickRedirect)){
             return false;
         }
         String classMethod = getClassMethod(isStatic, methodNumber);
@@ -52,6 +55,10 @@ public class PatchProxy {
             }
             return null;
         }
+        //special check for android 7.0+
+        if(!(changeQuickRedirect instanceof ChangeQuickRedirect)){
+            return null;
+        }
         String classMethod = getClassMethod(isStatic, methodNumber);
         if (TextUtils.isEmpty(classMethod)) {
             return null;
@@ -70,6 +77,10 @@ public class PatchProxy {
                 robustExtension.accessDispatch(new RobustArguments(paramsArray,current,isStatic, methodNumber, paramsClassTypes, returnType));
             }
             return;
+        }
+        //special check for android 7.0+
+        if(!(changeQuickRedirect instanceof ChangeQuickRedirect)){
+            return ;
         }
         notify(Constants.PATCH_EXECUTE);
         String classMethod = getClassMethod(isStatic, methodNumber);
@@ -106,11 +117,11 @@ public class PatchProxy {
         String classMethod = "";
         try {
             //可能过于耗时，这部分需要请自己调用函数
-//            java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
-//            String methodName = stackTraceElement.getMethodName();
-//            String className = stackTraceElement.getClassName();
-            String methodName="";
-            String className="";
+            java.lang.StackTraceElement stackTraceElement = (new java.lang.Throwable()).getStackTrace()[2];
+            String methodName = stackTraceElement.getMethodName();
+            String className = stackTraceElement.getClassName();
+//            String methodName="";
+//            String className="";
             classMethod = className + ":" + methodName + ":" + isStatic + ":" + methodNumber;
         }catch (Exception e){
 
