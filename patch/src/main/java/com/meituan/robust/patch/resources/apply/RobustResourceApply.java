@@ -252,7 +252,7 @@ public class RobustResourceApply {
         mEnsureStringBlocks.invoke(newAssetManager);
 
         //handle current activities 's mAssets , mTheme and caches
-        List<Activity> activities = ActivityUtils.getAllCurrentActivities(context);
+        List<Activity> activities = GetActivityUtils.getAllCurrentActivities(context);
         if (activities != null) {
             for (Activity activity : activities) {
                 Resources resources = activity.getResources();

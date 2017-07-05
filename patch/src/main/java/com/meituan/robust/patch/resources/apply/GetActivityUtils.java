@@ -16,8 +16,8 @@ import java.util.Map;
  * modified by hedex
  * Apply a change to the current activity.
  */
-class ActivityUtils {
-    private ActivityUtils() {
+class GetActivityUtils {
+    private GetActivityUtils() {
 
     }
 
