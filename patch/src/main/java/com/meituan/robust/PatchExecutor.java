@@ -4,10 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.meituan.robust.patch.resources.RobustResources;
-import com.meituan.robust.patch.resources.recover.ApkRecover;
-import com.meituan.robust.patch.resources.service.RobustRecoverService;
-import com.meituan.robust.patch.resources.util.ProcessUtil;
+import com.meituan.robust.resource.RobustResources;
+import com.meituan.robust.resource.recover.ApkRecover;
+import com.meituan.robust.resource.service.RobustRecoverService;
+import com.meituan.robust.resource.util.ProcessUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

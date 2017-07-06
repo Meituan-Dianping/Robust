@@ -1,8 +1,8 @@
 package com.meituan.robust.patch.resources.diff.apkdiffer;
 
-import com.meituan.robust.patch.resources.APKStructure;
+import com.meituan.robust.resource.APKStructure;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
-import com.meituan.robust.patch.resources.diff.data.ResDiffData;
+import com.meituan.robust.resource.diff.data.ResDiffData;
 
 import java.nio.file.Path;
 /**

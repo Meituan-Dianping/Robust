@@ -4,7 +4,7 @@ import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.ZipOperation;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
 import com.meituan.robust.patch.resources.diff.apkdiffer.APKDiffer;
-import com.meituan.robust.patch.resources.diff.data.APKDiffData;
+import com.meituan.robust.resource.diff.data.APKDiffData;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class APKDiffUtils {
         //2. get apk diff data , write diff data to output's assets dir,adapt windows mac linux
         File apkDiffDataFile = new File(diffOutDirFile, APKDiffData.ROBUST_RESOURCES_DIFF_RELATIVE_PATH);
 
-        boolean writeResult = ApkDiffDataReaderAndWriter.writeDiffData(apkDiffDataFile, apkDiffData);
+        boolean writeResult = com.meituan.robust.resource.diff.ApkDiffDataReaderAndWriter.writeDiffData(apkDiffDataFile, apkDiffData);
 
         if (!writeResult) {
             return;

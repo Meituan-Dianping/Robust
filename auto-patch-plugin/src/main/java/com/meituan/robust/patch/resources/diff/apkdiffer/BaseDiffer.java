@@ -3,11 +3,11 @@ package com.meituan.robust.patch.resources.diff.apkdiffer;
 import com.meituan.robust.common.CrcUtil;
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
-import com.meituan.robust.patch.resources.APKStructure;
+import com.meituan.robust.resource.APKStructure;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
-import com.meituan.robust.patch.resources.diff.data.BaseDiffData;
-import com.meituan.robust.patch.resources.diff.data.DataUnit;
-import com.meituan.robust.patch.resources.diff.util.DiffAndRecoverUtil;
+import com.meituan.robust.resource.diff.data.BaseDiffData;
+import com.meituan.robust.resource.diff.data.DataUnit;
+import com.meituan.robust.resource.diff.util.DiffAndRecoverUtil;
 
 import java.io.File;
 import java.io.IOException;

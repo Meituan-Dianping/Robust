@@ -4,7 +4,7 @@ import com.meituan.robust.Constants;
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.ResourceConstant;
 import com.meituan.robust.common.StringUtil;
-import com.meituan.robust.patch.resources.APKStructure;
+import com.meituan.robust.resource.APKStructure;
 import com.meituan.robust.patch.resources.diff.APKDiffUtils;
 
 import java.io.File;

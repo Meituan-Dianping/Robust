@@ -3,10 +3,10 @@ package com.meituan.robust.patch.resources.diff.apkdiffer;
 
 import com.meituan.robust.common.FileUtil;
 import com.meituan.robust.common.MD5;
-import com.meituan.robust.patch.resources.APKStructure;
+import com.meituan.robust.resource.APKStructure;
 import com.meituan.robust.patch.resources.config.RobustResourceConfig;
-import com.meituan.robust.patch.resources.diff.data.APKDiffData;
-import com.meituan.robust.patch.resources.diff.data.BaseDiffData;
+import com.meituan.robust.resource.diff.data.APKDiffData;
+import com.meituan.robust.resource.diff.data.BaseDiffData;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static com.meituan.robust.patch.resources.APKStructure.AndroidManifest_Type;
+import static com.meituan.robust.resource.APKStructure.AndroidManifest_Type;
 
 /**
  * Created by hedingxu on 17/5/31.
