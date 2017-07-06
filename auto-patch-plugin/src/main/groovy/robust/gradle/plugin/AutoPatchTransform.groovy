@@ -151,7 +151,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
             ReadMapping.getInstance().initMappingInfo();
         }
 
-        generatPatch(box, patchPath);
+        generatePatch(box, patchPath);
 
         zipPatchClassesFile()
         executeCommand(jar2DexCommand)
@@ -204,7 +204,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         }
     }
 
-    def generatPatch(List<CtClass> box, String patchPath) {
+    def generatePatch(List<CtClass> box, String patchPath) {
         if (!Config.isManual) {
             if (Config.patchMethodSignatureSet.size() < 1) {
                 if (Config.isResourceFix) {

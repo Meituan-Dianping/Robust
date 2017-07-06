@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <service
-            android:name="com.meituan.robust.patch.resources.service.RobustRecoverService"
+            android:name="com.meituan.robust.resource.service.RobustRecoverService"
             android:exported="false"
             android:process=":robust"/>
     </application>
