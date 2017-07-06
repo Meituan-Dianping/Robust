@@ -151,13 +151,13 @@ public class PatchExecutor extends Thread {
 
         }
 
-        if (failedPatches.size() > 0) {
-            //case: class in plugin, and robust run quickly, retry
-            // TODO: 17/6/20 什么时机重试呢？ 重试几次呢？
-            for (Patch patch : failedPatches) {
-                robustCallBack.logNotify("patch apply failed , patch name is : " + patch.getName(), "class:PatchExecutor method:applyDexTypePatches line:159");
-            }
-        }
+//        if (failedPatches.size() > 0) {
+//            //case: class in plugin, and robust run quickly, retry
+//            // TODO: 17/6/20 什么时机重试呢？ 重试几次呢？
+//            for (Patch patch : failedPatches) {
+//                robustCallBack.logNotify("patch apply failed , patch name is : " + patch.getName(), "class:PatchExecutor method:applyDexTypePatches line:159");
+//            }
+//        }
     }
 
     private void applyOtherPatches(List<Patch> resourcesPatches, List<Patch> dexAndResourcesPatches) {
@@ -239,8 +239,9 @@ public class PatchExecutor extends Thread {
         //classes need to patch
         List<PatchedClassInfo> patchedClasses = patchesInfo.getPatchedClassesInfo();
         if (null == patchedClasses || patchedClasses.isEmpty()) {
-            robustCallBack.logNotify("patchedClasses is null or empty, patch info:" + "id = " + patch.getName() + ",md5 = " + patch.getMd5(), "class:PatchExecutor method:patch line:122");
-            return false;
+//            robustCallBack.logNotify("patchedClasses is null or empty, patch info:" + "id = " + patch.getName() + ",md5 = " + patch.getMd5(), "class:PatchExecutor method:patch line:122");
+            //手写的补丁有时候会返回一个空list
+            return true;
         }
 
         boolean isClassNotFoundException = false;
@@ -284,12 +285,10 @@ public class PatchExecutor extends Thread {
                     Log.d("robust", "changeQuickRedirectField set sucess " + patchClassName);
                 } catch (Throwable t) {
                     Log.e("robust", "patch failed! ");
-                    t.printStackTrace();
                     robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:163");
                 }
             } catch (Throwable t) {
                 Log.e("robust", "patch failed! ");
-                t.printStackTrace();
                 robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:169");
             }
         }
