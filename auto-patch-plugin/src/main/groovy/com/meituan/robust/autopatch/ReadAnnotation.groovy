@@ -18,7 +18,7 @@ class ReadAnnotation {
 
     public static void readAnnotation(List<CtClass> box, Logger log) {
         logger = log;
-        Set patchMethodSignureSet = new HashSet<String>();
+        Set patchMethodSignatureSet = new HashSet<String>();
         synchronized (AutoPatchTransform.class) {
             if (Constants.ModifyAnnotationClass == null) {
                 Constants.ModifyAnnotationClass = box.get(0).getClassPool().get(Constants.MODIFY_ANNOTATION).toClass();
@@ -33,7 +33,7 @@ class ReadAnnotation {
                     boolean isNewlyAddClass = scanClassForAddClassAnnotation(ctclass);
                     //newly add class do not need scan for modify
                     if (!isNewlyAddClass) {
-                        patchMethodSignureSet.addAll(scanClassForModifyMethod(ctclass));
+                        patchMethodSignatureSet.addAll(scanClassForModifyMethod(ctclass));
                         scanClassForAddMethodAnnotation(ctclass);
                     }
                 } catch (NullPointerException e) {
@@ -49,8 +49,8 @@ class ReadAnnotation {
         println("new add classes list is ")
         JavaUtils.printList(Config.newlyAddedClassNameList)
         println(" patchMethodSignatureSet is printed below ")
-        JavaUtils.printList(patchMethodSignureSet.asList())
-        Config.patchMethodSignatureSet.addAll(patchMethodSignureSet);
+        JavaUtils.printList(patchMethodSignatureSet.asList())
+        Config.patchMethodSignatureSet.addAll(patchMethodSignatureSet);
     }
 
     public static boolean scanClassForAddClassAnnotation(CtClass ctclass) {
@@ -75,14 +75,14 @@ class ReadAnnotation {
     }
 
     public static Set scanClassForModifyMethod(CtClass ctclass) {
-        Set patchMethodSignureSet = new HashSet<String>();
+        Set patchMethodSignatureSet = new HashSet<String>();
         boolean isAllMethodsPatch = true;
         ctclass.declaredMethods.findAll {
             return it.hasAnnotation(Constants.ModifyAnnotationClass);
         }.each {
             method ->
                 isAllMethodsPatch = false;
-                addPatchMethodAndModifiedClass(patchMethodSignureSet, method);
+                addPatchMethodAndModifiedClass(patchMethodSignatureSet, method);
         }
 
         //do with lamda expression
@@ -97,7 +97,7 @@ class ReadAnnotation {
 
                         if (Constants.LAMBDA_MODIFY.equals(m.method.declaringClass.name)) {
                             isAllMethodsPatch = false;
-                            addPatchMethodAndModifiedClass(patchMethodSignureSet, method);
+                            addPatchMethodAndModifiedClass(patchMethodSignatureSet, method);
                         }
                     } catch (javassist.NotFoundException e) {
                         e.printStackTrace()
@@ -113,21 +113,21 @@ class ReadAnnotation {
                     ctclass.declaredMethods.findAll {
                         return Config.methodMap.get(it.longName) != null;
                     }.each { method ->
-                        addPatchMethodAndModifiedClass(patchMethodSignureSet, method);
+                        addPatchMethodAndModifiedClass(patchMethodSignatureSet, method);
                     }
                 } else {
                     ctclass.getClassPool().get(classModifyAnootation.value()).declaredMethods.findAll {
                         return Config.methodMap.get(it.longName) != null;
                     }.each { method ->
-                        addPatchMethodAndModifiedClass(patchMethodSignureSet, method);
+                        addPatchMethodAndModifiedClass(patchMethodSignatureSet, method);
                     }
                 }
             }
         }
-        return patchMethodSignureSet;
+        return patchMethodSignatureSet;
     }
 
-    public static Set addPatchMethodAndModifiedClass(Set patchMethodSignureSet, CtMethod method) {
+    public static Set addPatchMethodAndModifiedClass(Set patchMethodSignatureSet, CtMethod method) {
         if (Config.methodMap.get(method.longName) == null) {
             print("addPatchMethodAndModifiedClass pint methodmap ");
             JavaUtils.printMap(Config.methodMap);
@@ -137,12 +137,12 @@ class ReadAnnotation {
         Modify classModifyAnootation = method.declaringClass.getAnnotation(Constants.ModifyAnnotationClass) as Modify;
         if ((methodModifyAnootation == null || methodModifyAnootation.value().length() < 1)) {
             //no annotation value
-            patchMethodSignureSet.add(method.longName);
+            patchMethodSignatureSet.add(method.longName);
             if (!Config.modifiedClassNameList.contains(method.declaringClass.name))
                 Config.modifiedClassNameList.add(method.declaringClass.name);
         } else {
             //use value in annotation
-            patchMethodSignureSet.add(methodModifyAnootation.value());
+            patchMethodSignatureSet.add(methodModifyAnootation.value());
         }
         if (classModifyAnootation == null || classModifyAnootation.value().length() < 1) {
             if (!Config.modifiedClassNameList.contains(method.declaringClass.name)) {
@@ -153,6 +153,6 @@ class ReadAnnotation {
                 Config.modifiedClassNameList.add(classModifyAnootation.value());
             }
         }
-        return patchMethodSignureSet;
+        return patchMethodSignatureSet;
     }
 }

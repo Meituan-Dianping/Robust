@@ -18,6 +18,7 @@ import org.gradle.api.logging.Logger
 import java.util.zip.Deflater
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+
 /**
  * Created by mivanzhang on 16/7/21.
  *
@@ -97,22 +98,22 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         logger.quiet "check all class cost $cost second, class count: ${box.size()}"
         autoPatch(box)
 //        JavaUtils.removeJarFromLibs()
-        if (Config.debug){
-            JavaUtils.printMap2File(Config.methodMap,new File(project.projectDir.path + Constants.METHOD_MAP_PATH + ".txt"))
+        if (Config.debug) {
+            JavaUtils.printMap2File(Config.methodMap, new File(project.projectDir.path + Constants.METHOD_MAP_PATH + ".txt"))
             logger.quiet '================method signature to method id map unzip to file ================'
         }
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "autoPatch cost $cost second"
-        if (Config.isResourceFix){
+        if (Config.isResourceFix) {
             File jarFile = outputProvider.getContentLocation("main", getOutputTypes(), getScopes(),
                     Format.JAR);
-            if(!jarFile.getParentFile().exists()){
+            if (!jarFile.getParentFile().exists()) {
                 jarFile.getParentFile().mkdirs();
             }
-            if(jarFile.exists()){
+            if (jarFile.exists()) {
                 jarFile.delete();
             }
-            ResourceTaskUtils.keepCode(box,jarFile)
+            ResourceTaskUtils.keepCode(box, jarFile)
             return;
         }
         throw new RuntimeException("auto patch end successfully")
@@ -157,22 +158,23 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
         executeCommand(dex2SmaliCommand)
         SmaliTool.getInstance().dealObscureInSmali();
         executeCommand(smali2DexCommand)
-        //package patch.dex to patch.jar
+        //package patch.dex to patch.apk
         packagePatchDex2Apk()
-        if (!Config.isResourceFix){
+
+        if (Config.isResourceFix) {
+            File dexPatchFile = new File(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME);
+            if (dexPatchFile.exists()) {
+                Config.patchHasDex = true;
+            } else {
+                logger.quiet "dex patch file does not exists"
+                return
+            }
+        } else {
             deleteTmpFiles()
         }
-        Config.patchHasDex = true;
     }
 
     def zipPatchClassesFile() {
-        if (Config.isResourceFix){
-            File dexPatchFile = new File(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME);
-            if (!dexPatchFile.exists()){
-                logger.quiet "dex patch file is not exists"
-                return
-            }
-        }
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(Config.robustGenerateDirectory + Constants.ZIP_FILE_NAME));
         zipAllPatchClasses(Config.robustGenerateDirectory + Config.patchPackageName.substring(0, Config.patchPackageName.indexOf(".")), "", zipOut);
         zipOut.close();

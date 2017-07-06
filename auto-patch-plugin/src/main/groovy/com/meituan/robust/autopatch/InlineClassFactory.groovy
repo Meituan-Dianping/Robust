@@ -33,7 +33,7 @@ class InlineClassFactory {
         Set newlyAddedClassInlineSet = getAllInlineClasses(usedClass, null);
         usedClass.addAll(newlyAddedClassInlineSet);
         usedClass.addAll(Config.modifiedClassNameList)
-        Set inLineClassNameSet = getAllInlineClasses(usedClass, Config.patchMethodSignureSet);
+        Set inLineClassNameSet = getAllInlineClasses(usedClass, Config.patchMethodSignatureSet);
         inLineClassNameSet.removeAll(newlyAddedClassInlineSet)
         inLineClassNameSet.addAll(classInLineMethodsMap.keySet())
         //all inline patch class

@@ -34,8 +34,8 @@
         <!--<useAsm>false</useAsm>-->
 
         <!--资源Fix开关-->
-        <fixResources>true</fixResources>
-        <!--<fixResources>false</fixResources>-->
+        <!--<fixResources>true</fixResources>-->
+        <fixResources>false</fixResources>
 
         <!--<debug>true</debug>-->
     </switch>
