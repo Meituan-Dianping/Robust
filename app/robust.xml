@@ -9,8 +9,8 @@
 
         <!--是否开启手动模式，手动模式会去寻找配置项patchPackname包名下的所有类，自动的处理混淆，然后把patchPackname包名下的所有类制作成补丁-->
         <!--这个开关只是把配置项patchPackname包名下的所有类制作成补丁，适用于特殊情况，一般不会遇到-->
-        <!--<manual>true</manual>-->
-        <manual>false</manual>
+        <manual>true</manual>
+        <!--<manual>false</manual>-->
 
         <!--是否强制插入插入代码，Robust默认在debug模式下是关闭的，开启这个选项为true会在debug下插入代码-->
         <!--但是当配置项turnOnRobust是false时，这个配置项不会生效-->
@@ -26,8 +26,8 @@
         <patchLog>false</patchLog>
 
         <!--项目是否支持progaurd-->
-        <proguard>true</proguard>
-        <!--<proguard>false</proguard>-->
+        <!--<proguard>true</proguard>-->
+        <proguard>false</proguard>
 
         <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
         <useAsm>true</useAsm>

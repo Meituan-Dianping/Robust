@@ -1,7 +1,7 @@
 package com.meituan.robust.common;
 
 
-import java.nio.file.Path;
+//import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -108,21 +108,21 @@ public final class StringUtil {
         return sb.toString();
     }
 
-    public static boolean checkFileInPatternCompatOs(HashSet<Pattern> patterns, Path relativePath) {
-
-        //兼容 linux mac windows
-        if (!patterns.isEmpty()) {
-            for (Iterator<Pattern> it = patterns.iterator(); it.hasNext(); ) {
-                Pattern p = it.next();
-                String linux_mac_key = relativePath.toString().replace("\\", "/");
-                String windows_key = relativePath.toString().replace("/", "\\");
-                if (p.matcher(linux_mac_key).matches() || p.matcher(windows_key).matches()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    public static boolean checkFileInPatternCompatOs(HashSet<Pattern> patterns, Path relativePath) {
+//
+//        //兼容 linux mac windows
+//        if (!patterns.isEmpty()) {
+//            for (Iterator<Pattern> it = patterns.iterator(); it.hasNext(); ) {
+//                Pattern p = it.next();
+//                String linux_mac_key = relativePath.toString().replace("\\", "/");
+//                String windows_key = relativePath.toString().replace("/", "\\");
+//                if (p.matcher(linux_mac_key).matches() || p.matcher(windows_key).matches()) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
     public static boolean checkFileInPatternCompatOs(HashSet<Pattern> patterns, String relativePath) {
 

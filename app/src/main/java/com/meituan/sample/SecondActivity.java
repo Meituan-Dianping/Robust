@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import com.meituan.robust.patch.RobustModify;
 import com.meituan.robust.patch.annotaion.Add;
 import com.meituan.robust.patch.annotaion.Modify;
+import com.meituan.sample.demo.Old;
 import com.meituan.sample.robusttest.ConcreateClass;
 import com.meituan.sample.robusttest.People;
 import com.meituan.sample.robusttest.State;
@@ -37,9 +38,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     public static State state = new State(new Hll(true));
     private ListView listView;
     private String[] multiArr = {"列表1", "列表2", "列表3", "列表4"};
-    private String inlineToString(){
-     return super.toString();
- }
+
+    private String inlineToString() {
+        return super.toString();
+    }
+
     @Override
     @Modify
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                     Log.d("robust", " onclick  in Listener");
                 }
         );
+        setTextClickListener();
         //change text on the  SecondActivity
         textView.setText(getTextInfo(new Object[]{(name)}));
 //        Class clsArr = null;
@@ -78,18 +82,18 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         Log.d("robust", getString(R.string.app_name));
 
 
-
         //test for static methods
         Log.d("robust", "getValue is   " + getFieldValue("a", hll));
         Log.d("robust", "==========" + getInfo(state, new Super(), 1L) + "=============");
 
         //test for bundle
-        Bundle bundle=new Bundle();
-        bundle.putInt("asd",1);
+        Bundle bundle = new Bundle();
+        bundle.putInt("asd", 1);
         //test array
         BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
         listView.setAdapter(adapter);
     }
+
     /**
      * if you change the return value you will change the show text,in the demo we built a patch to change the text
      */
@@ -104,7 +108,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         //打开这部分注释，查看修复效果
 //        Arrays.fill(multiArr,"修复后的数据");
 //        return  "Fixed :资源修复测试 ：补丁修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
-        return  "Fixed success";
+        return "Fixed success";
 //        return "error occur ";
 
     }
@@ -113,10 +117,10 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     public String[] getArray(Object[] meituan) {
         People p = new People();
         p.setName("mivazhang");
-       return new String[]{p.getName(),"meituan"};
+        return new String[]{p.getName(), "meituan"};
     }
 
-// another usage of Modify anntation
+    // another usage of Modify anntation
 //    @Modify(value = "com.meituan.sample.SecondActivity.onCreate(android.os.Bundle)")
     @Modify
     private String getInfo(State stae, Super s, long l) {
@@ -130,7 +134,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                     Log.d("robust", " getInfo onclick  in Listener");
                 }
         );
-        textView.setOnClickListener(new View.OnClickListener(){
+        textView.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -148,8 +152,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
         return super.onCreateView(name, context, attrs);
     }
-
-
 
 
     @Add
@@ -226,5 +228,18 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
             op[1] = p;
             return (T) op;
         }
+    }
+
+    @Modify
+    public void setTextClickListener() {
+        TextView textView = (TextView) findViewById(R.id.secondtext);
+        textView.setOnClickListener(v -> {
+                    people.setAddr("earth");
+                    getInfo(state, new Super(), 1l);
+                    Log.d("robust", " onclick  in Listener");
+                }
+        );
+
+        new Old().method1();
     }
 }
