@@ -51,15 +51,23 @@ public class JavaUtils {
 //        HashMap<String, String> hashMap2 = getMapFromZippedFile(path2);
 //        System.err.println(hashMap1.equals(hashMap2));
 
-        parseRobustMethodsMap2File(path0, new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
+//        parseRobustMethodsMap2File(path0, new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
+
+        long currentTime = System.currentTimeMillis();
+        MethodInfo methodInfo = getMethodInfo(getMapFromZippedFile(path0),"3a14784fc776abddcbc524a840f8378a");
+        System.err.println("originalMethodStr: " + methodInfo.originalMethodStr);
+        System.err.println("className        : "+methodInfo.className);
+        System.err.println("methodName       : " + methodInfo.methodName);
+        System.err.println("paramTypes       : " + String.join(",",methodInfo.paramTypes));
+        System.err.println("spend time       : " + (System.currentTimeMillis() - currentTime));
     }
 
     public static void parseRobustMethodsMap2File(String robustMethodsMapPathStr, File targetFile) {
         HashMap<String, String> robustMethodsMap = getMapFromZippedFile(robustMethodsMapPathStr);
-        printMap2File(robustMethodsMap,targetFile);
+        printMap2File(robustMethodsMap, targetFile);
     }
 
-    public static void printMap2File(HashMap<String, String> robustMethodsMap, File targetFile){
+    public static void printMap2File(HashMap<String, String> robustMethodsMap, File targetFile) {
         StringBuilder methodBuilder = new StringBuilder();
         for (String key : robustMethodsMap.keySet()) {
             methodBuilder.append("key is   " + key + "  value is    " + String.valueOf(robustMethodsMap.get(key)) + "\n");
@@ -94,6 +102,53 @@ public class JavaUtils {
             throw new RuntimeException("getMapFromZippedFile from " + path + "  error ");
         }
         return result;
+    }
+
+    public static class MethodInfo {
+        private String originalMethodStr;
+        private String className;
+        private String methodName;
+        private String[] paramTypes;
+
+        public MethodInfo(String originalMethodStr) {
+            this.originalMethodStr = originalMethodStr;
+            parseMethodInfo();
+        }
+
+        private void parseMethodInfo() {
+            String leftBrace = "(";
+            String rightBrace = ")";
+            String comma = ",";
+            // originalMethodStr = com.meituan.sample.SecondActivity.getReflectField(java.lang.String,java.lang.Object)
+            int paramStart = originalMethodStr.indexOf(leftBrace);
+            int paramEnd = originalMethodStr.indexOf(rightBrace);
+            if (paramEnd > 0 & paramStart > 0 & paramEnd > paramStart) {
+                String paramTypesStr = this.originalMethodStr.substring(paramStart + 1, paramEnd);//java.lang.String,java.lang.Object
+                this.paramTypes = paramTypesStr.split(comma);//[java.lang.String,java.lang.Object]
+                String classAndMethod = originalMethodStr.substring(0, paramStart);//com.meituan.sample.SecondActivity.getReflectField
+                String[] tempStrArray = classAndMethod.split("\\.");//[......SecondActivity,getReflectField]
+                if (null != tempStrArray) {
+                    int tempLength = tempStrArray.length;
+                    if (tempStrArray.length > 0) {
+                        this.methodName = tempStrArray[tempLength - 1];//getReflectField
+                        this.className = classAndMethod.replace("." + methodName, "");//com.meituan.sample.SecondActivity
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    public static MethodInfo getMethodInfo(HashMap<String, String> robustMethodsMap, String robustMethodMd5) {
+        robustMethodMd5 = robustMethodMd5.trim();
+        for (String key : robustMethodsMap.keySet()) {
+            if (robustMethodMd5.equalsIgnoreCase(String.valueOf(robustMethodsMap.get(key)))) {
+                return new MethodInfo(key);
+            }
+        }
+
+        return null;
     }
 
     public static int copy(InputStream input, OutputStream output) throws IOException {
