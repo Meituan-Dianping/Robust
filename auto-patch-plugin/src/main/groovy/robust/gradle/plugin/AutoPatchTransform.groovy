@@ -178,16 +178,16 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
 
     def  generatPatch(List<CtClass> box,String patchPath){
         if (!Config.isManual) {
-            if (Config.patchMethodSignureSet.size() < 1) {
+            if (Config.patchMethodSignatureSet.size() < 1) {
                 throw new RuntimeException(" patch method is empty ,please check your Modify annotation or use RobustModify.modify() to mark modified methods")
             }
-            Config.methodNeedPatchSet.addAll(Config.patchMethodSignureSet)
+            Config.methodNeedPatchSet.addAll(Config.patchMethodSignatureSet)
             InlineClassFactory.dealInLineClass(patchPath, Config.newlyAddedClassNameList)
             initSuperMethodInClass(Config.modifiedClassNameList);
             //auto generate all class
             for (String fullClassName : Config.modifiedClassNameList) {
                 CtClass ctClass = Config.classPool.get(fullClassName)
-                CtClass patchClass = PatchesFactory.createPatch(patchPath, ctClass, false, NameManger.getInstance().getPatchName(ctClass.name), Config.patchMethodSignureSet)
+                CtClass patchClass = PatchesFactory.createPatch(patchPath, ctClass, false, NameManger.getInstance().getPatchName(ctClass.name), Config.patchMethodSignatureSet)
                 patchClass.writeFile(patchPath)
                 patchClass.defrost();
                 createControlClass(patchPath, ctClass)
@@ -249,7 +249,7 @@ class AutoPatchTransform extends Transform implements Plugin<Project> {
             modifiedCtClass = Config.classPool.get(modifiedFullClassName);
             modifiedCtClass.defrost();
             modifiedCtClass.declaredMethods.findAll {
-                return Config.patchMethodSignureSet.contains(it.longName)||InlineClassFactory.allInLineMethodLongname.contains(it.longName);
+                return Config.patchMethodSignatureSet.contains(it.longName)||InlineClassFactory.allInLineMethodLongname.contains(it.longName);
             }.each { behavior ->
                 behavior.instrument(new ExprEditor() {
                     @Override
