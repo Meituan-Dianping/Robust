@@ -10,21 +10,21 @@ class ReadXML {
         robust = new XmlSlurper().parse(new File("${path}${File.separator}${Constants.ROBUST_XML}"))
 
         //读取配置的补丁包名
-        if (robust.patchPackname.name.text() != null && !"".equals(robust.patchPackname.name.text()))
+        if (robust.patchPackname.name.text() != null && "" != robust.patchPackname.name.text())
             Config.patchPackageName = robust.patchPackname.name.text()
 
-        Config.isManual = robust.switch.manual != null && "true".equals(String.valueOf(robust.switch.manual.text()))
+        Config.isManual = robust.switch.manual != null && "true" == String.valueOf(robust.switch.manual.text())
         //读取mapping文件
-        if (robust.switch.proguard.text() != null && !"".equals(robust.switch.proguard.text()))
+        if (robust.switch.proguard.text() != null && "" != robust.switch.proguard.text())
             Config.supportProGuard = Boolean.valueOf(robust.switch.proguard.text()).booleanValue();
 
-        if (robust.mappingFile.name.text() != null && !"".equals(robust.mappingFile.name.text())) {
+        if (robust.mappingFile.name.text() != null && "" != robust.mappingFile.name.text()) {
             Config.mappingFilePath = robust.mappingFile.name.text()
         } else {
             Config.mappingFilePath = "${path}${Constants.DEFAULT_MAPPING_FILE}"
         }
 
-        if (Config.supportProGuard&&(Config.mappingFilePath == null || "".equals(Config.mappingFilePath) || !(new File(Config.mappingFilePath)).exists())) {
+        if (Config.supportProGuard&&(Config.mappingFilePath == null || "" == Config.mappingFilePath || !(new File(Config.mappingFilePath)).exists())) {
             throw new RuntimeException("Not found ${Config.mappingFilePath}, please put it on your project's robust dir or change your robust.xml !");
         }
 
@@ -35,7 +35,7 @@ class ReadXML {
         for (name in robust.patchMethodSignure.name) {
             if (!JavaUtils.isMethodSignureContainPatchClassName(String.valueOf(name.text()), Config.modifiedClassNameList))
                 throw new RuntimeException("input patchMethodSignure in robust.xml error,there are more than one patch classes,you need to config full class name and java method sigure");
-            Config.patchMethodSignureSet.add(String.valueOf(name.text()).trim());
+            Config.patchMethodSignatureSet.add(String.valueOf(name.text()).trim());
         }
 
         for (name in robust.packname.name) {
@@ -44,10 +44,10 @@ class ReadXML {
         for (name in robust.newlyAddClass.name) {
             Config.newlyAddedClassNameList.add(name.text());
         }
-        if (robust.switch.catchReflectException.text() != null && !"".equals(robust.switch.catchReflectException.text()))
+        if (robust.switch.catchReflectException.text() != null && "" != robust.switch.catchReflectException.text())
             Config.catchReflectException = Boolean.valueOf(robust.switch.catchReflectException.text()).booleanValue();
 
-        if (robust.switch.patchLog.text() != null && !"".equals(robust.switch.patchLog.text()))
+        if (robust.switch.patchLog.text() != null && "" != robust.switch.patchLog.text())
             Constants.isLogging = Boolean.valueOf(robust.switch.patchLog.text()).booleanValue();
 
         for (name in robust.noNeedReflectClass.name) {

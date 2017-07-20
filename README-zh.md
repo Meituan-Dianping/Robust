@@ -5,7 +5,7 @@
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 
- 新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题作出反应，补丁修补成功率高达99.9%。
+ 新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题0.4.7作出反应，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
@@ -28,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.4.5'
+	compile 'com.meituan.robust:robust:0.4.7'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -39,8 +39,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.5'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.5'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.7'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.7'
 	   }
 	}
 	```

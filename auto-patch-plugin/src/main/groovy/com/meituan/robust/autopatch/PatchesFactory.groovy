@@ -28,7 +28,7 @@ class PatchesFactory {
      * @param modifiedClass
      * @param isInline
      * @param patchName
-     * @param patchMethodSignureSet methods need patch,if patchMethodSignureSet length is 0,then will patch all methods in modifiedClass
+     * @param patchMethodSignureSet methods need patch,if patchMethodSignatureSet length is 0,then will patch all methods in modifiedClass
      * @return
      */
     private CtClass createPatchClass(CtClass modifiedClass, boolean isInline, String patchName, Set patchMethodSignureSet, String patchPath) throws CannotCompileException, IOException, NotFoundException {
@@ -36,9 +36,17 @@ class PatchesFactory {
         //just keep  methods need patch
         if (patchMethodSignureSet.size() != 0) {
             for (CtMethod method : modifiedClass.getDeclaredMethods()) {
-                if ((!patchMethodSignureSet.contains(method.getLongName()) || (!isInline && Config.methodMap.get(modifiedClass.getName() + "." + JavaUtils.getJavaMethodSignure(method)) == null))) {
+                //新增方法需要保留在补丁类中
+                if(!Config.supportProGuard&&Config.newlyAddedMethodSet.contains(method.longName)){
+                    continue;
+                }
+                //不是被补丁的方法
+                if ((!patchMethodSignureSet.contains(method.getLongName()) ||
+                        //不是内联并且是新增的方法
+                        (!isInline && Config.methodMap.get(modifiedClass.getName() + "." + JavaUtils.getJavaMethodSignure(method)) == null))) {
                     methodNoNeedPatchList.add(method);
                 } else {
+                    //移除methodNeedPatchSet中需要补丁的方法，留在补丁类中的方法默认全部会被处理
                     Config.methodNeedPatchSet.remove(method.getLongName());
                 }
             }
@@ -65,8 +73,8 @@ class PatchesFactory {
 
         for (CtMethod method : temPatchClass.getDeclaredMethods()) {
             //  shit !!too many situations need take into  consideration
-            //   methods has methodid   and in  patchMethodSignureSet
-            if (!Config.addedSuperMethodList.contains(method) && !reaLParameterMethod.equals(method) && !method.getName().startsWith(Constants.ROBUST_PUBLIC_SUFFIX)) {
+            //   methods has methodid   and in  patchMethodSignatureSet
+            if (!Config.addedSuperMethodList.contains(method) && reaLParameterMethod != method && !method.getName().startsWith(Constants.ROBUST_PUBLIC_SUFFIX)) {
                 method.instrument(
                         new ExprEditor() {
                             public void edit(FieldAccess f) throws CannotCompileException {
@@ -283,7 +291,7 @@ class PatchesFactory {
      * @param modifiedClass
      * @param isInline
      * @param patchName
-     * @param patchMethodSignureSet methods need patch,if patchMethodSignureSet length is 0,then will patch all methods in modifiedClass
+     * @param patchMethodSignureSet methods need patch,if patchMethodSignatureSet length is 0,then will patch all methods in modifiedClass
      * @return
      */
 
