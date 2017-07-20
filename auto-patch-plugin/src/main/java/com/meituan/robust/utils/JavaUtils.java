@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 import javassist.CtClass;
@@ -53,13 +54,27 @@ public class JavaUtils {
 
 //        parseRobustMethodsMap2File(path0, new File("/Users/hedingxu/robust-github/Robust/app/robust/methodsMap0_bak.robust"));
 
-        long currentTime = System.currentTimeMillis();
-        MethodInfo methodInfo = getMethodInfo(getMapFromZippedFile(path0),"3a14784fc776abddcbc524a840f8378a");
-        System.err.println("originalMethodStr: " + methodInfo.originalMethodStr);
-        System.err.println("className        : "+methodInfo.className);
-        System.err.println("methodName       : " + methodInfo.methodName);
-        System.err.println("paramTypes       : " + String.join(",",methodInfo.paramTypes));
-        System.err.println("spend time       : " + (System.currentTimeMillis() - currentTime));
+//        long currentTime = System.currentTimeMillis();
+//        MethodInfo methodInfo = getMethodInfo(getMapFromZippedFile(path0), "3a14784fc776abddcbc524a840f8378a");
+//        System.err.println("originalMethodStr: " + methodInfo.originalMethodStr);
+//        System.err.println("className        : " + methodInfo.className);
+//        System.err.println("methodName       : " + methodInfo.methodName);
+//        System.err.println("paramTypes       : " + String.join(",", methodInfo.paramTypes));
+//        System.err.println("spend time       : " + (System.currentTimeMillis() - currentTime));
+
+        HashMap<String, String> robustMethodsMap = getMapFromZippedFile(path0);
+        Set<String> keySet = robustMethodsMap.keySet();
+        for (String key :keySet) {
+            String methodSignature = key.trim();
+            MethodInfo methodInfo = new MethodInfo(methodSignature);
+
+//            if (methodInfo.paramTypes.length>0){
+//                methodInfo.paramTypes[0] = methodInfo.paramTypes[0] + "222";
+//            }
+            String methodId = getMethodId(robustMethodsMap,methodInfo.className,methodInfo.methodName ,methodInfo.paramTypes);
+            System.err.println("methodId : " + methodId + " ,methodString : " + methodSignature);
+        }
+
     }
 
     public static void parseRobustMethodsMap2File(String robustMethodsMapPathStr, File targetFile) {
@@ -149,6 +164,31 @@ public class JavaUtils {
         }
 
         return null;
+    }
+
+    public static String getMethodId(HashMap<String, String> robustMethodsMap, String className, String methodName, String[] parameterTypes) {
+        String methodSignature = getMethodSignature(className, methodName, parameterTypes);
+        return robustMethodsMap.get(methodSignature);
+//        return RobustMethodId.getMethodId(methodSignature);
+    }
+
+    public static String getMethodSignature(String className, String methodName, String[] parameterTypes) {
+        className = className.trim();
+        methodName = methodName.trim();
+
+        StringBuilder methodSignature = new StringBuilder();
+        methodSignature.append(className);
+        methodSignature.append(".");
+        methodSignature.append(methodName);
+        methodSignature.append("(");
+        for (int i = 0; i < parameterTypes.length; i++) {
+            methodSignature.append(parameterTypes[i].trim());
+            if (i != parameterTypes.length - 1) {
+                methodSignature.append(",");
+            }
+        }
+        methodSignature.append(")");
+        return methodSignature.toString();
     }
 
     public static int copy(InputStream input, OutputStream output) throws IOException {
