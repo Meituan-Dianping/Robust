@@ -120,10 +120,10 @@ public class JavaUtils {
     }
 
     public static class MethodInfo {
-        private String originalMethodStr;
-        private String className;
-        private String methodName;
-        private String[] paramTypes;
+        public String originalMethodStr;
+        public String className;
+        public String methodName;
+        public String[] paramTypes;
 
         public MethodInfo(String originalMethodStr) {
             this.originalMethodStr = originalMethodStr;
