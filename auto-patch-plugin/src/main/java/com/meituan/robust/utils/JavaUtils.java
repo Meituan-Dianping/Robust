@@ -45,6 +45,12 @@ public class JavaUtils {
 //    }
 
     public static void main(String[] args) {
+        String path_waimai = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap_waimai.robust";
+        parseRobustMethodsMap2File(path_waimai, new File(path_waimai + ".bak"));
+
+        if (true){
+            return;
+        }
         String path0 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap.robust";
 //        String path1 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-11.robust";
 //        String path2 = "/Users/hedingxu/robust-github/Robust/app/robust/methodsMap-12.robust";
@@ -139,7 +145,9 @@ public class JavaUtils {
             int paramEnd = originalMethodStr.indexOf(rightBrace);
             if (paramEnd > 0 & paramStart > 0 & paramEnd > paramStart) {
                 String paramTypesStr = this.originalMethodStr.substring(paramStart + 1, paramEnd);//java.lang.String,java.lang.Object
-                this.paramTypes = paramTypesStr.split(comma);//[java.lang.String,java.lang.Object]
+                if (!paramTypesStr.trim().equals("")){
+                    this.paramTypes = paramTypesStr.trim().split(comma);//[java.lang.String,java.lang.Object]
+                }
                 String classAndMethod = originalMethodStr.substring(0, paramStart);//com.meituan.sample.SecondActivity.getReflectField
                 String[] tempStrArray = classAndMethod.split("\\.");//[......SecondActivity,getReflectField]
                 if (null != tempStrArray) {
@@ -181,10 +189,12 @@ public class JavaUtils {
         methodSignature.append(".");
         methodSignature.append(methodName);
         methodSignature.append("(");
-        for (int i = 0; i < parameterTypes.length; i++) {
-            methodSignature.append(parameterTypes[i].trim());
-            if (i != parameterTypes.length - 1) {
-                methodSignature.append(",");
+        if (null != parameterTypes){
+            for (int i = 0; i < parameterTypes.length; i++) {
+                methodSignature.append(parameterTypes[i].trim());
+                if (i != parameterTypes.length - 1) {
+                    methodSignature.append(",");
+                }
             }
         }
         methodSignature.append(")");
