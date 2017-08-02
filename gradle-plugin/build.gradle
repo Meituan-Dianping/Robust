@@ -3,6 +3,10 @@ compileGroovy {
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
 }
+compileJava {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
 dependencies {
     compile gradleApi()
     compile localGroovy()
