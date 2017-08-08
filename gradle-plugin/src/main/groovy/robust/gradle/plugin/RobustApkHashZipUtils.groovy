@@ -3,6 +3,7 @@ package robust.gradle.plugin
 import com.meituan.robust.Constants
 
 import java.util.zip.*
+
 /**
  * Created by hedex on 17/2/14.
  */
@@ -82,7 +83,7 @@ class RobustApkHashZipUtils {
         while (entries.hasMoreElements()) {
 //            ZipEntry zipEntry = entries.nextElement();//保守
             ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
-            if (null != zipEntry ) {
+            if (null != zipEntry) {
                 addZipEntry(zipOutputStream, zipEntry, apZipFile.getInputStream(zipEntry))
             }
         }
@@ -116,7 +117,6 @@ class RobustApkHashZipUtils {
         return crc.getValue();
     }
 
-
     /**
      * add zip entry
      *
@@ -125,7 +125,8 @@ class RobustApkHashZipUtils {
      * @param inputStream
      * @throws Exception
      */
-    private static void addZipEntry(ZipOutputStream zipOutputStream, ZipEntry zipEntry, InputStream inputStream) throws Exception {
+    private
+    static void addZipEntry(ZipOutputStream zipOutputStream, ZipEntry zipEntry, InputStream inputStream) throws Exception {
         try {
             zipOutputStream.putNextEntry(zipEntry);
             byte[] buffer = new byte[1024];

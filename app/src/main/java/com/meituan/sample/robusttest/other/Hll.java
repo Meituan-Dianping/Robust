@@ -23,6 +23,7 @@ public class Hll implements CallBack {
     public Hll() {
 
     }
+
     private String privateMethod(int index, String name) {
         Log.d("robust", "in hll.getStrings()  ");
         packageMethod(1,name);

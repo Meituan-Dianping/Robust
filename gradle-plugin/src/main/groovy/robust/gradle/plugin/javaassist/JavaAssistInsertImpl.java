@@ -30,6 +30,7 @@ import robust.gradle.plugin.InsertcodeStrategy;
 
 /**
  * Created by zhangmeng on 2017/5/10.
+ * this class do almost the same thing with AsmInsertImpl
  */
 
 public class JavaAssistInsertImpl extends InsertcodeStrategy {
@@ -40,57 +41,64 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
 
     @Override
     protected void insertCode(List<CtClass> box, File jarFile) throws CannotCompileException, IOException, NotFoundException {
-        ZipOutputStream outStream=new JarOutputStream(new FileOutputStream(jarFile));
+        ZipOutputStream outStream = new JarOutputStream(new FileOutputStream(jarFile));
 //        new ForkJoinPool().submit {
-            for(CtClass ctClass:box) {
-                if (isNeedInsertClass(ctClass.getName())) {
-                    ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()));
-                    if (ctClass.isInterface() || ctClass.getDeclaredMethods().length < 1) {
-                        zipFile(ctClass.toBytecode(), outStream, ctClass.getName().replaceAll("\\.", "/") + ".class");
+        for (CtClass ctClass : box) {
+            if (isNeedInsertClass(ctClass.getName())) {
+                //change class modifier
+                ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()));
+                if (ctClass.isInterface() || ctClass.getDeclaredMethods().length < 1) {
+                    //skip the unsatisfied class
+                    zipFile(ctClass.toBytecode(), outStream, ctClass.getName().replaceAll("\\.", "/") + ".class");
+                    continue;
+                }
+
+                boolean addIncrementalChange = false;
+                for (CtBehavior ctBehavior : ctClass.getDeclaredBehaviors()) {
+                    if (!addIncrementalChange) {
+                        //insert the field
+                        addIncrementalChange = true;
+                        ClassPool classPool = ctBehavior.getDeclaringClass().getClassPool();
+                        CtClass type = classPool.getOrNull(Constants.INTERFACE_NAME);
+                        CtField ctField = new CtField(type, Constants.INSERT_FIELD_NAME, ctClass);
+                        ctField.setModifiers(AccessFlag.PUBLIC | AccessFlag.STATIC);
+                        ctClass.addField(ctField);
+                    }
+                    if (!isQualifiedMethod(ctBehavior)) {
                         continue;
                     }
-
-                    boolean addIncrementalChange = false;
-                    for (CtBehavior ctBehavior : ctClass.getDeclaredBehaviors()) {
-                        if (!addIncrementalChange) {
-                            addIncrementalChange = true;
-                            ClassPool classPool = ctBehavior.getDeclaringClass().getClassPool();
-                            CtClass type = classPool.getOrNull(Constants.INTERFACE_NAME);
-                            CtField ctField = new CtField(type, Constants.INSERT_FIELD_NAME, ctClass);
-                            ctField.setModifiers(AccessFlag.PUBLIC | AccessFlag.STATIC);
-                            ctClass.addField(ctField);
-                        }
-                        if(!isQualifiedMethod(ctBehavior)){
-                            continue;
-                        }
-                        //here comes the method will be inserted code
-                        methodMap.put(ctBehavior.getLongName(), insertMethodCount.incrementAndGet());
-                        try {
-                            if (ctBehavior.getMethodInfo().isMethod()) {
-                                CtMethod ctMethod=(CtMethod)ctBehavior;
-                                boolean isStatic = (ctMethod.getModifiers() & AccessFlag.STATIC)!= 0;
-                                CtClass returnType = ctMethod.getReturnType();
-                                String returnTypeString = returnType.getName();
-                                String body = "Object argThis = null;";
-                                if (!isStatic) {
-                                     body += "argThis = $0;";
-                                }
-                                String parametersClassType=getParametersClassType(ctMethod);
-//                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
-                                body += "   if (com.meituan.robust.PatchProxy.isSupport($args, argThis, "+Constants.INSERT_FIELD_NAME+", "+isStatic+
-                                        ", " + methodMap.get(ctBehavior.getLongName()) + ","+parametersClassType+","+returnTypeString+".class)) {";
-                                body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.getLongName()),parametersClassType,returnTypeString+".class");
-                                body += "   }";
-                                ctBehavior.insertBefore(body);
+                    //here comes the method will be inserted code
+                    methodMap.put(ctBehavior.getLongName(), insertMethodCount.incrementAndGet());
+                    try {
+                        if (ctBehavior.getMethodInfo().isMethod()) {
+                            CtMethod ctMethod = (CtMethod) ctBehavior;
+                            boolean isStatic = (ctMethod.getModifiers() & AccessFlag.STATIC) != 0;
+                            CtClass returnType = ctMethod.getReturnType();
+                            String returnTypeString = returnType.getName();
+                            //construct the code will be inserted in string format
+                            String body = "Object argThis = null;";
+                            if (!isStatic) {
+                                body += "argThis = $0;";
                             }
-                        } catch (Throwable t ) {
-                            t.printStackTrace();
-                            System.out.println("ctClass: " + ctClass.getName() + " error: " + t.getMessage());
+                            String parametersClassType = getParametersClassType(ctMethod);
+//                                body += "   if (com.meituan.robust.PatchProxy.isSupport(\$args, argThis, ${Constants.INSERT_FIELD_NAME}, $isStatic, " + methodMap.get(ctBehavior.longName) + ",${parametersClassType},${returnTypeString}.class)) {"
+                            body += "   if (com.meituan.robust.PatchProxy.isSupport($args, argThis, " + Constants.INSERT_FIELD_NAME + ", " + isStatic +
+                                    ", " + methodMap.get(ctBehavior.getLongName()) + "," + parametersClassType + "," + returnTypeString + ".class)) {";
+                            body += getReturnStatement(returnTypeString, isStatic, methodMap.get(ctBehavior.getLongName()), parametersClassType, returnTypeString + ".class");
+                            body += "   }";
+                            //finish the insert-code body ,let`s insert it
+                            ctBehavior.insertBefore(body);
                         }
+                    } catch (Throwable t) {
+                        //here we ignore the error
+                        t.printStackTrace();
+                        System.out.println("ctClass: " + ctClass.getName() + " error: " + t.getMessage());
                     }
                 }
-                zipFile(ctClass.toBytecode(), outStream, ctClass.getName().replaceAll("\\.", "/") + ".class");
             }
+            //zip the inserted-classes into output file
+            zipFile(ctClass.toBytecode(), outStream, ctClass.getName().replaceAll("\\.", "/") + ".class");
+        }
 //        }.get()
         outStream.close();
     }
@@ -146,25 +154,28 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
         return !isHotfixMethodLevel;
     }
 
-     private String getParametersClassType(CtMethod method) throws NotFoundException {
-        if(method.getParameterTypes().length==0){
+    private String getParametersClassType(CtMethod method) throws NotFoundException {
+        if (method.getParameterTypes().length == 0) {
             return " null ";
         }
-        StringBuilder parameterType=new StringBuilder();
+        StringBuilder parameterType = new StringBuilder();
         parameterType.append("new Class[]{");
-        for(CtClass paramterClass:method.getParameterTypes()){
+        for (CtClass paramterClass : method.getParameterTypes()) {
             parameterType.append(paramterClass.getName()).append(".class,");
         }
         //remove last ','
-        if(','==parameterType.charAt(parameterType.length()-1))
-            parameterType.deleteCharAt(parameterType.length()-1);
+        if (',' == parameterType.charAt(parameterType.length() - 1))
+            parameterType.deleteCharAt(parameterType.length() - 1);
         parameterType.append("}");
         return parameterType.toString();
     }
+
     //判断代码中是否有方法调用
     private boolean isCallMethod = false;
+
     /**
      * 判断是否有方法调用
+     *
      * @return 是否插桩
      */
     private boolean isMethodWithExpression(CtMethod ctMethod) throws CannotCompileException {
@@ -189,14 +200,18 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
              * @param a the <tt>new</tt> expression for creating an array.
              * @throws CannotCompileException
              */
-            public void edit(NewArray a) throws CannotCompileException { isCallMethod = true; }
+            public void edit(NewArray a) throws CannotCompileException {
+                isCallMethod = true;
+            }
 
             /**
              * Edits a method call (overridable).
              *
              * The default implementation performs nothing.
              */
-            public void edit(MethodCall m) throws CannotCompileException { isCallMethod = true; }
+            public void edit(MethodCall m) throws CannotCompileException {
+                isCallMethod = true;
+            }
 
             /**
              * Edits a constructor call (overridable).
@@ -216,79 +231,87 @@ public class JavaAssistInsertImpl extends InsertcodeStrategy {
              * Edits an instanceof expression (overridable).
              * The default implementation performs nothing.
              */
-            public void edit(Instanceof i) throws CannotCompileException { isCallMethod = true; }
+            public void edit(Instanceof i) throws CannotCompileException {
+                isCallMethod = true;
+            }
 
             /**
              * Edits an expression for explicit type casting (overridable).
              * The default implementation performs nothing.
              */
-            public void edit(Cast c) throws CannotCompileException { isCallMethod = true; }
+            public void edit(Cast c) throws CannotCompileException {
+                isCallMethod = true;
+            }
 
             /**
              * Edits a catch clause (overridable).
              * The default implementation performs nothing.
              */
-            public void edit(Handler h) throws CannotCompileException { isCallMethod = true; }
+            public void edit(Handler h) throws CannotCompileException {
+                isCallMethod = true;
+            }
         });
         return isCallMethod;
     }
+
     /**
      * 根据传入类型判断调用PathProxy的方法
-     * @param type 返回类型
-     * @param isStatic 是否是静态方法
+     *
+     * @param type         返回类型
+     * @param isStatic     是否是静态方法
      * @param methodNumber 方法数
      * @return 返回return语句
      */
-     private String getReturnStatement(String type, boolean isStatic, int methodNumber,String parametersClassType,String returnTypeString) {
+    private String getReturnStatement(String type, boolean isStatic, int methodNumber, String parametersClassType, String returnTypeString) {
         switch (type) {
             case Constants.CONSTRUCTOR:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, "+isStatic+", "+methodNumber+","+parametersClassType+","+returnTypeString+");  ";
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, " + isStatic + ", " + methodNumber + "," + parametersClassType + "," + returnTypeString + ");  ";
             case Constants.LANG_VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, "+isStatic+", "+methodNumber+","+parametersClassType+","+returnTypeString+");   return null;";
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, " + isStatic + ", " + methodNumber + "," + parametersClassType + "," + returnTypeString + ");   return null;";
 
             case Constants.VOID:
-                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, "+isStatic+", "+methodNumber+","+parametersClassType+","+returnTypeString+");   return ;";
+                return "    com.meituan.robust.PatchProxy.accessDispatchVoid( $args, argThis, changeQuickRedirect, " + isStatic + ", " + methodNumber + "," + parametersClassType + "," + returnTypeString + ");   return ;";
 
             case Constants.LANG_BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
             case Constants.BOOLEAN:
-                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch($args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).booleanValue();";
+                return "   return ((java.lang.Boolean)com.meituan.robust.PatchProxy.accessDispatch($args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).booleanValue();";
 
             case Constants.INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).intValue();";
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).intValue();";
             case Constants.LANG_INT:
-                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+methodNumber+","+parametersClassType+","+returnTypeString+")); ";
+                return "   return ((java.lang.Integer)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")); ";
 
             case Constants.LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).longValue();";
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).longValue();";
             case Constants.LANG_LONG:
-                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Long)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
 
             case Constants.DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).doubleValue();";
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).doubleValue();";
             case Constants.LANG_DOUBLE:
-                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Double)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
 
             case Constants.FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).floatValue();";
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).floatValue();";
             case Constants.LANG_FLOAT:
-                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Float)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
 
             case Constants.SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).shortValue();";
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).shortValue();";
             case Constants.LANG_SHORT:
-                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Short)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
 
             case Constants.BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).byteValue();";
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).byteValue();";
             case Constants.LANG_BYTE:
-                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Byte)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
             case Constants.CHAR:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+")).charValue();";
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ")).charValue();";
             case Constants.LANG_CHARACTER:
-                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+"));";
+                return "   return ((java.lang.Character)com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + "));";
             default:
-                return "   return ("+type+")com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, "+isStatic+","+ methodNumber+","+parametersClassType+","+returnTypeString+");";
+                return "   return (" + type + ")com.meituan.robust.PatchProxy.accessDispatch( $args, argThis, changeQuickRedirect, " + isStatic + "," + methodNumber + "," + parametersClassType + "," + returnTypeString + ");";
         }
     }
 }

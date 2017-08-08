@@ -28,7 +28,6 @@ public class Super extends Hll {
     }
 
 
-
     public String[] methodWithArrayParameters(String[] flag) {
         return flag;
     }
