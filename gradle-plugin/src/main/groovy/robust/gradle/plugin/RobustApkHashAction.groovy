@@ -8,6 +8,8 @@ import java.security.MessageDigest
 
 /**
  * Created by hedex on 17/2/14.
+ *
+ * calculate unique string for each apk,you can get the string in file located in build/outputs/robust/robust.apkhash
  */
 class RobustApkHashAction implements Action<Project> {
     @Override

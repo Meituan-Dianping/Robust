@@ -8,6 +8,8 @@ import java.lang.annotation.Target;
 
 /**
  * Created by mivanzhang on 16/12/19.
+ * 用来标记新增的类和方法
+ * annotaion used for add classes or methods,classes and methods will be packed into patch.jar/patch.apk
  */
 
 @Target({ElementType.FIELD, ElementType.METHOD, ElementType.TYPE, ElementType.CONSTRUCTOR})

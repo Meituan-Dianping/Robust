@@ -40,7 +40,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         robust = new XmlSlurper().parse(new File("${project.projectDir}/${Constants.ROBUST_XML}"))
         logger = project.logger
         initConfig()
-        //turnOnDevelopModel 是true的话，则强制执行插入
+        //isForceInsert 是true的话，则强制执行插入
         if (!isForceInsert) {
             def taskNames = project.gradle.startParameter.taskNames
             def isDebugTask = false;

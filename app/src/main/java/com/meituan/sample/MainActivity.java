@@ -49,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     Hll hll = new Hll(false);
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,27 +106,28 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        System.out.println(" run(String x) "+run("robust ",123));
-        System.out.println("  run(People x) "+run(new People(),123d));
-        System.out.println("  run(float x) "+run(123f));
-        System.out.println("  double run() "+run());
+        System.out.println(" run(String x) " + run("robust ", 123));
+        System.out.println("  run(People x) " + run(new People(), 123d));
+        System.out.println("  run(float x) " + run(123f));
+        System.out.println("  double run() " + run());
         System.out.println("in MainActivity end ");
     }
 
 
-
-    private String run(String x,int p){
-        return x+"meituan";
+    private String run(String x, int p) {
+        return x + "meituan";
     }
-    private String run(People x,double d){
+
+    private String run(People x, double d) {
         x.setAddr("meituan");
         return x.getAddr();
     }
-    private int run(float x){
-        return (int)x;
+
+    private int run(float x) {
+        return (int) x;
     }
 
-    private double run(){
+    private double run() {
         return 1d;
     }
 
