@@ -35,6 +35,13 @@ public class ProcessUtil {
         return currentProcessName;
     }
 
+    public static String getCurrentProcessName() {
+        if (TextUtils.isEmpty(currentProcessName)) {
+            currentProcessName = getCurrentProcessNameReal();
+        }
+        return currentProcessName;
+    }
+
     public static boolean isRobustProcess(Context context) {
         getCurrentProcessName(context);
         getCurrentPackageName(context);
@@ -62,6 +69,14 @@ public class ProcessUtil {
         }
         if (TextUtils.isEmpty(currentProcessName)) {
             currentProcessName = getCurrentProcessNameByPid(context);
+        }
+        return currentProcessName;
+    }
+
+    private static String getCurrentProcessNameReal() {
+        String currentProcessName = getCurrentProcessNameByReflect();
+        if (TextUtils.isEmpty(currentProcessName)) {
+            currentProcessName = getCurrentProcessNameByFile();
         }
         return currentProcessName;
     }
