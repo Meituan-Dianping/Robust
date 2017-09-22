@@ -1,7 +1,7 @@
 
 # Robust
  
-[![Release Version](https://api.bintray.com/packages/meituan/maven/com.meituan.robust:autopatchbase/images/download.svg)](https://github.com/Meituan-Dianping/Robust/releases)
+[![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.7) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.7/link)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 

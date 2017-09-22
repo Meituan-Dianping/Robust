@@ -1,6 +1,6 @@
 
 # Robust
- [![Release Version](https://api.bintray.com/packages/meituan/maven/com.meituan.robust:autopatchbase/images/download.svg)](https://github.com/Meituan-Dianping/Robust/releases)
+ [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.7) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.7/link)
  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
@@ -126,7 +126,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 7. 将补丁文件copy到手机上：
 
 	```java
-	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。
