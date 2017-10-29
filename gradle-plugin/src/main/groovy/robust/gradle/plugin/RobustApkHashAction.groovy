@@ -3,13 +3,11 @@ package robust.gradle.plugin
 import com.meituan.robust.Constants
 import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 
 import java.security.MessageDigest
-
 /**
  * Created by hedex on 17/2/14.
- *
- * calculate unique string for each apk,you can get the string in file located in build/outputs/robust/robust.apkhash
  */
 class RobustApkHashAction implements Action<Project> {
     @Override
@@ -25,6 +23,68 @@ class RobustApkHashAction implements Action<Project> {
 //                project.logger.quiet("===start compute robust apk hash===")
 //                def startTime = System.currentTimeMillis()
                 List<File> partFiles = new ArrayList<>()
+
+                if (isGradlePlugin300orAbove()){
+                    //protected FileCollection resourceFiles;
+                    FileCollection resourceFiles = packageTask.resourceFiles
+                    if (null == resourceFiles) {
+                        return
+                    }
+                    partFiles.add(resourceFiles.getFiles())
+
+                    //protected FileCollection dexFolders;
+                    FileCollection dexFolders = null
+                    try {
+                        dexFolders = packageTask.dexFolders
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != dexFolders) {
+                        partFiles.addAll(dexFolders.getFiles())
+                    }
+
+                    //protected FileCollection javaResourceFiles;
+                    FileCollection javaResourceFiles = null
+                    try {
+                        javaResourceFiles = packageTask.javaResourceFiles
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != javaResourceFiles) {
+                        partFiles.addAll(javaResourceFiles.getFiles())
+                    }
+
+                    //protected FileCollection jniFolders;
+                    FileCollection jniFolders = null
+                    try {
+                        jniFolders = packageTask.jniFolders
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != jniFolders) {
+                        partFiles.addAll(jniFolders.getFiles())
+                    }
+
+                    //protected FileCollection assets;
+                    FileCollection assets = null;
+                    try {
+                        assets = packageTask.assets
+                    } catch (MissingPropertyException e) {
+                    }
+                    if (null != assets) {
+                        partFiles.add(assets.getFiles())
+                    }
+
+                    String robustHash = computeRobustHash(partFiles)
+
+                    if (assets instanceof FileCollection) {
+                        FileCollection assetsFileCollection = (FileCollection) assets;
+                        createHashFile(assetsFileCollection.asPath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                    }
+                    return
+
+                } else {
+
                 File resourceFile = packageTask.resourceFile
                 if (null == resourceFile) {
                     return
@@ -63,11 +123,6 @@ class RobustApkHashAction implements Action<Project> {
                 }
 
 
-                try {
-                } catch (MissingPropertyException e) {
-                    // api is not public
-                }
-
                 File assets = null;
                 try {
                     assets = packageTask.assets
@@ -97,6 +152,7 @@ class RobustApkHashAction implements Action<Project> {
 //                logger.quiet "robust apk hash is $robustHash"
 //                logger.quiet "compute robust apk hash cost $cost second"
 //                project.logger.quiet("===compute robust apk hash end===")
+                }
             }
         }
     }
@@ -144,5 +200,15 @@ class RobustApkHashAction implements Action<Project> {
         fileWriter.write(hashValue)
         fileWriter.close()
         return hashFile
+    }
+
+    public static boolean isGradlePlugin300orAbove() {
+        try {
+            String gradlePluginVersion = com.android.builder.Version.ANDROID_GRADLE_PLUGIN_VERSION
+            return gradlePluginVersion.compareTo("3.0.0") >= 0;
+        } catch (Throwable throwable) {
+
+        }
+        return false;
     }
 }
