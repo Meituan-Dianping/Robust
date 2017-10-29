@@ -26,4 +26,14 @@ public class PatchTemplate implements ChangeQuickRedirect {
     public boolean isSupport(String methodName, Object[] paramArrayOfObject) {
         return true;
     }
+
+    //解决boolean被优化成byte的问题
+    private static Object fixObj(Object booleanObj) {
+        if (booleanObj instanceof Byte) {
+            byte byteValue = (Byte) booleanObj;
+            boolean booleanValue = byteValue != 0x00;
+            return new Boolean(booleanValue);
+        }
+        return booleanObj;
+    }
 }

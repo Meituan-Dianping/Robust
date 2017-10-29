@@ -12,7 +12,18 @@ class RobustApkHashZipUtils {
         ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(output));
         zipOut.setLevel(Deflater.BEST_SPEED);
 
-        for (File source : sources) {
+        List<File> fileList = new LinkedList<File>();
+        for (Object source : sources) {
+            if (source instanceof File){
+                fileList.add(source)
+            } else if (source instanceof Collection){
+                fileList.addAll(source)
+            } else {
+                System.err.println("packZip source 4" + source.getClass())
+            }
+        }
+
+        for (File source : fileList) {
             if (source.isDirectory()) {
                 zipDir(zipOut, "", source);
             } else {

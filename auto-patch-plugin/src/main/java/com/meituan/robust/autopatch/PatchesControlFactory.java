@@ -59,7 +59,7 @@ public class PatchesControlFactory {
             accessDispatchMethodBody.append("  android.util.Log.d(\"robust\",\"keyToValueRelation not contain\" );");
         }
         accessDispatchMethodBody.append("patch=new " + patchClass.getName() + "(paramArrayOfObject[paramArrayOfObject.length - 1]);\n");
-        accessDispatchMethodBody.append(" keyToValueRelation.put(paramArrayOfObject[paramArrayOfObject.length - 1], patch);\n");
+        accessDispatchMethodBody.append(" keyToValueRelation.put(paramArrayOfObject[paramArrayOfObject.length - 1], null);\n");
         accessDispatchMethodBody.append("}else{");
         accessDispatchMethodBody.append("patch=(" + patchClass.getName() + ") keyToValueRelation.get(paramArrayOfObject[paramArrayOfObject.length - 1]);\n");
         accessDispatchMethodBody.append("}");
@@ -125,10 +125,18 @@ public class PatchesControlFactory {
                     }
                 }
                 for (int index = 0; index < parametertypes.length; index++) {
+                    if (booleanPrimeType(parametertypes[index].getName())){
+                        accessDispatchMethodBody.append("((" + JavaUtils.getWrapperClass(parametertypes[index].getName()) + ") (fixObj(paramArrayOfObject[" + index + "]))");
+                        accessDispatchMethodBody.append(")" + JavaUtils.wrapperToPrime(parametertypes[index].getName()));
+                        if (index != parametertypes.length - 1) {
+                            accessDispatchMethodBody.append(",");
+                        }
+                    } else {
                     accessDispatchMethodBody.append("((" + JavaUtils.getWrapperClass(parametertypes[index].getName()) + ") (paramArrayOfObject[" + index + "])");
                     accessDispatchMethodBody.append(")" + JavaUtils.wrapperToPrime(parametertypes[index].getName()));
                     if (index != parametertypes.length - 1) {
                         accessDispatchMethodBody.append(",");
+                    }
                     }
                 }
                 accessDispatchMethodBody.append("));}\n");
@@ -171,6 +179,10 @@ public class PatchesControlFactory {
 
     public static CtClass createPatchesControl(CtClass modifiedClass) throws Exception {
         return patchesControlFactory.createControlClass(modifiedClass);
+    }
+
+    public static boolean booleanPrimeType(String typeName) {
+        return "boolean".equals(typeName);
     }
 
 }
