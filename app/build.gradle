@@ -4,7 +4,7 @@ apply plugin: 'robust'
 //apply plugin: 'auto-patch-plugin'
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.meituan.robust.sample"
         minSdkVersion 14
@@ -60,7 +60,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.android.support:design:24.2.1'
     compile 'org.javassist:javassist:3.20.0-GA'
     compile project(path: ':patch')
