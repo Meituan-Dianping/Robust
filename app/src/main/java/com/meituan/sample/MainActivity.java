@@ -1,22 +1,45 @@
 package com.meituan.sample;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.meituan.Hll;
 import com.meituan.robust.Patch;
 import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
+import com.meituan.sample.extension.LogExtension;
+import com.meituan.sample.robusttest.ImageQualityUtil;
+import com.meituan.sample.robusttest.NoField;
+import com.meituan.sample.robusttest.People;
+import com.meituan.sample.robusttest.SampleClass;
+import com.meituan.sample.robusttest.State;
+import com.meituan.sample.robusttest.Super;
+import com.meituan.sample.robusttest.other.Hll;
 
-import java.lang.reflect.Constructor;
+import java.util.List;
+
+/**
+ * For users of Robust you may only to use MainActivity or SecondActivity,other classes are used for test.<br>
+ * <br>
+ * If you just want to use Robust ,we recommend you just focus on MainActivity SecondActivity and PatchManipulateImp.Especially three buttons in MainActivity<br>
+ * <br>
+ * in the MainActivity have three buttons; "SHOW TEXT " Button will change the text in the MainActivity,you can patch the show text.<br>
+ * <br>
+ * "PATCH" button will load the patch ,the patch path can be configured in PatchManipulateImp.<br>
+ * <br>
+ * "JUMP_SECOND_ACTIVITY" button will jump to the second ACTIVITY,so you can patch a Activity.<br>
+ * <br>
+ * Attention to this ,We recommend that one patch is just for one built apk ,because every  built apk has its unique mapping.txt and resource id<br>
+ *
+ * @author mivanzhang
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,17 +50,44 @@ public class MainActivity extends AppCompatActivity {
     Hll hll = new Hll(false);
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        PatchProxy.register(new LogExtension());
+
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);
         state = new State<>(hll);
+        Button patch = (Button) findViewById(R.id.patch);
+        //beigin to patch
+        patch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isGrantSDCardReadPermission()) {
+                    runRobust();
+                } else {
+                    requestPermission();
+                }
+            }
+        });
+
+        findViewById(R.id.jump_second_activity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(intent);
+                Log.d("robusttest", (new NoField()).toString());
+                Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
+                SampleClass sampleClass = new SampleClass();
+                sampleClass.multiple(-1);
+            }
+        });
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //除了get方法有拦截之外，其他的几个方法没有做拦截，可能是处理get set方法的误杀
                 Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
                 state.setIndex(hll, 1, 1l, new Object());
                 Log.d("robust", "state.get()  " + state.get().toString());
@@ -47,43 +97,46 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("robust", "patch result after:" + s.protextedMethod());
                 textView.setText(s.getText());
                 s.getinstance();
-//                Log.d("robust", "s.getinstance(new Super())==  :    " + s.getinstance(new Super()));
             }
         });
-        Button patch = (Button) findViewById(R.id.patch);
-        patch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                PatchUtils.applyPatch(MainActivity.this, "group", "1.0", "channel", 1233445l, "qwertyuiop1", "QQQQQQQQQQQ");
-                new PatchExecutor(getApplicationContext(), new PatchManipulateImp(),  new Callback()).start();
-
-            }
-        });
-
+        //test situation,
         try {
             ImageQualityUtil.loadImage(null, null, null, 1, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        findViewById(R.id.jump_second_activity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = (Intent) invokeReflectConstruct("android.content.Intent", new Object[]{MainActivity.this, SecondActivity.class}, new Class[]{Context.class, Class.class});
-                startActivity(intent);
-                Log.d("robusttest", (new NoField()).toString());
-                Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
-                SampleClass sampleClass=new SampleClass();
-                sampleClass.multiple(-1);
-            }
-        });
 
+        System.out.println(" run(String x) " + run("robust ", 123));
+        System.out.println("  run(People x) " + run(new People(), 123d));
+        System.out.println("  run(float x) " + run(123f));
+        System.out.println("  double run() " + run());
+        System.out.println("in MainActivity end ");
     }
+
+
+    private String run(String x, int p) {
+        return x + "meituan";
+    }
+
+    private String run(People x, double d) {
+        x.setAddr("meituan");
+        return x.getAddr();
+    }
+
+    private int run(float x) {
+        return (int) x;
+    }
+
+    private double run() {
+        return 1d;
+    }
+
     //patch  data report
     class Callback implements RobustCallBack {
 
         @Override
-        public void onPatchListFetched(boolean result, boolean isNet) {
-             System.out.println(" robust arrived in onPatchListFetched");
+        public void onPatchListFetched(boolean result, boolean isNet, List<Patch> patches) {
+            System.out.println(" robust arrived in onPatchListFetched");
         }
 
         @Override
@@ -93,49 +146,56 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onPatchApplied(boolean result, Patch patch) {
-            System.out.println(" robust arrived in onPatchApplied");
+            System.out.println(" robust arrived in onPatchApplied ");
 
         }
 
         @Override
         public void logNotify(String log, String where) {
-            System.out.println(" robust arrived in logNotify");
+            System.out.println(" robust arrived in logNotify " + where);
         }
 
         @Override
         public void exceptionNotify(Throwable throwable, String where) {
-            System.out.println(" robust arrived in exceptionNotify");
+            throwable.printStackTrace();
+            System.out.println(" robust arrived in exceptionNotify " + where);
         }
     }
 
-    private static View getChildView(View view) {
-        if (!(view instanceof ViewGroup) || ((ViewGroup) view).getChildCount() < 1) {
-            return view;
+    private boolean isGrantSDCardReadPermission() {
+        return PermissionUtils.isGrantSDCardReadPermission(this);
+    }
+
+    private void requestPermission() {
+        PermissionUtils.requestSDCardReadPermission(this, REQUEST_CODE_SDCARD_READ);
+    }
+
+    private static final int REQUEST_CODE_SDCARD_READ = 1;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_SDCARD_READ:
+                handlePermissionResult();
+                break;
+
+            default:
+                break;
         }
-        ViewGroup viewGroup = (ViewGroup) view;
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            View text = getChildView(viewGroup.getChildAt(i));
-            if (text instanceof TextView) {
-                if ("作品累计票房".equals(((TextView) text).getText())) {
-                    return text;
-                }
-            }
+    }
+
+    private void handlePermissionResult() {
+        if (isGrantSDCardReadPermission()) {
+            runRobust();
+        } else {
+            Toast.makeText(this, "failure because without sd card read permission", Toast.LENGTH_SHORT).show();
         }
-        return null;
 
     }
 
-    public static Object invokeReflectConstruct(String className, Object[] parameter, Class[] args) {
-        try {
-            Class clazz = Class.forName(className);
-            Constructor constructor = clazz.getDeclaredConstructor(args);
-            constructor.setAccessible(true);
-            return constructor.newInstance(parameter);
-        } catch (Exception e) {
-            Log.d("robust", "invokeReflectConstruct construct error " + className + "   parameter   " + parameter);
-            e.printStackTrace();
-        }
-        throw new RuntimeException("invokeReflectConstruct error ");
+    private void runRobust() {
+        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new Callback()).start();
     }
+
 
 }

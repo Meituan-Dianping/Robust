@@ -7,31 +7,37 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.meituan.Hll;
+import com.meituan.sample.robusttest.other.Hll;
 import com.meituan.robust.patch.RobustModify;
 import com.meituan.robust.patch.annotaion.Add;
 import com.meituan.robust.patch.annotaion.Modify;
+import com.meituan.sample.robusttest.ConcreateClass;
+import com.meituan.sample.robusttest.People;
+import com.meituan.sample.robusttest.State;
+import com.meituan.sample.robusttest.Super;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected String flag = "flagstring";
     protected static String name = "zhang";
-    public int times = 0;
-    public static String staticStringField = "meituan";
-    public static int staticIntField = 12311111;
-    public long longField = 123l;
     public Hll hll = new Hll(true);
     private People people = new People();
     public static State state = new State(new Hll(true));
+    private ListView listView;
+    private String[] multiArr = {"列表1", "列表2", "列表3", "列表4"};
     private String inlineToString(){
      return super.toString();
  }
@@ -41,25 +47,77 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         System.out.println(inlineToString());
         setContentView(R.layout.activity_main2);
-        new Handler().postDelayed(new PreloadWebviewRunnable(this), 1100);
-        Log.d("robust", hll.getStrings(1, flag));
-        Log.d("robust", getString(R.string.app_name));
+
+        listView = (ListView) findViewById(R.id.listview);
+        //test lambda expression
         TextView textView = (TextView) findViewById(R.id.secondtext);
         textView.setOnClickListener(v -> {
                     RobustModify.modify();
+                    //test inner class accessibility
                     people.setAddr("asdasd");
                     getInfo(state, new Super(), 1l);
                     Log.d("robust", " onclick  in Listener");
                 }
         );
+        //change text on the  SecondActivity
+        textView.setText(getTextInfo(new Object[]{(name)}));
+//        Class clsArr = null;
+//        try {
+//            clsArr = Class.forName("[Ljava/lang/Object;");
+//            System.out.println(clsArr.getName());
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+        // belows are test!!,you may ignore
+        // belows are test!!,you may ignore
+        // belows are test!!,you may ignore
+        // belows are test!!,you may ignore
 
-        textView.setText(getTextInfo(name));
+        //test inner class
+        new Handler().postDelayed(new PreloadWebviewRunnable(this), 1100);
+        Log.d("robust", hll.getStrings(1, flag));
+        Log.d("robust", getString(R.string.app_name));
+
+
+
+        //test for static methods
         Log.d("robust", "getValue is   " + getFieldValue("a", hll));
         Log.d("robust", "==========" + getInfo(state, new Super(), 1L) + "=============");
-        Toast.makeText(getApplicationContext(),"I am robust",Toast.LENGTH_SHORT).show();
+
+        //test for bundle
+        Bundle bundle=new Bundle();
+        bundle.putInt("asd",1);
+        bundle.getFloat("asd");
+        //test array
+        BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
+        listView.setAdapter(adapter);
+    }
+    /**
+     * if you change the return value you will change the show text,in the demo we built a patch to change the text
+     */
+    @Modify
+    public String getTextInfo(Object[] meituan) {
+        People p = new People();
+        p.setName("mivazhang");
+        p.setCates("  AutoPatch");
+        people.setName(" I am Patch");
+        ConcreateClass concreateClass = new ConcreateClass();
+        getArray(meituan);
+        //打开这部分注释，查看修复效果
+//        Arrays.fill(multiArr,"修复后的数据");
+//        return  "修复后：you make it!!   name is " + p.getName()  +  "   \npatch success   " + people.getName() ;
+        return "error occur " + concreateClass.getA();
+
     }
 
-    //    @Modify(value = "com.meituan.sample.Super.onCreate(android.os.Bundle)")
+    @Add
+    public String[] getArray(Object[] meituan) {
+        People p = new People();
+        p.setName("mivazhang");
+       return new String[]{p.getName(),"meituan"};
+    }
+
+// another usage of Modify anntation
 //    @Modify(value = "com.meituan.sample.SecondActivity.onCreate(android.os.Bundle)")
     private String getInfo(State stae, Super s, long l) {
         String json = "[1,2,3,4,5]";
@@ -83,22 +141,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         return super.onCreateView(name, context, attrs);
     }
 
-    @Modify
-    //    public String getTextInfo(String baidu, People p) {
-    public String getTextInfo(String baidu) {
-        Bundle bundle=new Bundle();
-        bundle.putInt("asd",1);
-        bundle.getFloat("asd");
-        RobustModify.modify();
-        People p = new People();
-        p.setName("mivazhang");
-        p.setCates("  AutoPatch");
-        people.setAddr(baidu);
-        people.setName(" I am Patch");
-        ConcreateClass concreateClass = new ConcreateClass();
-        return p.getCates() + "you make it!!   " + p.getName() + baidu + getTextI1(flag) + people.getAddr() + "   name is  " + people.getName() + " conreate class getA " + concreateClass.getA();
-//        return "error " + concreateClass.getA();
-    }
+
 
 
     @Add
@@ -116,18 +159,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
     public static String[] methodWithArrayParameters(String[] flag) {
         return flag;
-    }
-
-    public Boolean getBoolean(String flag) {
-        return false;
-    }
-
-    public String getString(Hll hll) {
-        return "meituan";
-    }
-
-    public Super getStatus() {
-        return new Super();
     }
 
     @Override

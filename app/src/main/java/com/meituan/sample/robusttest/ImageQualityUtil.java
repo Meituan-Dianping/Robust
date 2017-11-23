@@ -1,4 +1,4 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 /**
  * Created by mivanzhang on 16/10/24.
@@ -23,9 +23,7 @@ import java.lang.ref.WeakReference;
 /**
  * 根据网络环境获取图片质量所对应的API中的字段
  * <p>
- * Date:2011-04-08 18:11
  *
- * @author mashengchao
  */
 public class ImageQualityUtil {
     private static final String LARGE_SIZE = "/440.267/";

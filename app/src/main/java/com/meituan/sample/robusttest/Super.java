@@ -1,9 +1,10 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 import android.util.Log;
 
-import com.meituan.Hll;
+import com.meituan.sample.robusttest.other.Hll;
 import com.meituan.robust.patch.annotaion.Modify;
+import com.meituan.sample.SecondActivity;
 
 /**
  * Created by mivanzhang on 16/7/21.
@@ -27,7 +28,6 @@ public class Super extends Hll {
     }
 
 
-
     public String[] methodWithArrayParameters(String[] flag) {
         return flag;
     }
@@ -38,7 +38,6 @@ public class Super extends Hll {
         CallBack callBack = hll;
         callBack.callBack();
         Super s = new Super();
-//        Log.d("robust", "protextedMethod  is  " + s.protextedMethod(s));
         times = 1 / 0;
         Log.d("robust", "test static block  ");
         Log.d("robust", staticStringField);
@@ -63,17 +62,6 @@ public class Super extends Hll {
 
     public Object getinstance() {
         privateMethod(1, "asd");
-//        Log.d("robust", "in Super.getinstance()  ");
-//        flag = s.flag;
-//        s.flag = staticStringField;
-//        Log.d("robust", "hll.getStrings   " + hll.getStrings(times, name));
-//        Hll newHll = new Hll(false);
-//        Log.d("robust", "newHll.getStrings   " + newHll.getStrings(times, name));
-//
-//        Log.d("robust", "state.packageMethod   " + state.packageMethod(times, name));
-//        Log.d("robust", "in Super.getinstance() byteFiled is  " + byteFiled);
-//        return s.flag + "   " + times + "   " + getText() + "   " + byteFiled + "   " + String.valueOf(longField) + state.packageMethod(times, name);
-//        Object o = StaticInstance.instance;
         Super s = new Super();
         s.times = 1;
         return s;

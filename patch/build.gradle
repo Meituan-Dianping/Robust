@@ -3,6 +3,7 @@ project.archivesBaseName = 'robust'
 android {
     compileSdkVersion 24
     buildToolsVersion '26.0.2'
+    buildToolsVersion '25.0.2'
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 24
@@ -11,6 +12,7 @@ android {
     }
     buildTypes {
         release {
+            consumerProguardFiles 'proguard-rules.pro'
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -29,8 +31,6 @@ configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 dependencies {
-    compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.google.code.gson:gson:2.4'
 //    compile 'com.meituan.robust:autopatchbase:' + VERSION_NAME
     compile project(':autopatchbase')
 }

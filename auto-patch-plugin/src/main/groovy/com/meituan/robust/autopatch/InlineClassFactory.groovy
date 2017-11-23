@@ -33,7 +33,7 @@ class InlineClassFactory {
         Set newlyAddedClassInlineSet = getAllInlineClasses(usedClass, null);
         usedClass.addAll(newlyAddedClassInlineSet);
         usedClass.addAll(Config.modifiedClassNameList)
-        Set inLineClassNameSet = getAllInlineClasses(usedClass, Config.patchMethodSignureSet);
+        Set inLineClassNameSet = getAllInlineClasses(usedClass, Config.patchMethodSignatureSet);
         inLineClassNameSet.removeAll(newlyAddedClassInlineSet)
         inLineClassNameSet.addAll(classInLineMethodsMap.keySet())
         //all inline patch class
@@ -117,7 +117,7 @@ class InlineClassFactory {
                     //找出modifiedclass中所有内联的类
                     allPatchMethodSignureSet.addAll(classInLineMethodsMap.getOrDefault(fullClassName, new ArrayList()))
                     if (isNewClass||allPatchMethodSignureSet.contains(method.longName)) {
-                        isNewClass=false;
+//                        isNewClass=false;
                         method.instrument(new ExprEditor() {
                             @Override
                             void edit(MethodCall m) throws CannotCompileException {

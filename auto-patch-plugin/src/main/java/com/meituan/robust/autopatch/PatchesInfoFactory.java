@@ -4,6 +4,7 @@ import com.meituan.robust.Constants;
 
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.bytecode.ClassFile;
 
 import static com.meituan.robust.autopatch.Config.classPool;
 import static javassist.CtNewMethod.make;
@@ -24,14 +25,13 @@ public class PatchesInfoFactory {
     private CtClass createPatchesInfoClass() {
         try {
             CtClass ctPatchesInfoImpl = classPool.makeClass(Config.patchPackageName + ".PatchesInfoImpl");
+            ctPatchesInfoImpl.getClassFile().setMajorVersion(ClassFile.JAVA_7);
             ctPatchesInfoImpl.setInterfaces(new CtClass[]{classPool.get("com.meituan.robust.PatchesInfo")});
             StringBuilder methodBody = new StringBuilder();
             methodBody.append("public java.util.List getPatchedClassesInfo() {");
             methodBody.append("  java.util.List patchedClassesInfos = new java.util.ArrayList();");
             for (int i = 0; i < Config.modifiedClassNameList.size(); i++) {
-                System.out.println("ReflectUtils.getFullClassNameFromFile(file)  " + Config.modifiedClassNameList.get(i));
                 if (Constants.OBSCURE) {
-                    System.out.println("Config.modifiedClassNameList.get(i)).getValueName()  " + ReadMapping.getInstance().getClassMapping(Config.modifiedClassNameList.get(i)));
                     methodBody.append("com.meituan.robust.PatchedClassInfo patchedClass" + i + " = new com.meituan.robust.PatchedClassInfo(\"" + ReadMapping.getInstance().getClassMappingOrDefault(Config.modifiedClassNameList.get(i)).getValueName() + "\",\"" + NameManger.getInstance().getPatchControlName(Config.modifiedClassNameList.get(i).substring(Config.modifiedClassNameList.get(i).lastIndexOf('.') + 1)) + "\");");
                 } else {
                     methodBody.append("com.meituan.robust.PatchedClassInfo patchedClass" + i + " = new com.meituan.robust.PatchedClassInfo(\"" + Config.modifiedClassNameList.get(i) + "\",\"" + NameManger.getInstance().getPatchControlName(Config.modifiedClassNameList.get(i).substring(Config.modifiedClassNameList.get(i).lastIndexOf('.') + 1)) + "\");");
@@ -45,6 +45,7 @@ public class PatchesInfoFactory {
             ctPatchesInfoImpl.addMethod(m);
             return ctPatchesInfoImpl;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
