@@ -1,12 +1,12 @@
-package com.meituan;
+package com.meituan.sample.robusttest.other;
 
 
 import android.util.Log;
 
-import com.meituan.sample.CallBack;
+import com.meituan.sample.robusttest.CallBack;
 
 import static android.R.attr.name;
-import static com.meituan.sample.State.index;
+import static com.meituan.sample.robusttest.State.index;
 
 /**
  * Created by c_kunwu on 16/5/13.
@@ -23,6 +23,7 @@ public class Hll implements CallBack {
     public Hll() {
 
     }
+
     private String privateMethod(int index, String name) {
         Log.d("robust", "in hll.getStrings()  ");
         packageMethod(1,name);
@@ -31,7 +32,6 @@ public class Hll implements CallBack {
     public int needP() {
         privateMethod(1,"asd");
         super.toString();
-//        Gll.log();
         getStrings(1,"meituan");
         return needToP ? 1 : 0;
     }
@@ -47,7 +47,6 @@ public class Hll implements CallBack {
     String packageMethod(int index, String name) {
         Log.d("robust", "in hll.packageMethod()  ");
         super.toString();
-//        Gll.log();
         if (needToP) {
             return index + " needToP ==true  " + name;
         }
@@ -62,7 +61,7 @@ public class Hll implements CallBack {
     }
 
     public int check() {
-        hllString="尔等插标卖首";
+        hllString="hllString checked";
         if (needToP) {
             hllString=index + " needToP ==true  " + name;
         }

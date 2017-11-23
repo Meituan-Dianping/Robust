@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'robust'
 //apply plugin: 'auto-patch-plugin'
+apply plugin: 'robust'
+
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 23
+    buildToolsVersion '25.0.2'
     defaultConfig {
         applicationId "com.meituan.robust.sample"
-        minSdkVersion 14
-        targetSdkVersion 24
+        minSdkVersion 9
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }

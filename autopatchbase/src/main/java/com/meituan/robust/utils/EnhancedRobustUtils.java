@@ -7,6 +7,8 @@ import java.lang.reflect.Method;
 
 /**
  * Created by mivanzhang on 16/8/15.
+ * <p>
+ * A reflect utility class, providing methods for reflecting methods and set/get fields
  */
 public class EnhancedRobustUtils {
     public static boolean isThrowable = true;

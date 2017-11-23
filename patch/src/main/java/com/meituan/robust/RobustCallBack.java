@@ -1,5 +1,7 @@
 package com.meituan.robust;
 
+import java.util.List;
+
 /**
  * Created by hedex on 17/1/22.
  */
@@ -11,7 +13,7 @@ public interface RobustCallBack {
      * @param result 补丁
      * @param isNet  补丁
      */
-    void onPatchListFetched(boolean result, boolean isNet);
+    void onPatchListFetched(boolean result, boolean isNet, List<Patch> patches);
 
 
     /**

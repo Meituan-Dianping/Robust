@@ -3,6 +3,7 @@ package com.meituan.robust.autopatch
 import com.meituan.robust.utils.JavaUtils
 import javassist.CtClass
 import javassist.CtMethod
+import javassist.bytecode.ClassFile
 
 class PatchesAssistFactory {
     def
@@ -10,6 +11,7 @@ class PatchesAssistFactory {
         CtClass assistClass = Config.classPool.getOrNull(NameManger.getInstance().getAssistClassName(patchClassName))
         if (assistClass == null) {
             assistClass = Config.classPool.makeClass(NameManger.getInstance().getAssistClassName(patchClassName))
+            assistClass.getClassFile().setMajorVersion(ClassFile.JAVA_7);
             if (modifiedClass.getSuperclass() != null)
                 assistClass.setSuperclass(modifiedClass.getSuperclass())
         }

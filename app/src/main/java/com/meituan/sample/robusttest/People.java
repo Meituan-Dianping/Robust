@@ -1,4 +1,4 @@
-package com.meituan.sample;
+package com.meituan.sample.robusttest;
 
 /**
  * Created by mivanzhang on 16/10/20.

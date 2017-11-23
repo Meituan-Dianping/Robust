@@ -1,8 +1,8 @@
 package com.meituan.robust.utils;
 
+import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.ClassMapping;
 import com.meituan.robust.autopatch.Config;
-import com.meituan.robust.Constants;
 import com.meituan.robust.autopatch.NameManger;
 import com.meituan.robust.autopatch.ReadMapping;
 
@@ -16,38 +16,39 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtPrimitiveType;
 
-import static com.meituan.robust.autopatch.Config.classPool;
-import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 import static com.meituan.robust.Constants.PACKNAME_END;
 import static com.meituan.robust.Constants.PACKNAME_START;
+import static com.meituan.robust.autopatch.Config.classPool;
+import static com.meituan.robust.autopatch.Config.invokeSuperMethodMap;
 
 /**
  * Created by mivanzhang on 17/2/8.
  */
 
-public class SmaliUitils {
-    private static SmaliUitils instance;
+public class SmaliTool {
+    private static SmaliTool instance;
 
-    public static SmaliUitils getInstance() {
+    public static SmaliTool getInstance() {
         if (instance == null) {
-            instance = new SmaliUitils();
+            instance = new SmaliTool();
         }
         return instance;
     }
 
-    private SmaliUitils() {
+    private SmaliTool() {
 
     }
 
     public void dealObscureInSmali() {
-        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", File.separator));
+        File diretory = new File(Config.robustGenerateDirectory + "classout" + File.separator + Config.patchPackageName.replaceAll("\\.", Matcher.quoteReplacement(File.separator)));
         if (!diretory.isDirectory() || diretory == null) {
-            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", File.separator) + " contains no smali file error!! ");
+            throw new RuntimeException(Config.robustGenerateDirectory + Config.patchPackageName.replaceAll(".", Matcher.quoteReplacement(File.separator)) + " contains no smali file error!! ");
         }
         List<File> smaliFileList = covertPathToFile(Config.robustGenerateDirectory + "classout" + File.separator, Config.newlyAddedClassNameList);
         for (File file : diretory.listFiles()) {
@@ -64,7 +65,6 @@ public class SmaliUitils {
                 // 一次读入一行，直到读入null为文件结束
                 while ((line = reader.readLine()) != null) {
                     // 显示行号
-                    System.out.println("lineNo  " + lineNo + "   ");
                     fileContent.append(dealWithSmaliLine(line, JavaUtils.getFullClassNameFromFile(file.getPath())) + "\n");
                     lineNo++;
                 }
@@ -98,7 +98,7 @@ public class SmaliUitils {
         }
         List<File> fileList = new ArrayList<>();
         for (String packname : packNameList) {
-            fileList.add(new File(directory + packname.replaceAll("\\.", "\\/") + ".smali"));
+            fileList.add(new File(directory + packname.replaceAll("\\.", Matcher.quoteReplacement(File.separator)) + ".smali"));
         }
         return fileList;
     }
@@ -222,8 +222,12 @@ public class SmaliUitils {
         return packageNameList;
 
     }
+    public static void main(String[] args) {
+        SmaliTool smaliUitils=new SmaliTool();
+        smaliUitils.getObscuredMethodSignure("invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;","com.meituan.second");
+    }
+    private  String getObscuredMethodSignure(final String line, String className) {
 
-    private String getObscuredMethodSignure(final String line, String className) {
         if (className.endsWith(Constants.PATCH_SUFFIX) && Config.modifiedClassNameList.contains(className.substring(0, className.indexOf(Constants.PATCH_SUFFIX)))) {
             className = className.substring(0, className.indexOf(Constants.PATCH_SUFFIX));
         }
@@ -232,9 +236,15 @@ public class SmaliUitils {
         String parameter = line.substring(line.indexOf("("), line.indexOf(")") + 1);
         int endIndex = line.indexOf(")");
         String methodSigure = line.substring(0, endIndex + 1);
+        //invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;
+        boolean isArray=false;
         for (int index = line.indexOf("(") + 1; index < endIndex; index++) {
-            if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.indexOf(Constants.PACKNAME_END) != -1) {
+            if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.contains(Constants.PACKNAME_END)) {
                 methodSignureBuilder.append(methodSigure.substring(index + 1, methodSigure.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\."));
+                if(isArray){
+                    methodSignureBuilder.append("[]");
+                    isArray=false;
+                }
                 index = methodSigure.indexOf(";", index);
                 methodSignureBuilder.append(",");
             }
@@ -271,7 +281,15 @@ public class SmaliUitils {
                     default:
                         break;
                 }
+                if(isArray){
+                    methodSignureBuilder.append("[]");
+                    isArray=false;
+                }
                 methodSignureBuilder.append(",");
+            }
+
+            if (Constants.ARRAY_TYPE.equals(String.valueOf(methodSigure.charAt(index)))) {
+                isArray=true;
             }
 
         }
@@ -283,6 +301,7 @@ public class SmaliUitils {
         String obscuredMethodSignure = methodSignureBuilder.toString();
         String obscuredMethodName = getObscuredMemberName(className, ReadMapping.getInstance().getMethodSignureWithReturnType(returnTypeList.get(0), obscuredMethodSignure));
         obscuredMethodSignure = obscuredMethodName + parameter;
+//        System.out.println("getObscuredMethodSignure is "+obscuredMethodSignure.substring(0, obscuredMethodSignure.indexOf("(")) + parameter);
         return obscuredMethodSignure.substring(0, obscuredMethodSignure.indexOf("(")) + parameter;
     }
 
@@ -336,7 +355,7 @@ public class SmaliUitils {
 
         ClassMapping classMapping = ReadMapping.getInstance().getClassMapping(className);
         if (classMapping == null) {
-            System.out.println("Warning: getObscuredMemberName ~~~~~~~~~~~~~~~~class " + className + "   member  " + memberName + "  robust can not find in mapping ");
+            System.out.println("Warning: getObscuredMemberName  class  name " + className + "   member name is  " + memberName + "  robust can not find in mapping!!! ");
             return JavaUtils.eradicatReturnType(memberName);
         }
 
@@ -363,7 +382,7 @@ public class SmaliUitils {
         if (null == classMapping || classMapping.getValueName() == null) {
             return className;
         }
-        return classMapping.getValueName().replaceAll("\\.", "/");
+        return classMapping.getValueName().replaceAll("\\.","/");
 
 
     }

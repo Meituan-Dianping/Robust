@@ -22,11 +22,12 @@ import static com.meituan.robust.Constants.DEFAULT_MAPPING_FILE;
 
 public final class Config {
     public static boolean catchReflectException = false;
+    public static boolean supportProGuard = true;
     public static boolean isLogging = true;
     public static boolean isManual = false;
     public static String patchPackageName = Constants.PATCH_PACKAGENAME;
     public static String mappingFilePath;
-    public static Set<String> patchMethodSignureSet = new HashSet<>();
+    public static Set<String> patchMethodSignatureSet = new HashSet<>();
     public static List<String> newlyAddedClassNameList = new ArrayList<String>();
     public static Set newlyAddedMethodSet = new HashSet<String>();
     public static List<String> modifiedClassNameList = new ArrayList<String>();
@@ -46,7 +47,7 @@ public final class Config {
         isManual = false;
         patchPackageName = Constants.PATCH_PACKAGENAME;
         mappingFilePath = DEFAULT_MAPPING_FILE;
-        patchMethodSignureSet = new HashSet<>();
+        patchMethodSignatureSet = new HashSet<>();
         newlyAddedClassNameList = new ArrayList<String>();
         modifiedClassNameList = new ArrayList<String>();
         hotfixPackageList = new ArrayList<>();
@@ -57,6 +58,7 @@ public final class Config {
         addedSuperMethodList = new ArrayList<>();
         noNeedReflectClassSet = new HashSet<>();
         noNeedReflectClassSet.addAll(Constants.NO_NEED_REFLECT_CLASS);
+        supportProGuard=true;
     }
 
 }

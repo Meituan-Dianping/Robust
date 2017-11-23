@@ -1,14 +1,19 @@
 
 # Robust
- 
+ [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.71) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.71/link)
+ [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
+ [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
+
 
  新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题作出反应，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
+  关于如何定制化以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+ 
 # 环境
 
- * Mac or Linux 
+ * Mac Linux Windows
  * Gradle 2.10+ 
  * Java 1.7 +
 
@@ -23,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.3.0'
+	compile 'com.meituan.robust:robust:0.4.71'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -34,8 +39,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.3.0'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.3.0'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.71'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.71'
 	   }
 	}
 	```
@@ -55,7 +60,7 @@
 # AutoPatch
  
  
-Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交修改完bug后的代码，运行和线上apk打包同样的gradle命令即可，会在项目的app/build/outputs/robust目录下生成补丁。
+Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交修改完bug后的代码，运行和线上apk打包同样的gradle命令即可，会在项目的app/build/outputs/robust目录下生成补丁。更多自动化补丁信息请参考：[Android热更新方案Robust开源，新增自动化补丁工具](http://tech.meituan.com/android_autopatch.html) 。
 
 # 使用方法
 
@@ -67,7 +72,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 将保存下来的mapping文件和methodsMap.robust文件放在app/robust/文件夹下。
 
-3. 修改代码，在改动的方法上面添加**@Modify**注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
+3. 修改代码，在改动的方法上面添加```@Modify```注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
 	
 	```java
 	   @Modify
@@ -99,6 +104,8 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	    }
 	```
 4. 运行和生成线上apk同样的命令，即可生成补丁，补丁目录app/build/outputs/robust/patch.jar
+5. 补丁制作成功后会停止构建apk，出现类似于如下的提示，表示补丁生成成功
+![补丁制作成功图片](images/patchsuccess_cn.png)
 
 # 样例使用：
 1. 生成样例apk，执行gradle命令：
@@ -108,26 +115,28 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 安装生成的apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
 3. 修改代码之后，加上**@Modify**注解或者调用指定的方法
-4. 把保存的mapping.txt和methodsMap.robust放到app/robust目录下
+4. 把保存的**mapping.txt**和**methodsMap.robust**放到app/robust目录下
 5. 执行和打包相同的gradle命令：
 	
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
-6. 将补丁文件copy到手机上：
+5. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
+![补丁制作成功图片](images/patchsuccess_cn.png)
+7. 将补丁文件copy到手机上：
 
 	```java
-	adb push /Users/zhangmeng/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch_temp.jar
+	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
 	手机上补丁的路径是`PatchManipulateImp`中指定的
-7. 打开App，点击Patch按钮就会加载补丁。
-8. 也可以加载app/robust的样例dex，修改了Jump_second_Activity跳转Activity的显示文字。
-9. 补丁加载之后每次都会删除，再次运行需要重新copy补丁。
+8. 打开App，点击Patch按钮就会加载补丁。
+9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
+10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制。
 
 # 注意事项
 
-1. 内部类的构造方法是private（private会生成一个匿名的构造函数），这时需要在制作补丁过程中手动修改构造方法的访问域，修改为public就好，根据ProGuard力度有关系
-2. 对于方法的返回值是this的情况无法处理，对builder模式支持并不是太好，在代码编写需要注意，可以增加一个类来包装一下，
+1. 内部类的构造方法是private（private会生成一个匿名的构造函数）时，需要在制作补丁过程中手动修改构造方法的访问域为public
+2. 对于方法的返回值是this的情况现在支持不好，比如builder模式，但在制作补丁代码时，可以通过如下方式来解决，增加一个类来包装一下(如下面的B类)，
 
 	```java
 	method a(){
@@ -141,10 +150,12 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	  return new B().setThis(this).getThis();
 	}
 	```
-3. 暂时不支持增加字段，但是自动化补丁现在可以增加类
-4. 新增加的类不能是非静态内部类（静态的内部类可以），新增类中的方法和字段需要全部都是public的
-5. 对于只有字段的访问的函数无法修复
-6. 不支持构造方法的修复
+3. 字段增加能力内测中，不过暂时可以通过增加新类，把字段放到新类中的方式来实现字段增加能力
+4. 新增的类支持包括静态内部类和非内部类
+5. 对于只有字段访问的函数无法直接修复，可通过调用处间接修复
+6. 构造方法的修复内测中
+7. 资源和so的修复内测中
+8. 更多的信息，请访问我们的[Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
 
 ## License
 

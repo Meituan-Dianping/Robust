@@ -23,6 +23,9 @@ public class Constants {
 
 
     public static final String ZIP_FILE_NAME = "meituan.jar";
+    public static final String PATACH_DEX_NAME = "patch.dex";
+    public static final String CLASSES_DEX_NAME = "classes.dex";
+    public static final String PATACH_JAR_NAME = "patch.jar";
     public static final String PATCH_SUFFIX = "Patch";
     public static final String PATCH_CONTROL_SUFFIX = "Control";
     public static final String INLINE_PATCH_SUFFIX = "InLinePatch";
@@ -45,10 +48,11 @@ public class Constants {
     public static Class AddAnnotationClass = null;
 
     public final static String[] LIB_NAME_ARRAY = {"baksmali-2.1.2.jar", "smali-2.1.2.jar", "dx.jar"};
-    public static final String PACKNAME_START = "L";
     public static final String PACKNAME_END = ";";
     public final static String PRIMITIVE_TYPE = "ZCBSIJFDV";
+    public final static String ARRAY_TYPE = "[";
     public final static char OBJECT_TYPE = 'L';
+    public static final String PACKNAME_START = String.valueOf(OBJECT_TYPE);
     public static final Boolean OBSCURE = true;
     //    public static final Boolean OBSCURE = false;
     //    public static final Boolean isLogging = false;
@@ -106,4 +110,9 @@ public class Constants {
 
     //robust apk hash : apk's unique id
     public static final String ROBUST_APK_HASH_FILE_NAME = "robust.apkhash";
+    public static final String ASPECTJ_AROUND_CLASS = "org.aspectj.runtime.internal.AroundClosure";
+    public static final String PATCH_EXECUTE = "patch execute ,other extension will be ignore ";
+
+
+
 }
