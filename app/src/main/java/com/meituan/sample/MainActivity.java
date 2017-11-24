@@ -16,10 +16,8 @@ import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
 import com.meituan.sample.extension.LogExtension;
 import com.meituan.sample.robusttest.ImageQualityUtil;
-import com.meituan.sample.robusttest.NoField;
 import com.meituan.sample.robusttest.People;
 import com.meituan.sample.robusttest.SampleClass;
-import com.meituan.sample.robusttest.State;
 import com.meituan.sample.robusttest.Super;
 import com.meituan.sample.robusttest.other.Hll;
 
@@ -45,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button button;
-    State<Integer> state;
-
     Hll hll = new Hll(false);
 
 
@@ -59,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
 
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);
-        state = new State<>(hll);
         Button patch = (Button) findViewById(R.id.patch);
         //beigin to patch
         patch.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
                 startActivity(intent);
-                Log.d("robusttest", (new NoField()).toString());
                 Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
                 SampleClass sampleClass = new SampleClass();
                 sampleClass.multiple(-1);
@@ -89,9 +83,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
-                state.setIndex(hll, 1, 1l, new Object());
-                Log.d("robust", "state.get()  " + state.get().toString());
-                Log.d("robust", " state.getIndex()  " + state.getIndex());
                 Super s = new Super();
                 Log.d("robust", "patch result before :" + s.check());
                 Log.d("robust", "patch result after:" + s.protextedMethod());

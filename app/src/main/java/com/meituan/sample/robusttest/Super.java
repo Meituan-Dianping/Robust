@@ -19,7 +19,6 @@ public class Super extends Hll {
     static int staticIntField = 12311111;
     private long longField = 123l;
     private Hll hll = new Hll(true);
-    private static State state = new State(new Hll(true));
     private String hllString = "SuperString";
 
     static {
@@ -50,8 +49,6 @@ public class Super extends Hll {
         flag = s.flag;
         times = 1123;
         s.times = times;
-        Log.d("robust", "state.get()   " + state.get());
-        state.index1 = times;
         return "";
 //        return flag + "   " + getinstance(s) + "   " + times + "   " + staticIntField;
     }
@@ -127,8 +124,4 @@ public class Super extends Hll {
         }
     }
 
-
-    public void test(NoField n) {
-        n.hashCode();
-    }
 }
