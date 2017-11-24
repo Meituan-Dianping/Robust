@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by c_kunwu on 16/5/5.
  */
-public class State<T> extends AsbtractInner implements Cloneable, Comparable {
+public class State<T> implements Cloneable, Comparable {
     public static int index = 0;
     public int index1 = 0;
     public String tag = "current";
@@ -60,17 +60,14 @@ public class State<T> extends AsbtractInner implements Cloneable, Comparable {
         return 0;
     }
 
-    @Override
     public int getTime() {
         return 0;
     }
 
-    @Override
     public String getName() {
         return null;
     }
 
-    @Override
     public void setName(String name) {
 
 
@@ -100,16 +97,3 @@ public class State<T> extends AsbtractInner implements Cloneable, Comparable {
     }
 }
 
-abstract class AsbtractInner {
-
-    public abstract int getTime();
-
-    public abstract String getName();
-
-    public abstract void setName(String name);
-
-    public String getAnswer(String name) {
-//            return "you make it";
-        return "hell world";
-    }
-}
