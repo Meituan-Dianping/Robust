@@ -72,28 +72,5 @@ public class State<T> implements Cloneable, Comparable {
 
 
     }
-
-
-    class Inner {
-        private int time;
-        private String name;
-
-        public int getTime() {
-            return time;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getAnswer(String name) {
-//            return "you make it";
-            return "hell world";
-        }
-    }
 }
 
