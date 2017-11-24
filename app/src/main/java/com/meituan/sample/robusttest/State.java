@@ -17,10 +17,6 @@ public class State<T> extends AsbtractInner implements Cloneable, Comparable {
     public String tag = "current";
     public Hll hll;
 
-    static {
-        index = 100;
-    }
-
     public long getIndex() {
         getText(1, 2L, 1);
         return -100;
