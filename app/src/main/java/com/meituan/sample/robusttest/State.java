@@ -13,7 +13,6 @@ import java.util.List;
 public class State<T> extends AsbtractInner implements Cloneable, Comparable {
     public static int index = 0;
     public int index1 = 0;
-    public byte byteFiled = 0;
     public String tag = "current";
     public Hll hll;
 
@@ -54,11 +53,6 @@ public class State<T> extends AsbtractInner implements Cloneable, Comparable {
     public T get() {
         Log.d("robust", "in state.get()  ");
         return getT(hll, 0, 1L, new Object()).get(0);
-    }
-
-    String packageMethod(int index, String name) {
-        Log.d("robust", "in Sate.packageMethod()  ");
-        return index + " needToP not equal true  " + name;
     }
 
     @Override
