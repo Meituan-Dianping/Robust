@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.meituan.sample.robusttest.other.Hll;
 import com.meituan.robust.patch.RobustModify;
 import com.meituan.robust.patch.annotaion.Add;
 import com.meituan.robust.patch.annotaion.Modify;
@@ -23,10 +22,10 @@ import com.meituan.sample.robusttest.ConcreateClass;
 import com.meituan.sample.robusttest.People;
 import com.meituan.sample.robusttest.State;
 import com.meituan.sample.robusttest.Super;
+import com.meituan.sample.robusttest.other.Hll;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
@@ -206,17 +205,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
 
             Toast.makeText(activityWeakReference.get(), "from PreloadWebviewRunnable PreloadWebviewRunnable ", Toast.LENGTH_SHORT).show();
 
-        }
-    }
-
-
-    class OP<T> {
-        T a;
-
-        T test(T p) {
-            Object op[] = new Object[10];
-            op[1] = p;
-            return (T) op;
         }
     }
 }
