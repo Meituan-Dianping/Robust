@@ -13,20 +13,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.meituan.robust.patch.RobustModify;
 import com.meituan.robust.patch.annotaion.Add;
 import com.meituan.robust.patch.annotaion.Modify;
-import com.meituan.sample.robusttest.ConcreateClass;
-import com.meituan.sample.robusttest.People;
-import com.meituan.sample.robusttest.State;
-import com.meituan.sample.robusttest.Super;
-import com.meituan.sample.robusttest.other.Hll;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.List;
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -48,7 +38,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 }
         );
         //change text on the  SecondActivity
-        textView.setText(getTextInfo(new Object[]{(name)}));
+        textView.setText(getTextInfo());
 
         //test array
         BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
@@ -56,14 +46,14 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 //    @Modify
-    public String getTextInfo(Object[] meituan) {
-        getArray(meituan);
+    public String getTextInfo() {
+        getArray();
         return "error occur " ;
 //        return "error fixed";
     }
 
     @Add
-    public String[] getArray(Object[] meituan) {
+    public String[] getArray() {
        return new String[]{"hello","world"};
     }
 

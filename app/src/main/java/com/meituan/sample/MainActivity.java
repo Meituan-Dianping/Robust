@@ -14,12 +14,6 @@ import com.meituan.robust.Patch;
 import com.meituan.robust.PatchExecutor;
 import com.meituan.robust.PatchProxy;
 import com.meituan.robust.RobustCallBack;
-import com.meituan.sample.extension.LogExtension;
-import com.meituan.sample.robusttest.ImageQualityUtil;
-import com.meituan.sample.robusttest.People;
-import com.meituan.sample.robusttest.SampleClass;
-import com.meituan.sample.robusttest.Super;
-import com.meituan.sample.robusttest.other.Hll;
 
 import java.util.List;
 
