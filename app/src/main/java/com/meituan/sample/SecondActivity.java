@@ -20,12 +20,10 @@ import java.lang.reflect.Field;
 
 public class SecondActivity extends AppCompatActivity implements View.OnClickListener {
 
-    protected String flag = "flagstring";
     protected static String name = "SecondActivity";
     private ListView listView;
     private String[] multiArr = {"列表1", "列表2", "列表3", "列表4"};
     @Override
-    @Modify
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
@@ -45,11 +43,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         listView.setAdapter(adapter);
     }
 
-//    @Modify
+    @Modify
     public String getTextInfo() {
         getArray();
-        return "error occur " ;
-//        return "error fixed";
+//        return "error occur " ;
+        return "error fixed";
     }
 
     @Add
