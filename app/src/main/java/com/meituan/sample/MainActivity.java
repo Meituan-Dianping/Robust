@@ -43,15 +43,11 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button button;
-    Hll hll = new Hll(false);
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PatchProxy.register(new LogExtension());
 
         button = (Button) findViewById(R.id.button);
         textView = (TextView) findViewById(R.id.textView);
@@ -73,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SecondActivity.class);
                 startActivity(intent);
-                Log.d("robusttest", ImageQualityUtil.getDefaultSize("asdasdasd"));
-                SampleClass sampleClass = new SampleClass();
-                sampleClass.multiple(-1);
             }
         });
 
@@ -83,74 +76,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
-                Super s = new Super();
-                Log.d("robust", "patch result before :" + s.check());
-                Log.d("robust", "patch result after:" + s.protextedMethod());
-                textView.setText(s.getText());
-                s.getinstance();
             }
         });
-        //test situation,
-        try {
-            ImageQualityUtil.loadImage(null, null, null, 1, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        System.out.println(" run(String x) " + run("robust ", 123));
-        System.out.println("  run(People x) " + run(new People(), 123d));
-        System.out.println("  run(float x) " + run(123f));
-        System.out.println("  double run() " + run());
-        System.out.println("in MainActivity end ");
-    }
-
-
-    private String run(String x, int p) {
-        return x + "meituan";
-    }
-
-    private String run(People x, double d) {
-        x.setAddr("meituan");
-        return x.getAddr();
-    }
-
-    private int run(float x) {
-        return (int) x;
-    }
-
-    private double run() {
-        return 1d;
-    }
-
-    //patch  data report
-    class Callback implements RobustCallBack {
-
-        @Override
-        public void onPatchListFetched(boolean result, boolean isNet, List<Patch> patches) {
-            System.out.println(" robust arrived in onPatchListFetched");
-        }
-
-        @Override
-        public void onPatchFetched(boolean result, boolean isNet, Patch patch) {
-            System.out.println(" robust arrived in onPatchFetched");
-        }
-
-        @Override
-        public void onPatchApplied(boolean result, Patch patch) {
-            System.out.println(" robust arrived in onPatchApplied ");
-
-        }
-
-        @Override
-        public void logNotify(String log, String where) {
-            System.out.println(" robust arrived in logNotify " + where);
-        }
-
-        @Override
-        public void exceptionNotify(Throwable throwable, String where) {
-            throwable.printStackTrace();
-            System.out.println(" robust arrived in exceptionNotify " + where);
-        }
     }
 
     private boolean isGrantSDCardReadPermission() {
@@ -185,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runRobust() {
-        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new Callback()).start();
+        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
     }
 
 
