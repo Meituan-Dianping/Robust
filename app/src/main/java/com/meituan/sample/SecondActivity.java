@@ -150,12 +150,6 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         return new State(new Hll(false));
     }
 
-    public State getTextI1(String baidu) {
-        Bundle baseBundle = new Bundle();
-        baseBundle.get("asdas");
-        return new State(new Hll(false));
-    }
-
     public static String[] methodWithArrayParameters(String[] flag) {
         return flag;
     }
