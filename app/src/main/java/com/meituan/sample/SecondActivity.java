@@ -43,11 +43,11 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         listView.setAdapter(adapter);
     }
 
-    @Modify
+//    @Modify
     public String getTextInfo() {
         getArray();
-//        return "error occur " ;
-        return "error fixed";
+        return "error occur " ;
+//        return "error fixed";
     }
 
     @Add
