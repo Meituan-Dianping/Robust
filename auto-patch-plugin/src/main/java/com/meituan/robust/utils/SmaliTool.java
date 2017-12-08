@@ -137,7 +137,8 @@ public class SmaliTool {
                 // 字段处理
                 //sget-object v4, Lcom/sankuai/meituan/fingerprint/FingerprintConfig;->accelerometerInfoList:Ljava/util/List;
                 String fieldName = result.substring(packageNameIndex + packageNameList.get(index).length() + 3, result.lastIndexOf(":"));
-                result = result.replace(fieldName, getObscuredMemberName(packageNameList.get(index).replaceAll("/", "\\."), fieldName));
+                // 前后都加上 "->" 是为了避免类名中包含字段名时，类名被误修改导致patch生成错误
+                result = result.replaceFirst("->" + fieldName, "->" + getObscuredMemberName(packageNameList.get(index).replaceAll("/", "\\."), fieldName));
             }
         }
         for (int index = 0; packageNameList != null && index < packageNameList.size(); index++) {
