@@ -48,10 +48,10 @@ public class EnhancedRobustUtils {
             for (Class<?> clazz = object.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
                 try {
                     method = clazz.getDeclaredMethod(methodName, parameterTypes);
-                    if (!method.isAccessible()) {
-                        method.setAccessible(true);
-                    }
-                    if (null == declaringClass || clazz.equals(declaringClass)) {
+                    if (method != null) {
+                        if (!method.isAccessible()) {
+                            method.setAccessible(true);
+                        }
                         return method;
                     }
                 } catch (Exception e) {
