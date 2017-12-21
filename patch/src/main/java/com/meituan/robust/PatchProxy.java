@@ -2,7 +2,9 @@ package com.meituan.robust;
 
 import android.text.TextUtils;
 
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by c_kunwu on 16/7/5.
@@ -10,13 +12,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class PatchProxy {
 
     // 用这个标识位来实现patch实时关闭
-    public static boolean enable = true;
+    private static volatile boolean enable = true;
+    private static Set<Integer> disabledMethodNumbers = new CopyOnWriteArraySet<>();
 
     private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
-    public static void setEnable(boolean enable) {
+    public static void setEnableForAll(boolean enable) {
         PatchProxy.enable = enable;
+    }
+
+    public static void setEnableForMethod(int methodNumber, boolean enable) {
+        if (enable) {
+            disabledMethodNumbers.remove(methodNumber);
+        } else {
+            disabledMethodNumbers.add(methodNumber);
+        }
     }
 
     public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
@@ -51,6 +62,10 @@ public class PatchProxy {
 
 
     public static Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+        // 避免耗时 加到accessDispatch里而不是isSupport中
+        if (disabledMethodNumbers.contains(methodNumber)) {
+            return null;
+        }
 
         if (changeQuickRedirect == null) {
             RobustExtension robustExtension = robustExtensionThreadLocal.get();
