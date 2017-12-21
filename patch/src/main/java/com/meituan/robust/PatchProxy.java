@@ -2,9 +2,7 @@ package com.meituan.robust;
 
 import android.text.TextUtils;
 
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * Created by c_kunwu on 16/7/5.
@@ -13,22 +11,12 @@ public class PatchProxy {
 
     // 用这个标识位来实现patch实时关闭
     private static volatile boolean enable = true;
-    // 控制方法级别的patch开关
-    private static Set<Integer> unsupportedMethodNumbers = new CopyOnWriteArraySet<>();
 
     private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
     public static void setEnable(boolean enable) {
         PatchProxy.enable = enable;
-    }
-
-    public static void setMethodSupported(int methodNumber, boolean supported) {
-        if (supported) {
-            unsupportedMethodNumbers.remove(methodNumber);
-        } else {
-            unsupportedMethodNumbers.add(methodNumber);
-        }
     }
 
     public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
@@ -51,10 +39,6 @@ public class PatchProxy {
         }
         String classMethod = getClassMethod(isStatic, methodNumber);
         if (TextUtils.isEmpty(classMethod)) {
-            return false;
-        }
-        // 避免耗时 不加到isSupport开头
-        if (unsupportedMethodNumbers.contains(methodNumber)) {
             return false;
         }
         Object[] objects = getObjects(paramsArray, current, isStatic);
