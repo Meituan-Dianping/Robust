@@ -9,11 +9,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class PatchProxy {
 
+    // 用这个标识位来实现patch实时关闭
+    public static boolean enable = true;
+
     private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
+    public static void setEnable(boolean enable) {
+        PatchProxy.enable = enable;
+    }
 
     public static boolean isSupport(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
+        if (!enable) {
+            return false;
+        }
         //Robust补丁优先执行，其他功能靠后
         if (changeQuickRedirect == null) {
             //不执行补丁，轮询其他监听者
