@@ -13,20 +13,21 @@ public class PatchProxy {
 
     // 用这个标识位来实现patch实时关闭
     private static volatile boolean enable = true;
-    private static Set<Integer> disabledMethodNumbers = new CopyOnWriteArraySet<>();
+    // 控制方法级别的patch开关
+    private static Set<Integer> unsupportedMethodNumbers = new CopyOnWriteArraySet<>();
 
     private static CopyOnWriteArrayList<RobustExtension> registerExtensionList=new CopyOnWriteArrayList<>();
     private static ThreadLocal<RobustExtension> robustExtensionThreadLocal =new ThreadLocal<>();
 
-    public static void setEnableForAll(boolean enable) {
+    public static void setEnable(boolean enable) {
         PatchProxy.enable = enable;
     }
 
-    public static void setEnableForMethod(int methodNumber, boolean enable) {
-        if (enable) {
-            disabledMethodNumbers.remove(methodNumber);
+    public static void setMethodSupported(int methodNumber, boolean supported) {
+        if (supported) {
+            unsupportedMethodNumbers.remove(methodNumber);
         } else {
-            disabledMethodNumbers.add(methodNumber);
+            unsupportedMethodNumbers.add(methodNumber);
         }
     }
 
@@ -52,6 +53,10 @@ public class PatchProxy {
         if (TextUtils.isEmpty(classMethod)) {
             return false;
         }
+        // 避免耗时 不加到isSupport开头
+        if (unsupportedMethodNumbers.contains(methodNumber)) {
+            return false;
+        }
         Object[] objects = getObjects(paramsArray, current, isStatic);
         try {
             return changeQuickRedirect.isSupport(classMethod, objects);
@@ -62,11 +67,6 @@ public class PatchProxy {
 
 
     public static Object accessDispatch(Object[] paramsArray, Object current, ChangeQuickRedirect changeQuickRedirect, boolean isStatic, int methodNumber,Class[] paramsClassTypes,Class returnType) {
-        // 避免耗时 加到accessDispatch里而不是isSupport中
-        if (disabledMethodNumbers.contains(methodNumber)) {
-            return null;
-        }
-
         if (changeQuickRedirect == null) {
             RobustExtension robustExtension = robustExtensionThreadLocal.get();
             robustExtensionThreadLocal.remove();
