@@ -5,7 +5,7 @@
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 
- 新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题作出反应，补丁修补成功率高达99.9%。
+ 新一代热更新系统Robust，对Android版本无差别兼容。无需重启就可以做到随时修改线上bug，快速修复线上问题，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
@@ -14,7 +14,7 @@
 # 环境
 
  * Mac Linux Windows
- * Gradle 2.10+ 
+ * Gradle 2.10+ , include 3.0
  * Java 1.7 +
 
 # 使用方法
