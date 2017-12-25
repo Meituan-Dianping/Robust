@@ -5,7 +5,7 @@
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 
- 新一代热更新系统Robust，对Android版本无差别兼容。无需重启就可以做到随时修改线上bug，快速修复线上问题，补丁修补成功率高达99.9%。
+ Robust是新一代热更新系统，无差别兼容Android2.3-8.0版本；无需重启补丁实时生效，快速修复线上问题，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
