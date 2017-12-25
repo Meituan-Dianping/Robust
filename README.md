@@ -14,7 +14,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 # Environment
 
  * Mac Linux and Windows
- * Gradle 2.10+  
+ * Gradle 2.10+ , include 3.0
  * Java 1.7 +
  
 # Usage
