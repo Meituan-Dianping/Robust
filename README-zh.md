@@ -44,18 +44,18 @@
 	   }
 	}
 	```
-3. 需要在项目的src同级目录下配置部分配置robust.xml文件，具体项请参考**app/robust.xml**，在这里面有多个配置项。
+3. 在项目的src同级目录下配置robust.xml文件，具体项请参考DEMO**app/robust.xml**
  
 # 优势
 
 * 支持Android2.3-8.x版本
-* 高兼容性、高稳定性，修复成功率高达三个九
-* 补丁下发立即生效，不需要重新启动
+* 高兼容性、高稳定性，修复成功率高达99.9%
+* 补丁实时生效，不需要重新启动
 * 支持方法级别的修复，包括静态方法
 * 支持增加方法和类
 * 支持ProGuard的混淆、内联、优化等操作
 
-需要保存打包时生成的mapping文件以及**build/outputs/robust/methodsMap.robust**文件。
+需要保存打包时生成的mapping文件以及**build/outputs/robust/methodsMap.robust**文件
 
 # AutoPatch
  
