@@ -45,16 +45,16 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 
 # Advantages
 
-* Support 2.3 to 8.X Android OS
+* Support 2.3 to 8.x Android OS
 * Perfect compatibility
-* Patch takes effect without reboot
+* Patch takes effect without a reboot
 * Support fixing at method level,including static methods
 * Support add classes and methods
-* Suport ProGuard,including inline methods or changing methods' signure
+* Support ProGuard,including inline methods or changing methods' signature
 
  
 
-When you build APK,you may need to save mapping.txt and files in build/outputs/robust/methodsMap.robust.
+When you build APK,you may need to save "mapping.txt" and the files in directory "build/outputs/robust/".
 
 # AutoPatch
  
