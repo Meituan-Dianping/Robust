@@ -5,6 +5,7 @@ import com.meituan.robust.Constants;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,7 @@ public final class Config {
     public static Set newlyAddedMethodSet = new HashSet<String>();
     public static List<String> modifiedClassNameList = new ArrayList<String>();
     public static List<String> hotfixPackageList = new ArrayList<>();
-    public static HashMap<String, Integer> methodMap = new HashMap();
+    public static LinkedHashMap<String, Integer> methodMap = new LinkedHashMap<>();
     public static  String robustGenerateDirectory;
     public static Map<String, List<CtMethod>> invokeSuperMethodMap = new HashMap<>();
     public static ClassPool classPool = new ClassPool();

@@ -163,6 +163,13 @@ class RobustTransform extends Transform implements Plugin<Project> {
         insertcodeStrategy.insertCode(box, jarFile);
         writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)
 
+        logger.quiet "===robust print id start==="
+        for (String method : insertcodeStrategy.methodMap.keySet()) {
+            int id = insertcodeStrategy.methodMap.get(method);
+            System.out.println("key is   " + method + "  value is    " + id);
+        }
+        logger.quiet "===robust print id end==="
+
         cost = (System.currentTimeMillis() - startTime) / 1000
         logger.quiet "robust cost $cost second"
         logger.quiet '================robust   end================'

@@ -60,6 +60,12 @@ class ConvertUtils {
 
         }
 
+        Collections.sort(allClass, new Comparator<CtClass>() {
+            @Override
+            int compare(CtClass class1, CtClass class2) {
+                return class1.getName() <=> class2.getName();
+            }
+        });
         return allClass;
     }
 

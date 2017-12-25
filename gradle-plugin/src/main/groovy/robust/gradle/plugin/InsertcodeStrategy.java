@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
@@ -34,8 +35,8 @@ public abstract class InsertcodeStrategy {
     //a switch control whether need to filter method in exceptMethodList, if false ,exceptMethodList will be ignored
     protected boolean isExceptMethodLevel = false;
     protected AtomicInteger insertMethodCount = new AtomicInteger(0);
-    //record every method with unique method number
-    public HashMap<String, Integer> methodMap = new HashMap();
+    //record every method with unique method number, use LinkedHashMap to keep order for printing
+    public HashMap<String, Integer> methodMap = new LinkedHashMap<>();
 
     public InsertcodeStrategy(List<String> hotfixPackageList, List<String> hotfixMethodList, List<String> exceptPackageList, List<String> exceptMethodList, boolean isHotfixMethodLevel, boolean isExceptMethodLevel) {
         this.hotfixPackageList = hotfixPackageList;
