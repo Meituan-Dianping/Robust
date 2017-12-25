@@ -72,7 +72,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 将保存下来的mapping文件和methodsMap.robust文件放在app/robust/文件夹下。
 
-3. 修改代码，在改动的方法上面添加```@Modify```注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
+3. 修改代码，在改动的方法上面添加```@Modify```注解,对于Lambda表达式请在修改的方法里面调用RobustModify.modify()方法
 	
 	```java
 	   @Modify
