@@ -45,7 +45,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 
 # Advantages
 
-* Support 2.3 to 7.X Android OS
+* Support 2.3 to 8.X Android OS
 * Perfect compatibility
 * Patch takes effect without reboot
 * Support fixing at method level,including static methods
