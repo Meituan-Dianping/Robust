@@ -113,22 +113,22 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
-2. 安装生成的apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
-3. 修改代码之后，加上**@Modify**注解或者调用指定的方法
+2. 安装样例apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
+3. 修改代码之后，加上**@Modify**注解或者调用RobustModify.modify()方法
 4. 把保存的**mapping.txt**和**methodsMap.robust**放到app/robust目录下
-5. 执行和打包相同的gradle命令：
+5. 执行与生成样式apk相同的gradle命令：
 	
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
 5. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
 ![补丁制作成功图片](images/patchsuccess_cn.png)
-7. 将补丁文件copy到手机上：
+7. 将补丁文件copy到手机目录/sdcard/robust下
 
 	```java
 	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
-	手机上补丁的路径是`PatchManipulateImp`中指定的
+	补丁的路径/sdcard/robust是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。
 9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
 10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制。
