@@ -166,7 +166,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         logger.quiet "===robust print id start==="
         for (String method : insertcodeStrategy.methodMap.keySet()) {
             int id = insertcodeStrategy.methodMap.get(method);
-            System.out.println("key is   " + method + "  value is    " + id);
+            logger.debug "key is   " + method + "  value is    " + id
         }
         logger.quiet "===robust print id end==="
 
