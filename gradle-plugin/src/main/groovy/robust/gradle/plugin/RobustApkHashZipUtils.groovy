@@ -92,8 +92,8 @@ class RobustApkHashZipUtils {
         ZipFile apZipFile = new ZipFile(apFile)
         final Enumeration<? extends ZipEntry> entries = apZipFile.entries();
         while (entries.hasMoreElements()) {
-//            ZipEntry zipEntry = entries.nextElement();//保守
-            ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
+            ZipEntry zipEntry = entries.nextElement();//保守
+//            ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
             if (null != zipEntry) {
                 addZipEntry(zipOutputStream, zipEntry, apZipFile.getInputStream(zipEntry))
             }
