@@ -165,14 +165,15 @@ public class PatchesControlFactory {
             Integer methodNumber = Config.methodMap.get(methodLongName);
             //just Forward methods with methodNumber
             if (methodNumber != null) {
-                methodsIdBuilder.append(methodNumber + ":");
+                // 一前一后的冒号作为匹配锚点，只有一边有的话可能会有多重匹配的bug
+                methodsIdBuilder.append(":" + methodNumber + ":");
             }
         }
 
         if (Constants.isLogging) {
-            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains(methodNo));");
+            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains(\":\" + methodNo + \":\"));");
         }
-        isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains(methodNo);");
+        isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains(\":\" + methodNo + \":\");");
         return isSupportBuilder.toString();
     }
 
