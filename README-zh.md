@@ -1,20 +1,20 @@
 
 # Robust
- [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.71) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.71/link)
+ [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.75) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.75/link)
  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 
- 新一代热更新系统Robust，对Android版本无差别兼容。无需发版就可以做到随时修改线上bug，快速对重大线上问题作出反应，补丁修补成功率高达99.9%。
+ Robust是新一代热更新系统，无差别兼容Android2.3-8.0版本；无需重启补丁实时生效，快速修复线上问题，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
-  关于如何定制化以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
- 
+  关于如何自定义以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
+
 # 环境
 
  * Mac Linux Windows
- * Gradle 2.10+ 
+ * Gradle 2.10+ , include 3.0
  * Java 1.7 +
 
 # 使用方法
@@ -28,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.4.71'
+	compile 'com.meituan.robust:robust:0.4.75'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -39,23 +39,23 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.71'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.71'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.75'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.75'
 	   }
 	}
 	```
-3. 需要在项目的src同级目录下配置部分配置robust.xml文件，具体项请参考**app/robust.xml**，在这里面有多个配置项。
+3. 在项目的src同级目录下配置robust.xml文件，具体项请参考DEMO**app/robust.xml**
  
 # 优势
 
-* 支持Android2.3-7.X版本
-* 高兼容性、高稳定性，修复成功率高达三个九
-* 补丁下发立即生效，不需要重新启动
+* 支持Android2.3-8.x版本
+* 高兼容性、高稳定性，修复成功率高达99.9%
+* 补丁实时生效，不需要重新启动
 * 支持方法级别的修复，包括静态方法
 * 支持增加方法和类
 * 支持ProGuard的混淆、内联、优化等操作
 
-需要保存打包时生成的mapping文件以及**build/outputs/robust/methodsMap.robust**文件。
+需要保存打包时生成的mapping文件以及**build/outputs/robust/methodsMap.robust**文件
 
 # AutoPatch
  
@@ -72,7 +72,7 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```
 2. 将保存下来的mapping文件和methodsMap.robust文件放在app/robust/文件夹下。
 
-3. 修改代码，在改动的方法上面添加```@Modify```注解或者在修改的方法里面调用RobustModify.modify()（针对Lambda表达式）
+3. 修改代码，在改动的方法上面添加```@Modify```注解,对于Lambda表达式请在修改的方法里面调用RobustModify.modify()方法
 	
 	```java
 	   @Modify
@@ -113,22 +113,22 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
-2. 安装生成的apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
-3. 修改代码之后，加上**@Modify**注解或者调用指定的方法
+2. 安装样例apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
+3. 修改代码之后，加上**@Modify**注解或者调用RobustModify.modify()方法
 4. 把保存的**mapping.txt**和**methodsMap.robust**放到app/robust目录下
-5. 执行和打包相同的gradle命令：
+5. 执行与生成样式apk相同的gradle命令：
 	
 	```java
 	./gradlew clean  assembleRelease --stacktrace --no-daemon
 	```
 5. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
 ![补丁制作成功图片](images/patchsuccess_cn.png)
-7. 将补丁文件copy到手机上：
+7. 将补丁文件copy到手机目录/sdcard/robust下
 
 	```java
 	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
 	```
-	手机上补丁的路径是`PatchManipulateImp`中指定的
+	补丁的路径/sdcard/robust是`PatchManipulateImp`中指定的
 8. 打开App，点击Patch按钮就会加载补丁。
 9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
 10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制。

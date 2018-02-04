@@ -1,7 +1,7 @@
 
 # Robust
  
-[![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.71) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.71/link)
+[![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.75) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.75/link)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
@@ -14,7 +14,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 # Environment
 
  * Mac Linux and Windows
- * Gradle 2.10+  
+ * Gradle 2.10+ , include 3.0
  * Java 1.7 +
  
 # Usage
@@ -26,7 +26,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	//please uncomment fellow line before you build a patch
 	//apply plugin: 'auto-patch-plugin'
 	apply plugin: 'robust'
-	compile 'com.meituan.robust:robust:0.4.71'
+	compile 'com.meituan.robust:robust:0.4.75'
 	```
 2. Add below codes in the outest project's build.gradle file.
 
@@ -36,8 +36,8 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.71'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.71'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.75'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.75'
 	   }
 	}
 	```
@@ -45,16 +45,16 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 
 # Advantages
 
-* Support 2.3 to 7.X Android OS
+* Support 2.3 to 8.x Android OS
 * Perfect compatibility
-* Patch takes effect without reboot
+* Patch takes effect without a reboot
 * Support fixing at method level,including static methods
 * Support add classes and methods
-* Suport ProGuard,including inline methods or changing methods' signure
+* Support ProGuard,including inline methods or changing methods' signature
 
  
 
-When you build APK,you may need to save mapping.txt and files in build/outputs/robust/methodsMap.robust.
+When you build APK,you may need to save "mapping.txt" and the files in directory "build/outputs/robust/".
 
 # AutoPatch
  

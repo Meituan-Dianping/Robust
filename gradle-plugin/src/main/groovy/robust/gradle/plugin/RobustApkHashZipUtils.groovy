@@ -92,10 +92,10 @@ class RobustApkHashZipUtils {
         ZipFile apZipFile = new ZipFile(apFile)
         final Enumeration<? extends ZipEntry> entries = apZipFile.entries();
         while (entries.hasMoreElements()) {
-//            ZipEntry zipEntry = entries.nextElement();//保守
-            ZipEntry zipEntry = new ZipEntry(entries.nextElement().name);
-            if (null != zipEntry) {
-                addZipEntry(zipOutputStream, zipEntry, apZipFile.getInputStream(zipEntry))
+            ZipEntry originZipEntry = entries.nextElement();
+            ZipEntry rightZipEntry = getRightZipEntry(originZipEntry);
+            if (null != rightZipEntry) {
+                addZipEntry(zipOutputStream, rightZipEntry, apZipFile.getInputStream(originZipEntry))
             }
         }
 
@@ -116,6 +116,34 @@ class RobustApkHashZipUtils {
 
         apFile.delete()
         tempZipFile.renameTo(apFile.getAbsolutePath())
+    }
+
+    private static ZipEntry getRightZipEntry(ZipEntry originZipEntry){
+        ZipEntry rightZipEntry = new ZipEntry(originZipEntry.getName());
+        if (ZipEntry.STORED == originZipEntry.getMethod()) {
+            rightZipEntry.setMethod(ZipEntry.STORED)
+            rightZipEntry.setSize(originZipEntry.getSize())
+            rightZipEntry.setCompressedSize(originZipEntry.getCompressedSize())
+            rightZipEntry.setCrc(originZipEntry.getCrc())
+        } else {
+            rightZipEntry.setMethod(ZipEntry.DEFLATED)
+        }
+        if (originZipEntry.getComment() != null) {
+            rightZipEntry.setComment(originZipEntry.getComment())
+        }
+        if (originZipEntry.getCreationTime() != null) {
+            rightZipEntry.setCreationTime(originZipEntry.getCreationTime())
+        }
+        if (originZipEntry.getLastAccessTime() != null) {
+            rightZipEntry.setLastAccessTime(originZipEntry.getLastAccessTime())
+        }
+        if (originZipEntry.getLastModifiedTime() != null) {
+            rightZipEntry.setLastModifiedTime(originZipEntry.getLastModifiedTime())
+        }
+        if (originZipEntry.getTime() > 0) {
+            rightZipEntry.setTime(originZipEntry.getTime())
+        }
+        return rightZipEntry;
     }
 
     private static long computeFileCrc32(File file) throws IOException {
