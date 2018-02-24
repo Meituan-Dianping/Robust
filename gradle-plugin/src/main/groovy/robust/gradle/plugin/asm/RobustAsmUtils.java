@@ -25,30 +25,30 @@ public final class RobustAsmUtils {
      * @param isStatic
      */
     public static void createInsertCode(GeneratorAdapter mv, String className, List<Type> args, Type returnType, boolean isStatic, int methodId) {
-
-        /**
-         * 调用isSupport方法
-         */
         prepareMethodParameters(mv, className, args, returnType, isStatic, methodId);
         //开始调用
         mv.visitMethodInsn(Opcodes.INVOKESTATIC,
                 PROXYCLASSNAME,
-                "isSupport",
-                "([Ljava/lang/Object;Ljava/lang/Object;" + REDIRECTCLASSNAME + "ZI[Ljava/lang/Class;Ljava/lang/Class;)Z");
+                "proxy",
+                "([Ljava/lang/Object;Ljava/lang/Object;" + REDIRECTCLASSNAME + "ZI[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;",
+                false);
+
+        int local = mv.newLocal(Type.getType("Lcom/meituan/robust/PatchProxyResult;"));
+        mv.storeLocal(local);
+        mv.loadLocal(local);
+
+        mv.visitFieldInsn(Opcodes.GETFIELD, "com/meituan/robust/PatchProxyResult", "isSupported", "Z");
+
+        // if isSupported
         Label l1 = new Label();
         mv.visitJumpInsn(Opcodes.IFEQ, l1);
-        prepareMethodParameters(mv, className, args, returnType, isStatic, methodId);
-        //开始调用
-        mv.visitMethodInsn(Opcodes.INVOKESTATIC,
-                PROXYCLASSNAME,
-                "accessDispatch",
-                "([Ljava/lang/Object;Ljava/lang/Object;" + REDIRECTCLASSNAME + "ZI[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;");
 
         //判断是否有返回值，代码不同
         if ("V".equals(returnType.getDescriptor())) {
-            mv.visitInsn(Opcodes.POP);
             mv.visitInsn(Opcodes.RETURN);
         } else {
+            mv.loadLocal(local);
+            mv.visitFieldInsn(Opcodes.GETFIELD, "com/meituan/robust/PatchProxyResult", "result", "Ljava/lang/Object;");
             //强制转化类型
             if (!castPrimateToObj(mv, returnType.getDescriptor())) {
                 //这里需要注意，如果是数组类型的直接使用即可，如果非数组类型，就得去除前缀了,还有最终是没有结束符;
