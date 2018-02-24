@@ -108,6 +108,34 @@ public class SmaliTool {
         if (null == line || line.length() < 1 || line.startsWith("#")) {
             return line;
         }
+
+        // 主要针对 @Add 的新增类，需要为其创建混淆规则，为以后混淆方法名做准备。
+        if (Config.newlyAddedClassNameList.contains(fullClassName)) {
+            if (ReadMapping.getInstance().getClassMapping(fullClassName) == null) {
+                ClassMapping classMapping = new ClassMapping();
+                classMapping.setClassName(fullClassName);
+                classMapping.setValueName(fullClassName);
+                ReadMapping.getInstance().setClassMapping(fullClassName, classMapping);
+            }
+
+            if (line.startsWith(".super") || line.startsWith(".implements")) {
+                List<String> packNameFromSmaliLine = getPackNameFromSmaliLine(line);
+                if (packNameFromSmaliLine.size() > 0) {
+                    String className = packNameFromSmaliLine.get(0).replaceAll("/", "\\.");
+                    ClassMapping superClassMapping = ReadMapping.getInstance().getClassMapping(className);
+                    ClassMapping newClassMapping = ReadMapping.getInstance().getClassMapping(fullClassName);
+                    if (superClassMapping != null) {
+                        for (String key : superClassMapping.getMemberMapping().keySet()) {
+                            // 理论上.super的出现的比.implement出现早，而且继承的混淆规则应该更准确，所以在这里谁先进map谁优先。
+                            if (!newClassMapping.getMemberMapping().containsKey(key)) {
+                                newClassMapping.getMemberMapping().put(key, superClassMapping.getMemberMapping().get(key));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         String result = invokeSuperMethodInSmali(line, fullClassName);
 
         int packageNameIndex;
@@ -130,9 +158,15 @@ public class SmaliTool {
             }
 
             //invoke-virtual {v0, v5, v6, p0}, Landroid/support/v4/app/LoaderManager;->initLoader(ILandroid/os/Bundle;Landroid/support/v4/app/bi;)Landroid/support/v4/content/Loader;
-            if (result.contains("invoke") && (packageNameIndex + packageNameList.get(index).length() + 3 < result.length()) && result.substring(packageNameIndex + packageNameList.get(index).length() + 1, packageNameIndex + packageNameList.get(index).length() + 3).equals("->")) {
+            if (result.contains("invoke") &&
+                    (packageNameIndex + packageNameList.get(index).length() + 3 < result.length()) &&
+                    result.substring(packageNameIndex + packageNameList.get(index).length() + 1, packageNameIndex + packageNameList.get(index).length() + 3).equals("->")) {
                 //方法调用的替换
-                result = result.replace(result.substring(packageNameIndex + packageNameList.get(index).length() + 3, result.indexOf(")") + 1), getObscuredMethodSignure(result.substring(packageNameIndex + packageNameList.get(index).length() + 3), packageNameList.get(index).replaceAll("/", "\\.")));
+                result = result.replace(
+                        result.substring(packageNameIndex + packageNameList.get(index).length() + 3, result.indexOf(")") + 1),
+                        getObscuredMethodSignure(result.substring(packageNameIndex + packageNameList.get(index).length() + 3),
+                                packageNameList.get(index).replaceAll("/", "\\."))
+                );
             } else if (result.contains("->") && (result.indexOf("(") == -1) && ((packageNameIndex + packageNameList.get(index).length() + 3) < result.length())) {
                 // 字段处理
                 //sget-object v4, Lcom/sankuai/meituan/fingerprint/FingerprintConfig;->accelerometerInfoList:Ljava/util/List;
@@ -141,10 +175,30 @@ public class SmaliTool {
                 result = result.replaceFirst("->" + fieldName, "->" + getObscuredMemberName(packageNameList.get(index).replaceAll("/", "\\."), fieldName));
             }
         }
+
+        // 处理@Add新增类的方法名混淆
+        if (Config.newlyAddedClassNameList.contains(fullClassName)) {
+            if (result.startsWith(".method ") &&
+                    !result.contains("constructor <init>") &&
+                    !result.contains("constructor <clinit>")) {
+                System.out.println("new Add class: line = " + line);
+                //.method public onFailure(Lcom/bytedance/retrofit2/Call;Ljava/lang/Throwable;)V
+                int start = result.indexOf("(");
+                for (; start >= 0; start--) {
+                    if (line.charAt(start) == ' ') {
+                        break;
+                    }
+                }
+                String methodSignature = result.substring(start + 1);
+                // 注意getObscuredMethodSignure并没有混淆返回值，不能在下面这句话之后直接返回。还需要最后混淆一次
+                result = result.replace(methodSignature.substring(0, methodSignature.indexOf(")") + 1),
+                        getObscuredMethodSignure(methodSignature, fullClassName));
+            }
+        }
+
         for (int index = 0; packageNameList != null && index < packageNameList.size(); index++) {
             result = result.replace(packageNameList.get(index), getObscuredClassName(packageNameList.get(index)));
         }
-
         return result;
     }
 
@@ -223,11 +277,13 @@ public class SmaliTool {
         return packageNameList;
 
     }
+
     public static void main(String[] args) {
-        SmaliTool smaliUitils=new SmaliTool();
-        smaliUitils.getObscuredMethodSignure("invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;","com.meituan.second");
+        SmaliTool smaliUitils = new SmaliTool();
+        smaliUitils.getObscuredMethodSignure("invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;", "com.meituan.second");
     }
-    private  String getObscuredMethodSignure(final String line, String className) {
+
+    private String getObscuredMethodSignure(final String line, String className) {
 
         if (className.endsWith(Constants.PATCH_SUFFIX) && Config.modifiedClassNameList.contains(className.substring(0, className.indexOf(Constants.PATCH_SUFFIX)))) {
             className = className.substring(0, className.indexOf(Constants.PATCH_SUFFIX));
@@ -238,13 +294,13 @@ public class SmaliTool {
         int endIndex = line.indexOf(")");
         String methodSigure = line.substring(0, endIndex + 1);
         //invokeReflectConstruct(Ljava/lang/String;[Ljava/lang/Object;[Ljava/lang/Class;)Ljava/lang/Object;
-        boolean isArray=false;
+        boolean isArray = false;
         for (int index = line.indexOf("(") + 1; index < endIndex; index++) {
             if (Constants.PACKNAME_START.equals(String.valueOf(methodSigure.charAt(index))) && methodSigure.contains(Constants.PACKNAME_END)) {
                 methodSignureBuilder.append(methodSigure.substring(index + 1, methodSigure.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", "\\."));
-                if(isArray){
+                if (isArray) {
                     methodSignureBuilder.append("[]");
-                    isArray=false;
+                    isArray = false;
                 }
                 index = methodSigure.indexOf(";", index);
                 methodSignureBuilder.append(",");
@@ -282,15 +338,15 @@ public class SmaliTool {
                     default:
                         break;
                 }
-                if(isArray){
+                if (isArray) {
                     methodSignureBuilder.append("[]");
-                    isArray=false;
+                    isArray = false;
                 }
                 methodSignureBuilder.append(",");
             }
 
             if (Constants.ARRAY_TYPE.equals(String.valueOf(methodSigure.charAt(index)))) {
-                isArray=true;
+                isArray = true;
             }
 
         }
@@ -383,7 +439,7 @@ public class SmaliTool {
         if (null == classMapping || classMapping.getValueName() == null) {
             return className;
         }
-        return classMapping.getValueName().replaceAll("\\.","/");
+        return classMapping.getValueName().replaceAll("\\.", "/");
 
 
     }
