@@ -5,10 +5,7 @@ import com.meituan.robust.utils.JavaUtils
 import javassist.*
 import javassist.bytecode.AccessFlag
 import javassist.bytecode.ClassFile
-import javassist.expr.ExprEditor
-import javassist.expr.FieldAccess
-import javassist.expr.MethodCall
-import javassist.expr.NewExpr
+import javassist.expr.*
 
 import static com.meituan.robust.utils.JavaUtils.printList
 
@@ -37,7 +34,7 @@ class PatchesFactory {
         if (patchMethodSignureSet.size() != 0) {
             for (CtMethod method : modifiedClass.getDeclaredMethods()) {
                 //新增方法需要保留在补丁类中
-                if(!Config.supportProGuard&&Config.newlyAddedMethodSet.contains(method.longName)){
+                if (!Config.supportProGuard && Config.newlyAddedMethodSet.contains(method.longName)) {
                     continue;
                 }
                 //不是被补丁的方法
@@ -64,7 +61,7 @@ class PatchesFactory {
 
         dealWithSuperMethod(temPatchClass, modifiedClass, patchPath);
 
-        if (Config.supportProGuard&&ReadMapping.getInstance().getClassMapping(modifiedClass.getName()) == null) {
+        if (Config.supportProGuard && ReadMapping.getInstance().getClassMapping(modifiedClass.getName()) == null) {
             throw new RuntimeException(" something wrong with mappingfile ,cannot find  class  " + modifiedClass.getName() + "   in mapping file");
         }
         List<CtMethod> invokeSuperMethodList = Config.invokeSuperMethodMap.getOrDefault(modifiedClass.getName(), new ArrayList<>());
@@ -98,7 +95,7 @@ class PatchesFactory {
                             @Override
                             void edit(NewExpr e) throws CannotCompileException {
                                 //inner class in the patched class ,not all inner class
-                                if (Config.newlyAddedClassNameList.contains(e.getClassName())||Config.noNeedReflectClassSet.contains(e.getClassName())) {
+                                if (Config.newlyAddedClassNameList.contains(e.getClassName()) || Config.noNeedReflectClassSet.contains(e.getClassName())) {
                                     return;
                                 }
 
@@ -115,10 +112,15 @@ class PatchesFactory {
                             }
 
                             @Override
+                            void edit(Cast c) throws CannotCompileException {
+                                c.replace(ReflectUtils.getCastString(c, temPatchClass))
+                            }
+
+                            @Override
                             void edit(MethodCall m) throws CannotCompileException {
 
                                 //methods no need reflect
-                                if(Config.noNeedReflectClassSet.contains(m.method.declaringClass.name)){
+                                if (Config.noNeedReflectClassSet.contains(m.method.declaringClass.name)) {
                                     return;
                                 }
                                 if (m.getMethodName().contains("lambdaFactory")) {

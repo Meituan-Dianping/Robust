@@ -6,6 +6,7 @@ import com.meituan.robust.Constants
 import com.meituan.robust.utils.JavaUtils
 import javassist.*
 import javassist.bytecode.AccessFlag
+import javassist.expr.Cast
 import javassist.expr.MethodCall
 import javassist.expr.NewExpr
 import org.apache.commons.io.FileUtils
@@ -162,7 +163,7 @@ class ReflectUtils {
         }
         StringBuilder signureBuilder = new StringBuilder();
         String name;
-        boolean isArray=false;
+        boolean isArray = false;
         for (int index = 1; index < signature.indexOf(")"); index++) {
             if (Constants.OBJECT_TYPE == signature.charAt(index) && signature.indexOf(Constants.PACKNAME_END) != -1) {
                 name = signature.substring(index + 1, signature.indexOf(Constants.PACKNAME_END, index)).replaceAll("/", ".")
@@ -172,9 +173,9 @@ class ReflectUtils {
                     signureBuilder.append(name);
                 }
                 index = signature.indexOf(";", index);
-                if(isArray){
+                if (isArray) {
                     signureBuilder.append("[]");
-                    isArray=false;
+                    isArray = false;
                 }
                 signureBuilder.append(".class,");
             }
@@ -190,15 +191,15 @@ class ReflectUtils {
                     case 'D': signureBuilder.append("double"); break;
                     default: break;
                 }
-                if(isArray){
+                if (isArray) {
                     signureBuilder.append("[]");
-                    isArray=false;
+                    isArray = false;
                 }
                 signureBuilder.append(".class,");
             }
 
             if (Constants.ARRAY_TYPE.equals(String.valueOf(signature.charAt(index)))) {
-                isArray=true;
+                isArray = true;
             }
         }
         if (signureBuilder.length() > 0 && String.valueOf(signureBuilder.charAt(signureBuilder.length() - 1)).equals(","))
@@ -262,7 +263,6 @@ class ReflectUtils {
 //        println("getNewInnerClassString   " + stringBuilder.toString())
         return stringBuilder.toString();
     }
-
 
 
     private static String getParameterClassString(CtClass[] parameters) {
@@ -358,6 +358,18 @@ class ReflectUtils {
         stringBuilder.append("}");
 //        println("getMethodCallString  " + stringBuilder.toString())
         return stringBuilder.toString();
+    }
+
+    def
+    static String getCastString(Cast c, CtClass patchClass) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{");
+        stringBuilder.append(" if(\$1 == this ){");
+        stringBuilder.append("\$_=((" + patchClass.getName() + ")\$1)." + Constants.ORIGINCLASS + ";")
+        stringBuilder.append("}else{");
+        stringBuilder.append("\$_=(\$r)\$1;");
+        stringBuilder.append("}");
+        stringBuilder.append("}");
     }
 
     def
