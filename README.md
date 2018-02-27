@@ -1,7 +1,7 @@
 
 # Robust
  
-[![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.75) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.75/link)
+[![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.76) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.76/link)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
@@ -26,7 +26,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	//please uncomment fellow line before you build a patch
 	//apply plugin: 'auto-patch-plugin'
 	apply plugin: 'robust'
-	compile 'com.meituan.robust:robust:0.4.75'
+	compile 'com.meituan.robust:robust:0.4.76'
 	```
 2. Add below codes in the outest project's build.gradle file.
 
@@ -36,8 +36,8 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.75'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.75'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.76'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.76'
 	   }
 	}
 	```
