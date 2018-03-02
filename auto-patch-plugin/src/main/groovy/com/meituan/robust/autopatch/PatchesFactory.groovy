@@ -113,7 +113,15 @@ class PatchesFactory {
 
                             @Override
                             void edit(Cast c) throws CannotCompileException {
-                                c.replace(ReflectUtils.getCastString(c, temPatchClass))
+                                //inner class in the patched class ,not all inner class
+                                if (Config.newlyAddedClassNameList.contains(c.thisClass.getName()) || Config.noNeedReflectClassSet.contains(c.thisClass.getName())) {
+                                    return;
+                                }
+                                def isStatic = ReflectUtils.isStatic(c.thisMethod.getAccessFlags());
+                                if (!isStatic) {
+                                    // static函数是没有this指令的，直接会报错。
+                                    c.replace(ReflectUtils.getCastString(c, temPatchClass))
+                                }
                             }
 
                             @Override

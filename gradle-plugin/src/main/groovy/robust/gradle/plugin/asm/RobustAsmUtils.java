@@ -30,7 +30,7 @@ public final class RobustAsmUtils {
         mv.visitMethodInsn(Opcodes.INVOKESTATIC,
                 PROXYCLASSNAME,
                 "proxy",
-                "([Ljava/lang/Object;Ljava/lang/Object;" + REDIRECTCLASSNAME + "ZI[Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;",
+                "([Ljava/lang/Object;Ljava/lang/Object;" + REDIRECTCLASSNAME + "ZI[Ljava/lang/Class;Ljava/lang/Class;)Lcom/meituan/robust/PatchProxyResult;",
                 false);
 
         int local = mv.newLocal(Type.getType("Lcom/meituan/robust/PatchProxyResult;"));
