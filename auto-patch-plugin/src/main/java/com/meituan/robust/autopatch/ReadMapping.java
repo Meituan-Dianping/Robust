@@ -65,7 +65,7 @@ public class ReadMapping {
                     classMapping.setValueName(line.split("->")[1].substring(0, line.split("->")[1].length() - 1).trim());
                     line = reader.readLine();
                     while (line != null) {
-                        line=line.trim();
+                        line = line.trim();
                         if (line.endsWith(":")) {
                             needBacktrace = true;
                             break;
@@ -107,12 +107,16 @@ public class ReadMapping {
         return usedInModifiedClassMappingInfo.get(classname);
     }
 
+    public void setClassMapping(String classname, ClassMapping classMapping) {
+        usedInModifiedClassMappingInfo.put(classname, classMapping);
+    }
+
     public ClassMapping getClassMappingOrDefault(String classname) {
-        ClassMapping defaultClassMapping=new ClassMapping();
-        if(!Config.supportProGuard){
+        ClassMapping defaultClassMapping = new ClassMapping();
+        if (!Config.supportProGuard) {
             defaultClassMapping.setValueName(classname);
         }
-        return usedInModifiedClassMappingInfo.getOrDefault(classname,defaultClassMapping);
+        return usedInModifiedClassMappingInfo.getOrDefault(classname, defaultClassMapping);
     }
 
     /***
