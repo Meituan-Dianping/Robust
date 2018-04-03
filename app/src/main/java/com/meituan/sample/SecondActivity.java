@@ -1,8 +1,8 @@
 package com.meituan.sample;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -36,15 +36,21 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
                 }
         );
         //change text on the  SecondActivity
-        textView.setText(getTextInfo());
+        textView.setText(getTextInfoNoStatic(((SecondActivity) this.getApplicationContext())));
 
         //test array
         BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
+        getTextInfo((((SecondActivity) this.getApplicationContext())));
         listView.setAdapter(adapter);
     }
 
+    @Add
+    public static String getTextInfo(Activity activity) {
+        return "test fot cast" + activity.toString();
+    }
+
 //    @Modify
-    public String getTextInfo() {
+    public String getTextInfoNoStatic(Activity activity) {
         getArray();
         return "error occur " ;
 //        return "error fixed";
