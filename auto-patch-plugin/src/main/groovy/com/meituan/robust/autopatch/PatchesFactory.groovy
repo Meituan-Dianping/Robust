@@ -1,6 +1,7 @@
 package com.meituan.robust.autopatch
 
 import com.meituan.robust.Constants
+import com.meituan.robust.utils.EnhancedRobustUtils
 import com.meituan.robust.utils.JavaUtils
 import javassist.*
 import javassist.bytecode.AccessFlag
@@ -8,7 +9,6 @@ import javassist.bytecode.ClassFile
 import javassist.expr.*
 
 import static com.meituan.robust.utils.JavaUtils.printList
-
 /**
  * Created by zhangmeng on 16/12/2.
  * <p>
@@ -114,10 +114,12 @@ class PatchesFactory {
                             @Override
                             void edit(Cast c) throws CannotCompileException {
                                 //inner class in the patched class ,not all inner class
-                                if (Config.newlyAddedClassNameList.contains(c.thisClass.getName()) || Config.noNeedReflectClassSet.contains(c.thisClass.getName())) {
+                                if (Config.newlyAddedClassNameList.contains(c.getEnclosingClass().getName()) || Config.noNeedReflectClassSet.contains(c.getEnclosingClass().getName())) {
                                     return;
                                 }
-                                def isStatic = ReflectUtils.isStatic(c.thisMethod.getAccessFlags());
+                                boolean isStatic = EnhancedRobustUtils.invokeReflectMethod("withinStatic", c, null, null, Expr.class)
+//                                MethodInfo methodInfo = EnhancedRobustUtils.getFieldValue("thisMethod", c, Expr.class)
+//                                def isStatic = ReflectUtils.isStatic(methodInfo.getAccessFlags());
                                 if (!isStatic) {
                                     // static函数是没有this指令的，直接会报错。
                                     c.replace(ReflectUtils.getCastString(c, temPatchClass))
