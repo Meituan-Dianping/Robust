@@ -211,10 +211,14 @@ public class JavaUtils {
         realParameterBuilder.append("}");
         realParameterBuilder.append(" Object[] realParameter = new Object[args.length];");
         realParameterBuilder.append("for (int i = 0; i < args.length; i++) {");
+        realParameterBuilder.append("if (args[i] instanceof Object[]) {");
+        realParameterBuilder.append("realParameter[i] =" + Constants.GET_REAL_PARAMETER + "((Object[]) args[i]);");
+        realParameterBuilder.append("} else {");
         realParameterBuilder.append("if (args[i] ==this) {");
         realParameterBuilder.append(" realParameter[i] =this." + ORIGINCLASS + ";");
         realParameterBuilder.append("} else {");
         realParameterBuilder.append(" realParameter[i] = args[i];");
+        realParameterBuilder.append(" }");
         realParameterBuilder.append(" }");
         realParameterBuilder.append(" }");
         realParameterBuilder.append("  return realParameter;");
