@@ -12,6 +12,7 @@ import javassist.expr.NewExpr
 import org.apache.commons.io.FileUtils
 import robust.gradle.plugin.AutoPatchTransform
 
+import java.lang.reflect.Field
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.regex.Matcher
@@ -514,4 +515,27 @@ class ReflectUtils {
     private static String getCoutNumber() {
         return " No:  " + ++invokeCount;
     }
+
+    public static Object readField(Object object, String fieldName) {
+        def field = null
+        def clazz = object.class;
+        while (clazz != null) {
+            try {
+                field = clazz.getDeclaredField(fieldName);
+                if (field != null) {
+                    field.setAccessible(true);
+                    break;
+                }
+                return field;
+            } catch (final NoSuchFieldException e) {
+                // ignore
+            }
+            clazz = clazz.superclass;
+        }
+        if (field != null) {
+            return field.get(object);
+        }
+        return null;
+    }
+
 }
