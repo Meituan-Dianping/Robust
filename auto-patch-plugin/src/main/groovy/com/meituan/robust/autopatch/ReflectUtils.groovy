@@ -12,7 +12,6 @@ import javassist.expr.NewExpr
 import org.apache.commons.io.FileUtils
 import robust.gradle.plugin.AutoPatchTransform
 
-import java.lang.reflect.Field
 import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.regex.Matcher
@@ -453,6 +452,7 @@ class ReflectUtils {
         return (modifiers & AccessFlag.STATIC) != 0;
     }
 
+    @Deprecated
     def static String invokeSuperString(MethodCall m) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -464,6 +464,32 @@ class ReflectUtils {
             stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ",\$\$);");
         } else {
             stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ");");
+        }
+
+        stringBuilder.append("}");
+//        println("invokeSuperString  " + m.methodName + "   " + stringBuilder.toString())
+        return stringBuilder.toString();
+    }
+
+    def static String invokeSuperString(MethodCall m, String originClass) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("{");
+        if (!m.method.returnType.equals(CtClass.voidType)) {
+            stringBuilder.append("\$_=(\$r)");
+        }
+        if (m.method.parameterTypes.length > 0) {
+            if (!originClass.isEmpty()) {
+                stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(null," + originClass + ",\$\$);");
+            } else {
+                stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ",\$\$);");
+            }
+        } else {
+            if (!originClass.isEmpty()) {
+                stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(null," + originClass + ");");
+            } else {
+                stringBuilder.append(getStaticSuperMethodName(m.methodName) + "(this," + Constants.ORIGINCLASS + ");");
+            }
         }
 
         stringBuilder.append("}");
