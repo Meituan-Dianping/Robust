@@ -5,6 +5,7 @@ import com.meituan.robust.utils.JavaUtils
 import javassist.*
 import javassist.bytecode.AccessFlag
 import javassist.bytecode.ClassFile
+import javassist.bytecode.LocalVariableAttribute
 import javassist.bytecode.MethodInfo
 import javassist.expr.*
 
@@ -170,7 +171,18 @@ class PatchesFactory {
                                             int index = invokeSuperMethodList.indexOf(m.getMethod());
                                             CtMethod superMethod = invokeSuperMethodList.get(index);
                                             if (superMethod.getLongName() != null && superMethod.getLongName() == m.getMethod().getLongName()) {
-                                                m.replace(ReflectUtils.invokeSuperString(m));
+                                                String firstVariable = "";
+                                                if (ReflectUtils.isStatic(method.getModifiers())) {
+                                                    //修复static 方法中含有super的问题，比如Aspectj处理后的方法
+                                                    MethodInfo methodInfo = method.getMethodInfo();
+                                                    LocalVariableAttribute table = methodInfo.getCodeAttribute().getAttribute(LocalVariableAttribute.tag);
+                                                    int numberOfLocalVariables = table.tableLength();
+                                                    if (numberOfLocalVariables > 0) {
+                                                        int frameWithNameAtConstantPool = table.nameIndex(0);
+                                                        firstVariable = methodInfo.getConstPool().getUtf8Info(frameWithNameAtConstantPool)
+                                                    }
+                                                }
+                                                m.replace(ReflectUtils.invokeSuperString(m, firstVariable));
                                                 return;
                                             }
                                         }
