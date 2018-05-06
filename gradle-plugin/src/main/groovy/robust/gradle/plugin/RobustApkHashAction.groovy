@@ -19,6 +19,10 @@ class RobustApkHashAction implements Action<Project> {
                 return
             }
 
+            if (!RobustTransform.isInsertCode(variant.buildType.name)) {
+                return
+            }
+
             packageTask.doFirst {
 //                project.logger.quiet("===start compute robust apk hash===")
 //                def startTime = System.currentTimeMillis()
