@@ -223,4 +223,25 @@ class RobustApkHashAction implements Action<Project> {
         //see https://developer.android.com/studio/releases/gradle-plugin
         return project.getGradle().gradleVersion >= "4.6"
     }
+
+    static String getGradlePluginVersion() {
+        String version = null
+        try {
+            def clazz = Class.forName("com.android.builder.Version")
+            def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
+            field.setAccessible(true)
+            version = field.get(null)
+        } catch (Exception ignore) {
+        }
+        if (version == null) {
+            try {
+                def clazz = Class.forName("com.android.builder.model.Version")
+                def field = clazz.getDeclaredField("ANDROID_GRADLE_PLUGIN_VERSION")
+                field.setAccessible(true)
+                version = field.get(null)
+            } catch (Exception ignore) {
+            }
+        }
+        return version
+    }
 }
