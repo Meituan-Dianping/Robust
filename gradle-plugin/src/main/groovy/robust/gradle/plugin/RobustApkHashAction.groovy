@@ -24,9 +24,15 @@ class RobustApkHashAction implements Action<Project> {
 //                def startTime = System.currentTimeMillis()
                 List<File> partFiles = new ArrayList<>()
 
-                if (isGradlePlugin300orAbove()){
+                if (isGradlePlugin300orAbove(project)){
                     //protected FileCollection resourceFiles;
-                    FileCollection resourceFiles = packageTask.resourceFiles
+                    FileCollection resourceFiles
+                    if (isGradlePlugin320orAbove(project)) {
+                        //gradle 4.6 适配
+                        resourceFiles = packageTask.resourceFiles.get()
+                    } else {
+                        resourceFiles = packageTask.resourceFiles
+                    }
                     if (null == resourceFiles) {
                         return
                     }
@@ -68,7 +74,12 @@ class RobustApkHashAction implements Action<Project> {
                     //protected FileCollection assets;
                     FileCollection assets = null;
                     try {
-                        assets = packageTask.assets
+                        if (isGradlePlugin320orAbove(project)) {
+                            //gradle 4.6 适配
+                            assets = packageTask.assets.get()
+                        } else {
+                            assets = packageTask.assets
+                        }
                     } catch (MissingPropertyException e) {
                     }
                     if (null != assets) {
@@ -202,14 +213,15 @@ class RobustApkHashAction implements Action<Project> {
         return hashFile
     }
 
-    public static boolean isGradlePlugin300orAbove() {
-        try {
-            String gradlePluginVersion = getGradlePluginVersion()
-            return gradlePluginVersion.compareTo("3.0.0") >= 0;
-        } catch (Throwable throwable) {
+    public static boolean isGradlePlugin300orAbove(Project project) {
+        //gradlePlugin3.0 -> gradle 4.1+
+        return project.getGradle().gradleVersion >= "4.1"
+    }
 
-        }
-        return false;
+    public static boolean isGradlePlugin320orAbove(Project project) {
+        //gradlePlugin3.2.0 -> gradle 4.6+
+        //see https://developer.android.com/studio/releases/gradle-plugin
+        return project.getGradle().gradleVersion >= "4.6"
     }
 
     static String getGradlePluginVersion() {
