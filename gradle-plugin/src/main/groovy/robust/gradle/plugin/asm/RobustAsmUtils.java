@@ -346,7 +346,7 @@ public final class RobustAsmUtils {
         }
         if ("C".equals(typeS)) {
             mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Character");//强制转化类型
-            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "intValue", "()C");
+            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C");
             return true;
         }
         if ("S".equals(typeS)) {
