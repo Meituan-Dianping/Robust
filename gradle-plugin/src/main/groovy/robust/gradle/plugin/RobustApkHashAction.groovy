@@ -213,15 +213,37 @@ class RobustApkHashAction implements Action<Project> {
         return hashFile
     }
 
-    public static boolean isGradlePlugin300orAbove(Project project) {
+    static boolean isGradlePlugin300orAbove(Project project) {
         //gradlePlugin3.0 -> gradle 4.1+
-        return project.getGradle().gradleVersion >= "4.1"
+        return compare(project.getGradle().gradleVersion, "4.1") >= 0
     }
 
-    public static boolean isGradlePlugin320orAbove(Project project) {
+    static boolean isGradlePlugin320orAbove(Project project) {
         //gradlePlugin3.2.0 -> gradle 4.6+
         //see https://developer.android.com/studio/releases/gradle-plugin
-        return project.getGradle().gradleVersion >= "4.6"
+        return compare(project.getGradle().gradleVersion, "4.6") >= 0
+    }
+
+    /**
+     *
+     * @param lhsVersion gradle version code {@code lhsVersion}
+     * @param rhsVersion second gradle version code {@code rhsVersion} to compare with {@code lhsVersion}
+     * @return an integer < 0 if {@code lhsVersion} is less than {@code rhsVersion}, 0 if they are
+     *         equal, and > 0 if {@code lhsVersion} is greater than {@code rhsVersion}.
+     */
+    private static int compare(String lhsVersion, String rhsVersion) {
+        def lhsArray = lhsVersion.split("\\.")
+        def rhsArray = rhsVersion.split("\\.")
+        for (int index = 0; index < rhsArray.size(); index++) {
+            if (index < lhsArray.size()) {
+                if (lhsArray[index] != rhsArray[index]) {
+                    return lhsArray[index].toInteger() > rhsArray[index].toInteger() ? 1 : -1
+                }
+            } else {
+                return -1
+            }
+        }
+        return 0
     }
 
     static String getGradlePluginVersion() {
