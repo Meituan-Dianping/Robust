@@ -50,6 +50,9 @@ public class AsmInsertImpl extends InsertcodeStrategy {
         ZipOutputStream outStream = new JarOutputStream(new FileOutputStream(jarFile));
         //get every class in the box ,ready to insert code
         for (CtClass ctClass : box) {
+            if (ctClass.isFrozen()) {
+                ctClass.defrost();
+            }
             //change modifier to public ,so all the class in the apk will be public ,you will be able to access it in the patch
             ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()));
             if (isNeedInsertClass(ctClass.getName()) && !(ctClass.isInterface() || ctClass.getDeclaredMethods().length < 1)) {
