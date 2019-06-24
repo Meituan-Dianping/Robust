@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -87,23 +88,29 @@ public class PatchExecutor extends Thread {
             return false;
         }
 
-        DexClassLoader classLoader = new DexClassLoader(patch.getTempPath(), context.getCacheDir().getAbsolutePath(),
-                null, PatchExecutor.class.getClassLoader());
-        patch.delete(patch.getTempPath());
+        ClassLoader classLoader = null;
 
-        Class patchClass, oldClass;
+        try {
+            File dexOutputDir = getPatchCacheDirPath(context, patch.getName() + patch.getMd5());
+            classLoader = new DexClassLoader(patch.getTempPath(), dexOutputDir.getAbsolutePath(),
+                    null, PatchExecutor.class.getClassLoader());
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        if (null == classLoader) {
+            return false;
+        }
 
-        Class patchsInfoClass;
+        Class patchClass, sourceClass;
+
+        Class patchesInfoClass;
         PatchesInfo patchesInfo = null;
         try {
-            Log.d("robust", "PatchsInfoImpl name:" + patch.getPatchesInfoImplClassFullName());
-            patchsInfoClass = classLoader.loadClass(patch.getPatchesInfoImplClassFullName());
-            patchesInfo = (PatchesInfo) patchsInfoClass.newInstance();
-            Log.d("robust", "PatchsInfoImpl ok");
+            Log.d("robust", "patch patch_info_name:" + patch.getPatchesInfoImplClassFullName());
+            patchesInfoClass = classLoader.loadClass(patch.getPatchesInfoImplClassFullName());
+            patchesInfo = (PatchesInfo) patchesInfoClass.newInstance();
         } catch (Throwable t) {
-            robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:108");
-            Log.e("robust", "PatchsInfoImpl failed,cause of" + t.toString());
-            t.printStackTrace();
+            Log.e("robust", "patch failed 188 ", t);
         }
 
         if (patchesInfo == null) {
@@ -114,10 +121,12 @@ public class PatchExecutor extends Thread {
         //classes need to patch
         List<PatchedClassInfo> patchedClasses = patchesInfo.getPatchedClassesInfo();
         if (null == patchedClasses || patchedClasses.isEmpty()) {
-            robustCallBack.logNotify("patchedClasses is null or empty, patch info:" + "id = " + patch.getName() + ",md5 = " + patch.getMd5(), "class:PatchExecutor method:patch line:122");
-            return false;
+//            robustCallBack.logNotify("patchedClasses is null or empty, patch info:" + "id = " + patch.getName() + ",md5 = " + patch.getMd5(), "class:PatchExecutor method:patch line:122");
+            //手写的补丁有时候会返回一个空list
+            return true;
         }
 
+        boolean isClassNotFoundException = false;
         for (PatchedClassInfo patchedClassInfo : patchedClasses) {
             String patchedClassName = patchedClassInfo.patchedClassName;
             String patchClassName = patchedClassInfo.patchClassName;
@@ -127,12 +136,19 @@ public class PatchExecutor extends Thread {
             }
             Log.d("robust", "current path:" + patchedClassName);
             try {
-                oldClass = classLoader.loadClass(patchedClassName.trim());
-                Field[] fields = oldClass.getDeclaredFields();
-                Log.d("robust", "oldClass :" + oldClass + "     fields " + fields.length);
+                try {
+                    sourceClass = classLoader.loadClass(patchedClassName.trim());
+                } catch (ClassNotFoundException e) {
+                    isClassNotFoundException = true;
+//                    robustCallBack.exceptionNotify(e, "class:PatchExecutor method:patch line:258");
+                    continue;
+                }
+
+                Field[] fields = sourceClass.getDeclaredFields();
+                Log.d("robust", "oldClass :" + sourceClass + "     fields " + fields.length);
                 Field changeQuickRedirectField = null;
                 for (Field field : fields) {
-                    if (TextUtils.equals(field.getType().getCanonicalName(), ChangeQuickRedirect.class.getCanonicalName()) && TextUtils.equals(field.getDeclaringClass().getCanonicalName(), oldClass.getCanonicalName())) {
+                    if (TextUtils.equals(field.getType().getCanonicalName(), ChangeQuickRedirect.class.getCanonicalName()) && TextUtils.equals(field.getDeclaringClass().getCanonicalName(), sourceClass.getCanonicalName())) {
                         changeQuickRedirectField = field;
                         break;
                     }
@@ -148,20 +164,36 @@ public class PatchExecutor extends Thread {
                     Object patchObject = patchClass.newInstance();
                     changeQuickRedirectField.setAccessible(true);
                     changeQuickRedirectField.set(null, patchObject);
-                    Log.d("robust", "changeQuickRedirectField set sucess " + patchClassName);
+                    Log.d("robust", "changeQuickRedirectField set success " + patchClassName);
                 } catch (Throwable t) {
                     Log.e("robust", "patch failed! ");
-                    t.printStackTrace();
                     robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:163");
                 }
             } catch (Throwable t) {
                 Log.e("robust", "patch failed! ");
-                t.printStackTrace();
-                robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:169");
+//                robustCallBack.exceptionNotify(t, "class:PatchExecutor method:patch line:169");
             }
         }
         Log.d("robust", "patch finished ");
+        if (isClassNotFoundException) {
+            return false;
+        }
         return true;
+    }
+
+    private static final String ROBUST_PATCH_CACHE_DIR = "patch_cache";
+
+    /*
+     * @param c
+     * @return 返回缓存补丁路径，一般是内部存储,补丁目录
+     */
+    private static File getPatchCacheDirPath(Context c, String key) {
+        File patchTempDir = c.getDir(ROBUST_PATCH_CACHE_DIR + key, Context.MODE_PRIVATE);
+        if (!patchTempDir.exists()) {
+            patchTempDir.mkdir();
+        }
+
+        return patchTempDir;
     }
 
 }
