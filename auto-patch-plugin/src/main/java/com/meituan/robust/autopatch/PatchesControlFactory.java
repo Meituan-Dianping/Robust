@@ -8,11 +8,12 @@ import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AccessFlag;
 
+import static com.meituan.robust.autopatch.Config.catchReflectException;
 import static com.meituan.robust.autopatch.Config.classPool;
 
 /**
  * Created by mivanzhang on 17/2/9.
- *
+ * <p>
  * create patch control classes,which dispatch patch methods
  */
 
@@ -44,7 +45,7 @@ public class PatchesControlFactory {
     private
     static String getAccessDispatchMethodBody(CtClass patchClass, String modifiedClassName) throws NotFoundException {
         StringBuilder accessDispatchMethodBody = new StringBuilder();
-        if(Config.catchReflectException){
+        if (catchReflectException || Config.rollbackWhenException) {
             accessDispatchMethodBody.append("try{");
         }
         if (Constants.isLogging) {
@@ -125,25 +126,28 @@ public class PatchesControlFactory {
                     }
                 }
                 for (int index = 0; index < parametertypes.length; index++) {
-                    if (booleanPrimeType(parametertypes[index].getName())){
+                    if (booleanPrimeType(parametertypes[index].getName())) {
                         accessDispatchMethodBody.append("((" + JavaUtils.getWrapperClass(parametertypes[index].getName()) + ") (fixObj(paramArrayOfObject[" + index + "]))");
                         accessDispatchMethodBody.append(")" + JavaUtils.wrapperToPrime(parametertypes[index].getName()));
                         if (index != parametertypes.length - 1) {
                             accessDispatchMethodBody.append(",");
                         }
                     } else {
-                    accessDispatchMethodBody.append("((" + JavaUtils.getWrapperClass(parametertypes[index].getName()) + ") (paramArrayOfObject[" + index + "])");
-                    accessDispatchMethodBody.append(")" + JavaUtils.wrapperToPrime(parametertypes[index].getName()));
-                    if (index != parametertypes.length - 1) {
-                        accessDispatchMethodBody.append(",");
-                    }
+                        accessDispatchMethodBody.append("((" + JavaUtils.getWrapperClass(parametertypes[index].getName()) + ") (paramArrayOfObject[" + index + "])");
+                        accessDispatchMethodBody.append(")" + JavaUtils.wrapperToPrime(parametertypes[index].getName()));
+                        if (index != parametertypes.length - 1) {
+                            accessDispatchMethodBody.append(",");
+                        }
                     }
                 }
                 accessDispatchMethodBody.append("));}\n");
             }
         }
-        if(Config.catchReflectException){
+        if (catchReflectException || Config.rollbackWhenException) {
             accessDispatchMethodBody.append(" } catch (Throwable e) {");
+            if (Config.rollbackWhenException) {
+                accessDispatchMethodBody.append("com.meituan.robust.RollbackManager.getInstance().notifyOnException(methodsId, methodLongName, e); ");
+            }
             accessDispatchMethodBody.append(" e.printStackTrace();}");
         }
         return accessDispatchMethodBody.toString();
@@ -152,6 +156,8 @@ public class PatchesControlFactory {
     private static String getIsSupportMethodBody(CtClass patchClass, String modifiedClassName) throws NotFoundException {
         StringBuilder isSupportBuilder = new StringBuilder();
         StringBuilder methodsIdBuilder = new StringBuilder();
+        StringBuilder methodsLongNameBuilder = new StringBuilder();
+
         if (Constants.isLogging) {
             isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject);");
         }
@@ -167,13 +173,23 @@ public class PatchesControlFactory {
             if (methodNumber != null) {
                 // 一前一后的冒号作为匹配锚点，只有一边有的话可能会有多重匹配的bug
                 methodsIdBuilder.append(":" + methodNumber + ":");
+                methodsLongNameBuilder.append(methodLongName + ";");
             }
         }
 
+        String methodsIdStr = methodsIdBuilder.toString();
         if (Constants.isLogging) {
-            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdBuilder.toString() + "\".contains(\":\" + methodNo + \":\"));");
+            isSupportBuilder.append("  android.util.Log.d(\"robust\",\"arrivied in isSupport \"+methodName+\" paramArrayOfObject  \" +paramArrayOfObject+\" isSupport result is \"+\"" + methodsIdStr + "\".contains(\":\" + methodNo + \":\"));");
         }
-        isSupportBuilder.append("return \"" + methodsIdBuilder.toString() + "\".contains(\":\" + methodNo + \":\");");
+
+        isSupportBuilder.append("methodsId=\"" + methodsIdStr + "\";");
+        isSupportBuilder.append("methodLongName=\"" + methodsLongNameBuilder.toString() + "\";");
+
+        if (Config.rollbackWhenException) {
+            isSupportBuilder.append(" if (com.meituan.robust.RollbackManager.getInstance().getRollback(\"" + methodsIdStr + "\")) return false; ");
+        }
+
+        isSupportBuilder.append("return \"" + methodsIdStr + "\".contains(\":\" + methodNo + \":\");");
         return isSupportBuilder.toString();
     }
 

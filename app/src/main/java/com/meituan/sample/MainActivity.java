@@ -3,13 +3,20 @@ package com.meituan.sample;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.util.ArrayMap;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.RollbackListener;
+import com.meituan.robust.RollbackManager;
+
+import java.util.Map;
+
 /**
  * For users of Robust you may only to use MainActivity or SecondActivity,other classes are used for test.<br>
  * <br>
@@ -30,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button button;
+    private static final String TAG = "MainActivity";
+    private Map<String, Boolean> rollBacks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +109,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void runRobust() {
+        initRollbackListener();
         new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
+    }
+
+    private void initRollbackListener() {
+        //TODO: 初始化时从本地取出，反序列化为map
+        rollBacks = new ArrayMap<>();
+
+        RollbackManager.getInstance().setRollbackListener(new RollbackListener() {
+            @Override
+            public void onRollback(String methodsId, String methodLongName, Throwable e) {
+                Log.e(TAG, "补丁$methodsId 发生异常，执行回滚！");
+                saveRollbackFlag(methodsId);
+            }
+
+            private void saveRollbackFlag(String methodsId) {
+                rollBacks.put(methodsId, true);
+                //TODO:存储标志位到本地
+            }
+
+            @Override
+            public boolean getRollback(String methodsId) {
+                boolean rollback = rollBacks.get(methodsId) != null ? rollBacks.get(methodsId) : false;
+                Log.d(TAG, "获取补丁$methodsId 的回滚状态为：$rollback");
+                return rollback;
+            }
+        });
+    }
+
+    /**
+     * 当有新补丁时清空rollbacks，标记所有位置为不回滚
+     */
+    public void notifyPatchUpdated() {
+        if (rollBacks != null) {
+            rollBacks.clear();
+        }
+        //TODO:存储标志位到本地
     }
 }
