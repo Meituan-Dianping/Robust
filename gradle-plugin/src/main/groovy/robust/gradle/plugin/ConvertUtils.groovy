@@ -52,7 +52,10 @@ class ConvertUtils {
         println "read all class file cost $cost second"
         classNames.each {
             try {
-                allClass.add(classPool.get(it));
+                CtClass cc = classPool.get(it)
+                cc.stopPruning(true)
+                cc.defrost()
+                allClass.add(cc)
             } catch (javassist.NotFoundException e) {
                 println "class not found exception class name:  $it "
 
