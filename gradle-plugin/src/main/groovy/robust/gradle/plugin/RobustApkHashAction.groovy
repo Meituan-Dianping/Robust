@@ -1,11 +1,16 @@
 package robust.gradle.plugin
 
 import com.meituan.robust.Constants
+import org.apache.commons.io.IOUtils
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
 import java.security.MessageDigest
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
+
 /**
  * Created by hedex on 17/2/14.
  */
@@ -25,18 +30,25 @@ class RobustApkHashAction implements Action<Project> {
                 List<File> partFiles = new ArrayList<>()
 
                 if (isGradlePlugin300orAbove(project)){
+
                     //protected FileCollection resourceFiles;
                     FileCollection resourceFiles
                     if (isGradlePlugin320orAbove(project)) {
-                        //gradle 4.6 适配
-                        resourceFiles = packageTask.resourceFiles.get()
+                        try {
+                            //gradle 4.6 适配
+                            resourceFiles = packageTask.resourceFiles.get()
+                            partFiles.add(resourceFiles.getFiles())
+                        } catch (Exception e){
+                            //gradle 5.4+ & gradle tools 3.5.0+ 适配
+                            Object resFiles = packageTask.resourceFiles
+                            for (File file : resFiles){
+                                partFiles.add(file)
+                            }
+                        }
                     } else {
                         resourceFiles = packageTask.resourceFiles
+                        partFiles.add(resourceFiles.getFiles())
                     }
-                    if (null == resourceFiles) {
-                        return
-                    }
-                    partFiles.add(resourceFiles.getFiles())
 
                     //protected FileCollection dexFolders;
                     FileCollection dexFolders = null
@@ -73,10 +85,27 @@ class RobustApkHashAction implements Action<Project> {
 
                     //protected FileCollection assets;
                     FileCollection assets = null;
+                    boolean gradleToolsBigThan350 = false;
                     try {
                         if (isGradlePlugin320orAbove(project)) {
-                            //gradle 4.6 适配
-                            assets = packageTask.assets.get()
+                            try {
+                                //gradle 4.6 适配
+                                assets = packageTask.assets.get()
+                            } catch (Exception e) {
+                                //gradle 5.4+ & gradle tools 3.5.0+ 适配
+                                gradleToolsBigThan350 = true;
+                                assets = packageTask.assets.getAsFileTree()
+//                                for (File file : packageTask.assets.getAsFileTree().getFiles()){
+//                                    if (null == assetsDir) {
+//                                        assetsDir = file.getParentFile()
+//                                    }
+//                                    System.err.println("robust ====== packageTask.assets file  " + file.getAbsolutePath())
+////                                    partFiles.add(file)
+//                                }
+
+//                                System.err.println("robust ====== packageTask.assetsDir   " + assetsDir.getAbsolutePath())
+                            }
+
                         } else {
                             assets = packageTask.assets
                         }
@@ -87,11 +116,25 @@ class RobustApkHashAction implements Action<Project> {
                     }
 
                     String robustHash = computeRobustHash(partFiles)
-
-                    if (assets instanceof FileCollection) {
+                    if (gradleToolsBigThan350) {
+                        //gradle tools 3.5.0+ , add Constants.ROBUST_APK_HASH_FILE_NAM file to resources.ap_
+//                        createHashFile(assetsDir.getAbsolutePath(), Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                        for (File file : packageTask.getInputs().getFiles().getAsFileTree()) {
+                            if (file.getAbsolutePath().endsWith(".ap_")) {
+                                try {
+                                    createHashFile2(file.getAbsolutePath(), "assets/" + Constants.ROBUST_APK_HASH_FILE_NAME, robustHash);
+//                                    System.out.println(">>>write hash:" + robustHash);
+                                } catch (IOException e) {
+                                }
+                            }
+                        }
+                    } else if (assets instanceof FileCollection) {
                         FileCollection assetsFileCollection = (FileCollection) assets;
                         createHashFile(assetsFileCollection.asPath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
                     }
+                    //额外保存一份Constants.ROBUST_APK_HASH_FILE_NAME文件到build/output/robust，便于CI存储
+                    String buildRobustDir = "${project.buildDir}" + File.separator + "$Constants.ROBUST_GENERATE_DIRECTORY" + File.separator
+                    createHashFile(buildRobustDir, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
                     return
 
                 } else {
@@ -212,6 +255,34 @@ class RobustApkHashAction implements Action<Project> {
         fileWriter.close()
         return hashFile
     }
+
+    def static void createHashFile2(String filePath, String fileName, String content) throws IOException {
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath));
+        ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(filePath + ".temp"));
+        ZipEntry entry = zis.getNextEntry();
+        while (entry != null) {
+            zos.putNextEntry(new ZipEntry(entry.getName()));
+            byte[] bytes = IOUtils.toByteArray(zis);
+            zos.write(bytes);
+            entry = zis.getNextEntry();
+        }
+        ZipEntry e = new ZipEntry(fileName);
+//        System.out.println("append: " + e.getName());
+        zos.putNextEntry(e);
+        zos.write(content.getBytes());
+        zos.closeEntry();
+
+        zos.flush();
+        zos.close();
+        zis.close();
+
+        try {
+            new File(filePath).delete();
+            new File(filePath + ".temp").renameTo(new File(filePath));
+        } catch (Exception ex) {
+        }
+    }
+
 
     static boolean isGradlePlugin300orAbove(Project project) {
         //gradlePlugin3.0 -> gradle 4.1+

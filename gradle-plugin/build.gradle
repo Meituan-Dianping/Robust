@@ -9,7 +9,8 @@ dependencies {
     compile 'com.android.tools.build:gradle:2.1.0'
     compile 'org.javassist:javassist:3.20.0-GA'
     compile fileTree(dir: "./src/main/libs", include: ['*.jar'])
-    compile project(':autopatchbase')
+//    compile project(':autopatchbase')
+    compile 'com.meituan.robust:autopatchbase:0.4.90'
     compile 'org.ow2.asm:asm:5.0.1'
 }
 
