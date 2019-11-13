@@ -25,18 +25,25 @@ class RobustApkHashAction implements Action<Project> {
                 List<File> partFiles = new ArrayList<>()
 
                 if (isGradlePlugin300orAbove(project)){
+
                     //protected FileCollection resourceFiles;
                     FileCollection resourceFiles
                     if (isGradlePlugin320orAbove(project)) {
-                        //gradle 4.6 适配
-                        resourceFiles = packageTask.resourceFiles.get()
+                        try {
+                            //gradle 4.6 适配
+                            resourceFiles = packageTask.resourceFiles.get()
+                            partFiles.add(resourceFiles.getFiles())
+                        } catch (Exception e){
+                            //gradle 5.4+ & gradle tools 3.5.0+ 适配
+                            Object resFiles = packageTask.resourceFiles
+                            for (File file : resFiles){
+                                partFiles.add(file)
+                            }
+                        }
                     } else {
                         resourceFiles = packageTask.resourceFiles
+                        partFiles.add(resourceFiles.getFiles())
                     }
-                    if (null == resourceFiles) {
-                        return
-                    }
-                    partFiles.add(resourceFiles.getFiles())
 
                     //protected FileCollection dexFolders;
                     FileCollection dexFolders = null
@@ -73,10 +80,29 @@ class RobustApkHashAction implements Action<Project> {
 
                     //protected FileCollection assets;
                     FileCollection assets = null;
+                    File assetsDir = null;
                     try {
                         if (isGradlePlugin320orAbove(project)) {
-                            //gradle 4.6 适配
-                            assets = packageTask.assets.get()
+                            try {
+                                //gradle 4.6 适配
+                                assets = packageTask.assets.get()
+                            } catch (Exception e) {
+                                //gradle 5.4+ & gradle tools 3.5.0+ 适配
+                                assets = packageTask.assets.getAsFileTree()
+                                System.err.println("robust ====== packageTask" + packageTask.getClass().toString())
+                                System.err.println("robust ====== packageTask" + packageTask.toString())
+                                System.err.println("robust ====== packageTask.assets " + assets.asPath)
+                                for (File file : packageTask.assets.getAsFileTree().getFiles()){
+                                    if (null == assetsDir) {
+                                        assetsDir = file.getParentFile()
+                                    }
+                                    System.err.println("robust ====== packageTask.assets file  " + file.getAbsolutePath())
+//                                    partFiles.add(file)
+                                }
+
+                                System.err.println("robust ====== packageTask.assetsDir   " + assetsDir.getAbsolutePath())
+                            }
+
                         } else {
                             assets = packageTask.assets
                         }
@@ -87,8 +113,10 @@ class RobustApkHashAction implements Action<Project> {
                     }
 
                     String robustHash = computeRobustHash(partFiles)
-
-                    if (assets instanceof FileCollection) {
+                    if (null != assetsDir) {
+                        //gradle tools 3.5.0+
+                        createHashFile(assetsDir.getAbsolutePath(), Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                    } else if (assets instanceof FileCollection) {
                         FileCollection assetsFileCollection = (FileCollection) assets;
                         createHashFile(assetsFileCollection.asPath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
                     }
