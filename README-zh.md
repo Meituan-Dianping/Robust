@@ -1,6 +1,6 @@
 
 # Robust
- [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.90) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.90/link)
+ [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.91) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.91/link)
  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
@@ -28,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.4.90'
+	compile 'com.meituan.robust:robust:0.4.91'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -39,8 +39,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.90'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.90'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.91'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.91'
 	   }
 	}
 	```
