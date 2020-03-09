@@ -31,6 +31,8 @@ class RobustTransform extends Transform implements Plugin<Project> {
     private static boolean isForceInsert = false;
 //    private static boolean useASM = false;
     private static boolean useASM = true;
+    private static boolean isForceInsertLambda = false;
+
     def robust
     InsertcodeStrategy insertcodeStrategy;
 
@@ -110,6 +112,10 @@ class RobustTransform extends Transform implements Plugin<Project> {
         else
             isForceInsert = false
 
+        if (robust.switch.forceInsertLambda != null && "true".equals(String.valueOf(robust.switch.forceInsertLambda.text())))
+            isForceInsertLambda = true;
+        else
+            isForceInsertLambda = false;
     }
 
     @Override
@@ -155,10 +161,10 @@ class RobustTransform extends Transform implements Plugin<Project> {
         def box = ConvertUtils.toCtClasses(inputs, classPool)
         def cost = (System.currentTimeMillis() - startTime) / 1000
 //        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
-        if(useASM){
-            insertcodeStrategy=new AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
-        }else {
-            insertcodeStrategy=new JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
+        if (useASM) {
+            insertcodeStrategy = new AsmInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel, isForceInsertLambda);
+        } else {
+            insertcodeStrategy = new JavaAssistInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel, isForceInsertLambda);
         }
         insertcodeStrategy.insertCode(box, jarFile);
         writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)
