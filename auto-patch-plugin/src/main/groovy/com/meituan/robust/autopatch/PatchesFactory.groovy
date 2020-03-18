@@ -119,7 +119,7 @@ class PatchesFactory {
                                 CtClass thisClass = ReflectUtils.readField(c, "thisClass");
 
                                 def isStatic = ReflectUtils.isStatic(thisMethod.getAccessFlags());
-                                if (!isStatic) {
+                                if (!isStatic && !c.type.isArray()) {
                                     //inner class in the patched class ,not all inner class
                                     if (Config.newlyAddedClassNameList.contains(thisClass.getName()) || Config.noNeedReflectClassSet.contains(thisClass.getName())) {
                                         return;
