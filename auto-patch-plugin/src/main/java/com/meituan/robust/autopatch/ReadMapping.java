@@ -127,6 +127,10 @@ public class ReadMapping {
 
     public String getMethodSigureWithReturnTypeInMapping(String returnTypeWithNumber, String methodSignure) {
         //初步观察mapping文件，使用":"来截取返回值，还可以通过寻找第一个字符，
+        if (methodSignure.contains(":")) {
+            //兼容R8
+            return getMethodSignureWithReturnType(returnTypeWithNumber.substring(returnTypeWithNumber.lastIndexOf(":") + 1), methodSignure.substring(0, methodSignure.indexOf(":")));
+        }
         return getMethodSignureWithReturnType(returnTypeWithNumber.substring(returnTypeWithNumber.lastIndexOf(":") + 1), methodSignure);
     }
 
