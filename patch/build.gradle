@@ -25,13 +25,18 @@ android {
         exclude 'META-INF/maven/commons-cli/commons-cli/pom.properties'
         exclude 'META-INF/maven/commons-cli/commons-cli/pom.xml'
     }
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
 }
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 dependencies {
-//    compile 'com.meituan.robust:autopatchbase:' + VERSION_NAME
-    compile project(':autopatchbase')
+    implementation 'com.meituan.robust:autopatchbase:1.1.0-SNAPSHOT'
+//    compile project(':autopatchbase')
 }
 
-apply from: '../gradle_mvn_push.gradle'
+apply from: rootProject.file("./gradle/upload_local_maven.gradle")

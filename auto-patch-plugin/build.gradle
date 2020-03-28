@@ -9,7 +9,10 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.1.0'
     compile 'org.javassist:javassist:3.20.0-GA'
+    implementation 'com.meituan.robust:autopatchbase:1.1.0-SNAPSHOT'
 //    compile 'com.meituan.robust:autopatchbase:' + VERSION_NAME
-    compile project(':autopatchbase')
+//    compile project(':autopatchbase')
 }
-apply from: '../gradle_mvn_push.gradle'
+
+apply from: rootProject.file("./gradle/upload_local_maven_java.gradle")
+
