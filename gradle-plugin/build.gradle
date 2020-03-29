@@ -15,5 +15,24 @@ dependencies {
     compile 'org.ow2.asm:asm:5.0.1'
 }
 
-apply from: rootProject.file("./gradle/upload_local_maven_java.gradle")
+//apply from: rootProject.file("./gradle/upload_local_maven_java.gradle")
+apply plugin: 'maven'
+uploadArchives {
+    repositories.mavenDeployer {
+
+        repository(url: uri('../repo')) {
+
+        }
+
+        snapshotRepository(url: uri('../repo')) {
+
+        }
+
+        pom.project {
+            groupId "com.meituan.robust"
+            artifactId 'gradle-plugin'
+            version "1.5.0"
+        }
+    }
+}
 

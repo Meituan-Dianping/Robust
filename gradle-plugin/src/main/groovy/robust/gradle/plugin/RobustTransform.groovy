@@ -8,108 +8,40 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import robust.gradle.plugin.asm.AsmInsertImpl
+import robust.gradle.plugin.config.GlobalConfig
+import robust.gradle.plugin.config.RobustExtension
 import robust.gradle.plugin.javaassist.JavaAssistInsertImpl
+import robust.gradle.plugin.utils.RobustLog
 
 import java.util.zip.GZIPOutputStream
+
 /**
  * Created by mivanzhang on 16/11/3.
  *
  * insert code
  *
  */
-
-class RobustTransform extends Transform implements Plugin<Project> {
+class RobustTransform extends Transform {
+    private static final String TAG = "Robust.RobustTransform";
     Project project
-    static Logger logger
-    private static List<String> hotfixPackageList = new ArrayList<>();
-    private static List<String> hotfixMethodList = new ArrayList<>();
-    private static List<String> exceptPackageList = new ArrayList<>();
-    private static List<String> exceptMethodList = new ArrayList<>();
-    private static boolean isHotfixMethodLevel = false;
-    private static boolean isExceptMethodLevel = false;
-//    private static boolean isForceInsert = true;
-    private static boolean isForceInsert = false;
-//    private static boolean useASM = false;
-    private static boolean useASM = true;
-    def robust
+    private List<String> hotfixPackageList = new ArrayList<>();
+    private List<String> hotfixMethodList = new ArrayList<>();
+    private List<String> exceptPackageList = new ArrayList<>();
+    private List<String> exceptMethodList = new ArrayList<>();
+    private boolean isHotfixMethodLevel = false;
+    private boolean isExceptMethodLevel = false;
+
     InsertcodeStrategy insertcodeStrategy;
 
-    @Override
-    void apply(Project target) {
-        project = target
-        robust = new XmlSlurper().parse(new File("${project.projectDir}/${Constants.ROBUST_XML}"))
-        logger = project.logger
-        initConfig()
-        //isForceInsert 是true的话，则强制执行插入
-        if (!isForceInsert) {
-            def taskNames = project.gradle.startParameter.taskNames
-            def isDebugTask = false;
-            for (int index = 0; index < taskNames.size(); ++index) {
-                def taskName = taskNames[index]
-                logger.debug "input start parameter task is ${taskName}"
-                //FIXME: assembleRelease下屏蔽Prepare，这里因为还没有执行Task，没法直接通过当前的BuildType来判断，所以直接分析当前的startParameter中的taskname，
-                //另外这里有一个小坑task的名字不能是缩写必须是全称 例如assembleDebug不能是任何形式的缩写输入
-                if (taskName.endsWith("Debug") && taskName.contains("Debug")) {
-//                    logger.warn " Don't register robust transform for debug model !!! task is：${taskName}"
-                    isDebugTask = true
-                    break;
-                }
-            }
-            if (!isDebugTask) {
-                project.android.registerTransform(this)
-                project.afterEvaluate(new RobustApkHashAction())
-                logger.quiet "Register robust transform successful !!!"
-            }
-            if (null != robust.switch.turnOnRobust && !"true".equals(String.valueOf(robust.switch.turnOnRobust))) {
-                return;
-            }
-        } else {
-            project.android.registerTransform(this)
-            project.afterEvaluate(new RobustApkHashAction())
-        }
-    }
-
-    def initConfig() {
-        hotfixPackageList = new ArrayList<>()
-        hotfixMethodList = new ArrayList<>()
-        exceptPackageList = new ArrayList<>()
-        exceptMethodList = new ArrayList<>()
-        isHotfixMethodLevel = false;
-        isExceptMethodLevel = false;
-        /*对文件进行解析*/
-        for (name in robust.packname.name) {
-            hotfixPackageList.add(name.text());
-        }
-        for (name in robust.exceptPackname.name) {
-            exceptPackageList.add(name.text());
-        }
-        for (name in robust.hotfixMethod.name) {
-            hotfixMethodList.add(name.text());
-        }
-        for (name in robust.exceptMethod.name) {
-            exceptMethodList.add(name.text());
-        }
-
-        if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnHotfixMethod.text()))) {
-            isHotfixMethodLevel = true;
-        }
-
-        if (null != robust.switch.useAsm && "false".equals(String.valueOf(robust.switch.useAsm.text()))) {
-            useASM = false;
-        }else {
-            //默认使用asm
-            useASM = true;
-        }
-
-        if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnExceptMethod.text()))) {
-            isExceptMethodLevel = true;
-        }
-
-        if (robust.switch.forceInsert != null && "true".equals(String.valueOf(robust.switch.forceInsert.text())))
-            isForceInsert = true
-        else
-            isForceInsert = false
-
+    RobustTransform(Project project, List<String> hotfixPackageList, List<String> hotfixMethodList, List<String> exceptPackageList,
+                    List<String> exceptMethodList, boolean isHotfixMethodLevel, boolean isExceptMethodLevel) {
+        this.project = project
+        this.hotfixPackageList = hotfixPackageList
+        this.hotfixMethodList = hotfixMethodList
+        this.exceptPackageList = exceptPackageList
+        this.exceptMethodList = exceptMethodList
+        this.isHotfixMethodLevel = isHotfixMethodLevel
+        this.isExceptMethodLevel = isExceptMethodLevel
     }
 
     @Override
@@ -135,15 +67,15 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
-        logger.quiet '================robust start================'
+        RobustLog.i(TAG, '================robust start================')
         def startTime = System.currentTimeMillis()
         outputProvider.deleteAll()
         File jarFile = outputProvider.getContentLocation("main", getOutputTypes(), getScopes(),
                 Format.JAR);
-        if(!jarFile.getParentFile().exists()){
+        if (!jarFile.getParentFile().exists()) {
             jarFile.getParentFile().mkdirs();
         }
-        if(jarFile.exists()){
+        if (jarFile.exists()) {
             jarFile.delete();
         }
 
@@ -153,26 +85,25 @@ class RobustTransform extends Transform implements Plugin<Project> {
         }
 
         def box = ConvertUtils.toCtClasses(inputs, classPool)
-        def cost = (System.currentTimeMillis() - startTime) / 1000
-//        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
-        if(useASM){
-            insertcodeStrategy=new AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
-        }else {
-            insertcodeStrategy=new JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
+//        RobustLog.i( "check all class cost $cost second, class count: ${box.size()}")
+        if (GlobalConfig.turnOnDebug) {
+            insertcodeStrategy = new AsmInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel);
+        } else {
+            insertcodeStrategy = new JavaAssistInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel);
         }
         insertcodeStrategy.insertCode(box, jarFile);
         writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)
 
-        logger.quiet "===robust print id start==="
+        RobustLog.i(TAG, "===robust print id start===");
         for (String method : insertcodeStrategy.methodMap.keySet()) {
             int id = insertcodeStrategy.methodMap.get(method);
-            System.out.println("key is   " + method + "  value is    " + id);
+            RobustLog.i(TAG, "key is   " + method + "  value is    " + id);
         }
-        logger.quiet "===robust print id end==="
+        RobustLog.i(TAG, "===robust print id end===")
 
-        cost = (System.currentTimeMillis() - startTime) / 1000
-        logger.quiet "robust cost $cost second"
-        logger.quiet '================robust   end================'
+        def cost = (System.currentTimeMillis() - startTime) / 1000
+        RobustLog.i(TAG, "robust cost $cost second")
+        RobustLog.i(TAG, '================robust   end================')
     }
 
     private void writeMap2File(Map map, String path) {
@@ -193,7 +124,6 @@ class RobustTransform extends Transform implements Plugin<Project> {
         gzip.close();
         fileOut.flush()
         fileOut.close()
-
     }
 
 }

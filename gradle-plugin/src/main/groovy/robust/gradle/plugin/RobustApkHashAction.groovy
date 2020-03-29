@@ -5,6 +5,7 @@ import org.apache.commons.io.IOUtils
 import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
+import robust.gradle.plugin.config.GlobalConfig
 
 import java.security.MessageDigest
 import java.util.zip.ZipEntry
@@ -18,6 +19,15 @@ class RobustApkHashAction implements Action<Project> {
     @Override
     void execute(Project project) {
         project.android.applicationVariants.each { variant ->
+
+            project.logger.quiet "RobustApkHashAction"
+            def config = project.robustConfig
+            GlobalConfig.turnOnDebug = config.turnOnDebug
+            GlobalConfig.patchPkg = config.patchPkg
+            GlobalConfig.hotfixPkgs = config.hotfixPkgs
+            GlobalConfig.exceptPkgs = config.exceptPkgs
+            GlobalConfig.noNeedReflectClass = config.noNeedReflectClass
+
             def packageTask = project.tasks.findByName("package${variant.name.capitalize()}")
 
             if (packageTask == null) {
@@ -29,7 +39,7 @@ class RobustApkHashAction implements Action<Project> {
 //                def startTime = System.currentTimeMillis()
                 List<File> partFiles = new ArrayList<>()
 
-                if (isGradlePlugin300orAbove(project)){
+                if (isGradlePlugin300orAbove(project)) {
 
                     //protected FileCollection resourceFiles;
                     FileCollection resourceFiles
@@ -38,10 +48,10 @@ class RobustApkHashAction implements Action<Project> {
                             //gradle 4.6 适配
                             resourceFiles = packageTask.resourceFiles.get()
                             partFiles.add(resourceFiles.getFiles())
-                        } catch (Exception e){
+                        } catch (Exception e) {
                             //gradle 5.4+ & gradle tools 3.5.0+ 适配
                             Object resFiles = packageTask.resourceFiles
-                            for (File file : resFiles){
+                            for (File file : resFiles) {
                                 partFiles.add(file)
                             }
                         }
@@ -139,68 +149,68 @@ class RobustApkHashAction implements Action<Project> {
 
                 } else {
 
-                File resourceFile = packageTask.resourceFile
-                if (null == resourceFile) {
-                    return
-                }
-                partFiles.add(resourceFile)
+                    File resourceFile = packageTask.resourceFile
+                    if (null == resourceFile) {
+                        return
+                    }
+                    partFiles.add(resourceFile)
 
-                Collection<File> dexFolders = null
-                try {
-                    dexFolders = packageTask.dexFolders
-                } catch (MissingPropertyException e) {
-                    // api is not public
-                }
-                if (null != dexFolders) {
-                    partFiles.addAll(dexFolders)
-                }
+                    Collection<File> dexFolders = null
+                    try {
+                        dexFolders = packageTask.dexFolders
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != dexFolders) {
+                        partFiles.addAll(dexFolders)
+                    }
 
-                Collection<File> javaResourceFiles = null
-                try {
-                    javaResourceFiles = packageTask.javaResourceFiles
-                } catch (MissingPropertyException e) {
-                    // api is not public
-                }
-                if (null != javaResourceFiles) {
-                    partFiles.addAll(javaResourceFiles)
-                }
-
-
-                Collection<File> jniFolders = null
-                try {
-                    jniFolders = packageTask.jniFolders
-                } catch (MissingPropertyException e) {
-                    // api is not public
-                }
-                if (null != jniFolders) {
-                    partFiles.addAll(jniFolders)
-                }
+                    Collection<File> javaResourceFiles = null
+                    try {
+                        javaResourceFiles = packageTask.javaResourceFiles
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != javaResourceFiles) {
+                        partFiles.addAll(javaResourceFiles)
+                    }
 
 
-                File assets = null;
-                try {
-                    assets = packageTask.assets
-                } catch (MissingPropertyException e) {
-                    // Android Gradle Plugin version < 2.2.0-beta1
-                }
+                    Collection<File> jniFolders = null
+                    try {
+                        jniFolders = packageTask.jniFolders
+                    } catch (MissingPropertyException e) {
+                        // api is not public
+                    }
+                    if (null != jniFolders) {
+                        partFiles.addAll(jniFolders)
+                    }
 
-                if (null != assets) {
-                    partFiles.add(assets)
-                }
 
-                String robustHash = computeRobustHash(partFiles)
+                    File assets = null;
+                    try {
+                        assets = packageTask.assets
+                    } catch (MissingPropertyException e) {
+                        // Android Gradle Plugin version < 2.2.0-beta1
+                    }
 
-                if (null != assets) {
-                    // Android Gradle Plugin is 2.2.0-beta1 + , assets is able to access
-                    createHashFile(assets.absolutePath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
-                } else {
-                    // add robustHashFile to resourceFile
-                    File robustHashFile = createHashFile(resourceFile.parentFile.absolutePath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
-                    RobustApkHashZipUtils.addApkHashFile2ApFile(resourceFile, robustHashFile);
-                }
+                    if (null != assets) {
+                        partFiles.add(assets)
+                    }
 
-                String buildRubustDir = "${project.buildDir}" + File.separator + "$Constants.ROBUST_GENERATE_DIRECTORY" + File.separator
-                createHashFile(buildRubustDir, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                    String robustHash = computeRobustHash(partFiles)
+
+                    if (null != assets) {
+                        // Android Gradle Plugin is 2.2.0-beta1 + , assets is able to access
+                        createHashFile(assets.absolutePath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                    } else {
+                        // add robustHashFile to resourceFile
+                        File robustHashFile = createHashFile(resourceFile.parentFile.absolutePath, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
+                        RobustApkHashZipUtils.addApkHashFile2ApFile(resourceFile, robustHashFile);
+                    }
+
+                    String buildRubustDir = "${project.buildDir}" + File.separator + "$Constants.ROBUST_GENERATE_DIRECTORY" + File.separator
+                    createHashFile(buildRubustDir, Constants.ROBUST_APK_HASH_FILE_NAME, robustHash)
 
 //                def cost = (System.currentTimeMillis() - startTime) / 1000
 //                logger.quiet "robust apk hash is $robustHash"

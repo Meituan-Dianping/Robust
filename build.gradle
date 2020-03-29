@@ -7,13 +7,16 @@ buildscript {
         maven {
             url("http://10.0.20.167:8081/repository/ks_kt_lib_public/")
         }
+        maven {
+            url uri('./repo')
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
-//        classpath 'com.meituan.robust:gradle-plugin:1.0.0-SNAPSHOT'
-//        classpath 'com.meituan.robust:auto-patch-plugin:1.1.0-SNAPSHOT'
+        classpath 'com.meituan.robust:gradle-plugin:1.5.0'
+        classpath 'com.meituan.robust:auto-patch-plugin:1.0.0'
         classpath 'me.tatarka:gradle-retrolambda:3.7.0'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.4'
@@ -30,6 +33,9 @@ allprojects {
         jcenter()
         maven {
             url("http://10.0.20.167:8081/repository/ks_kt_lib_public/")
+        }
+        maven {
+            url uri('./repo')
         }
     }
     tasks.withType(JavaCompile) { options.encoding = "UTF-8" }

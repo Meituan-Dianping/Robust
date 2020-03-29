@@ -10,6 +10,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.patch.RobustModify;
+import com.meituan.robust.patch.annotaion.Modify;
+import com.meituan.sample.patch.PatchManipulateImp;
+import com.meituan.sample.patch.PermissionUtils;
+import com.meituan.sample.patch.RobustCallBackSample;
+
 /**
  * For users of Robust you may only to use MainActivity or SecondActivity,other classes are used for test.<br>
  * <br>
@@ -62,10 +68,14 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "arrived in ", Toast.LENGTH_SHORT).show();
+                showToast();
             }
-        });
 
+        });
+    }
+    @Modify
+    private void showToast() {
+        Toast.makeText(MainActivity.this, "showClick111111111111111111111111", Toast.LENGTH_SHORT).show();
     }
 
     private boolean isGrantSDCardReadPermission() {

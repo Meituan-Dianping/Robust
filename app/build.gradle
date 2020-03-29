@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 //apply plugin: 'auto-patch-plugin'
-//apply plugin: 'robust'
+apply plugin: 'robust'
 
 android {
     compileSdkVersion 25
@@ -72,4 +72,12 @@ dependencies {
     compile 'com.android.support:design:25.4.0'
     compile 'org.javassist:javassist:3.20.0-GA'
     compile project(path: ':patch')
+}
+
+//Robust 自定义字段
+robustConfig {
+    turnOnDebug = true
+    hotfixPkgs = ['com.meituan','com.sankuai','om.dianping']
+    exceptPkgs = ['com.meituan.robust','com.meituan.sample.extension']
+    patchPkg = 'com.meituan.robust.patch'
 }

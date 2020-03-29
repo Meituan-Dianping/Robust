@@ -15,7 +15,7 @@
         <!--是否强制插入插入代码，Robust默认在debug模式下是关闭的，开启这个选项为true会在debug下插入代码-->
         <!--但是当配置项turnOnRobust是false时，这个配置项不会生效-->
         <!--<forceInsert>true</forceInsert>-->
-        <forceInsert>false</forceInsert>
+        <forceInsert>true</forceInsert>
 
         <!--是否捕获补丁中所有异常，建议上线的时候这个开关的值为true，测试的时候为false-->
         <catchReflectException>true</catchReflectException>
@@ -26,7 +26,7 @@
         <patchLog>false</patchLog>
 
         <!--项目是否支持progaurd-->
-        <proguard>true</proguard>
+        <proguard>false</proguard>
         <!--<proguard>false</proguard>-->
 
         <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
@@ -38,9 +38,7 @@
     <!--这个配置项是各个APP需要自行配置，就是你们App里面你们自己代码的包名，
     这些包名下的类会被Robust插入代码，没有被Robust插入代码的类Robust是无法修复的-->
     <packname name="hotfixPackage">
-        <name>com.meituan</name>
-        <name>com.sankuai</name>
-        <name>com.dianping</name>
+        <name>com.meituan.sample</name>
     </packname>
 
     <!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加-->
@@ -52,7 +50,7 @@
     <!--补丁的包名，请保持和类PatchManipulateImp中fetchPatchList方法中设置的补丁类名保持一致（ setPatchesInfoImplClassFullName("com.meituan.robust.patch.PatchesInfoImpl")），
     各个App可以独立定制，需要确保的是setPatchesInfoImplClassFullName设置的包名是如下的配置项，类名必须是：PatchesInfoImpl-->
     <patchPackname name="patchPackname">
-        <name>com.meituan.robust.patch</name>
+        <name>com.meituan.sample.patch</name>
     </patchPackname>
 
     <!--自动化补丁中，不需要反射处理的类，这个配置项慎重选择-->
