@@ -59,6 +59,7 @@ public class AsmInsertImpl extends InsertcodeStrategy {
                 zipFile(ctClass.toBytecode(), outStream, ctClass.getName().replaceAll("\\.", "/") + ".class");
 
             }
+            ctClass.defrost();
         }
         outStream.close();
     }
