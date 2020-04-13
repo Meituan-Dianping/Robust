@@ -34,17 +34,22 @@ public abstract class InsertcodeStrategy {
 
     //a switch control whether need to filter method in exceptMethodList, if false ,exceptMethodList will be ignored
     protected boolean isExceptMethodLevel = false;
+
+    //a switch control whether need to insert code into lambda function
+    protected boolean isForceInsertLambda = false;
+
     protected AtomicInteger insertMethodCount = new AtomicInteger(0);
     //record every method with unique method number, use LinkedHashMap to keep order for printing
     public HashMap<String, Integer> methodMap = new LinkedHashMap<>();
 
-    public InsertcodeStrategy(List<String> hotfixPackageList, List<String> hotfixMethodList, List<String> exceptPackageList, List<String> exceptMethodList, boolean isHotfixMethodLevel, boolean isExceptMethodLevel) {
+    public InsertcodeStrategy(List<String> hotfixPackageList, List<String> hotfixMethodList, List<String> exceptPackageList, List<String> exceptMethodList, boolean isHotfixMethodLevel, boolean isExceptMethodLevel, boolean isForceInsertLambda) {
         this.hotfixPackageList = hotfixPackageList;
         this.hotfixMethodList = hotfixMethodList;
         this.exceptPackageList = exceptPackageList;
         this.exceptMethodList = exceptMethodList;
         this.isHotfixMethodLevel = isHotfixMethodLevel;
         this.isExceptMethodLevel = isExceptMethodLevel;
+        this.isForceInsertLambda = isForceInsertLambda;
         insertMethodCount.set(0);
     }
 

@@ -32,6 +32,10 @@
         <!--项目是否支持ASM进行插桩，默认使用ASM，推荐使用ASM，Javaassist在容易和其他字节码工具相互干扰-->
         <useAsm>true</useAsm>
         <!--<useAsm>false</useAsm>-->
+
+        <!--针对Java8级别的Lambda表达式，编译为private级别的javac函数，此时由开发者决定是否进行插桩处理-->
+        <forceInsertLambda>true</forceInsertLambda>
+<!--        <forceInsertLambda>false</forceInsertLambda>-->
     </switch>
 
     <!--需要热补的包名或者类名，这些包名下的所有类都被会插入代码-->
