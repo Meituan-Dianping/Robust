@@ -209,7 +209,7 @@ public class JavaUtils {
         realParameterBuilder.append("if (args == null || args.length < 1) {");
         realParameterBuilder.append(" return args;");
         realParameterBuilder.append("}");
-        realParameterBuilder.append(" Object[] realParameter = new Object[args.length];");
+        realParameterBuilder.append(" Object[] realParameter = (Object[]) java.lang.reflect.Array.newInstance(args.getClass().getComponentType(), args.length);");
         realParameterBuilder.append("for (int i = 0; i < args.length; i++) {");
         realParameterBuilder.append("if (args[i] instanceof Object[]) {");
         realParameterBuilder.append("realParameter[i] =" + Constants.GET_REAL_PARAMETER + "((Object[]) args[i]);");
