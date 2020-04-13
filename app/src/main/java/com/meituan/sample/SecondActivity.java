@@ -3,6 +3,7 @@ package com.meituan.sample;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
         //test array
         BaseAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_expandable_list_item_1, multiArr);
         listView.setAdapter(adapter);
+        printLog("robust", new String[][]{new String[]{"1", "2", "3"}, new String[]{"4", "5", "6"}});
     }
 
 //    @Modify
@@ -90,5 +92,17 @@ public class SecondActivity extends AppCompatActivity implements View.OnClickLis
             e.printStackTrace();
         }
         return null;
+    }
+
+    private void printLog(@NonNull String tag, @NonNull String[][] args) {
+        int i = 0;
+        int j = 0;
+        for (String[] array : args) {
+            for (String arg : array) {
+                Log.d(tag, "args[" + i + "][" + j + "] is: " + arg);
+                j++;
+            }
+            i++;
+        }
     }
 }
