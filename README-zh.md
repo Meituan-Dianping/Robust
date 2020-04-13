@@ -1,11 +1,11 @@
 
 # Robust
- [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.96) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.96/link)
+ [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.97) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.97/link)
  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
  [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 
- Robust是新一代热更新系统，无差别兼容Android2.3-8.0版本；无需重启补丁实时生效，快速修复线上问题，补丁修补成功率高达99.9%。
+ Robust是新一代热更新系统，无差别兼容Android2.3-10版本；无需重启补丁实时生效，快速修复线上问题，补丁修补成功率高达99.9%。
  
  [English Introduction](README.md)
  
@@ -28,7 +28,7 @@
 	apply plugin: 'robust'
 		
 		
-	compile 'com.meituan.robust:robust:0.4.96'
+	compile 'com.meituan.robust:robust:0.4.97'
 		
 	```
  2. 在整个项目的build.gradle加入classpath
@@ -39,8 +39,8 @@
 	        jcenter()
 	    }
 	    dependencies {
-	         classpath 'com.meituan.robust:gradle-plugin:0.4.96'
-	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.96'
+	         classpath 'com.meituan.robust:gradle-plugin:0.4.97'
+	         classpath 'com.meituan.robust:auto-patch-plugin:0.4.97'
 	   }
 	}
 	```
