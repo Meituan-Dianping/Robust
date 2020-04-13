@@ -47,6 +47,9 @@ class ReadXML {
         if (robust.switch.catchReflectException.text() != null && "" != robust.switch.catchReflectException.text())
             Config.catchReflectException = Boolean.valueOf(robust.switch.catchReflectException.text()).booleanValue();
 
+        if (robust.switch.rollbackWhenException.text() != null && "" != robust.switch.rollbackWhenException.text())
+            Config.rollbackWhenException = Boolean.valueOf(robust.switch.rollbackWhenException.text()).booleanValue();
+
         if (robust.switch.patchLog.text() != null && "" != robust.switch.patchLog.text())
             Constants.isLogging = Boolean.valueOf(robust.switch.patchLog.text()).booleanValue();
 

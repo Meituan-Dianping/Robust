@@ -23,6 +23,7 @@ import static com.meituan.robust.Constants.DEFAULT_MAPPING_FILE;
 
 public final class Config {
     public static boolean catchReflectException = false;
+    public static boolean rollbackWhenException = false;
     public static boolean supportProGuard = true;
     public static boolean isLogging = true;
     public static boolean isManual = false;
@@ -44,6 +45,7 @@ public final class Config {
 
     public static void init() {
         catchReflectException = false;
+        rollbackWhenException = false;
         isLogging = true;
         isManual = false;
         patchPackageName = Constants.PATCH_PACKAGENAME;

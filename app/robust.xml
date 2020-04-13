@@ -21,6 +21,9 @@
         <catchReflectException>true</catchReflectException>
         <!--<catchReflectException>false</catchReflectException>-->
 
+        <!--是否检测补丁异常，自动回滚补丁-->
+        <rollbackWhenException>true</rollbackWhenException>
+
         <!--是否在补丁加上log，建议上线的时候这个开关的值为false，测试的时候为true-->
         <!--<patchLog>true</patchLog>-->
         <patchLog>false</patchLog>

@@ -17,6 +17,9 @@ public class PatchTemplate implements ChangeQuickRedirect {
 
     private static final Map<Object, Object> keyToValueRelation = new WeakHashMap<>();
 
+    private String methodsId;
+    private String methodLongName;
+
     @Override
     public Object accessDispatch(String methodName, Object[] paramArrayOfObject) {
         return null;
