@@ -48,7 +48,7 @@
  
 # 优势
 
-* 支持Android2.3-9.x版本
+* 支持Android2.3-10版本
 * 高兼容性、高稳定性，修复成功率高达99.9%
 * 补丁实时生效，不需要重新启动
 * 支持方法级别的修复，包括静态方法
@@ -56,6 +56,11 @@
 * 支持ProGuard的混淆、内联、优化等操作
 
 需要保存打包时生成的mapping文件以及**build/outputs/robust/methodsMap.robust**文件
+# 注意 gradle 3.6及以上版本默认启用R8，会将插入的ChangeQuickRedirect变量优化掉，需要在混淆文件proguard-rules.pro中加入以下代码。
+
+-keepclassmembers class **{
+    public static com.meituan.robust.ChangeQuickRedirect *;
+}
 
 # AutoPatch
  
