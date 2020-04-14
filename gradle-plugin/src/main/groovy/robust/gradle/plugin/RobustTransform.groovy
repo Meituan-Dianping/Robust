@@ -2,15 +2,22 @@ package robust.gradle.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.android.build.gradle.internal.pipeline.TransformTask
 import com.meituan.robust.Constants
 import javassist.ClassPool
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.execution.TaskExecutionListener
 import org.gradle.api.logging.Logger
+import org.gradle.api.tasks.TaskState
+import org.gradle.internal.hash.HashUtil
 import robust.gradle.plugin.asm.AsmInsertImpl
 import robust.gradle.plugin.javaassist.JavaAssistInsertImpl
 
 import java.util.zip.GZIPOutputStream
+
 /**
  * Created by mivanzhang on 16/11/3.
  *
@@ -29,6 +36,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
     private static boolean isExceptMethodLevel = false;
 //    private static boolean isForceInsert = true;
     private static boolean isForceInsert = false;
+    private static boolean insertCode = false;
 //    private static boolean useASM = false;
     private static boolean useASM = true;
     private static boolean isForceInsertLambda = false;
@@ -42,33 +50,23 @@ class RobustTransform extends Transform implements Plugin<Project> {
         robust = new XmlSlurper().parse(new File("${project.projectDir}/${Constants.ROBUST_XML}"))
         logger = project.logger
         initConfig()
-        //isForceInsert 是true的话，则强制执行插入
-        if (!isForceInsert) {
-            def taskNames = project.gradle.startParameter.taskNames
-            def isDebugTask = false;
-            for (int index = 0; index < taskNames.size(); ++index) {
-                def taskName = taskNames[index]
-                logger.debug "input start parameter task is ${taskName}"
-                //FIXME: assembleRelease下屏蔽Prepare，这里因为还没有执行Task，没法直接通过当前的BuildType来判断，所以直接分析当前的startParameter中的taskname，
-                //另外这里有一个小坑task的名字不能是缩写必须是全称 例如assembleDebug不能是任何形式的缩写输入
-                if (taskName.endsWith("Debug") && taskName.contains("Debug")) {
-//                    logger.warn " Don't register robust transform for debug model !!! task is：${taskName}"
-                    isDebugTask = true
-                    break;
+        project.android.registerTransform(this)
+        project.afterEvaluate(new RobustApkHashAction())
+        project.gradle.addListener(new TaskExecutionListener() {
+            @Override
+            void beforeExecute(Task task) {
+                if (task instanceof TransformTask) {
+                    if (task.transform instanceof RobustTransform) {
+                        insertCode = isInsertCode(task.variantName)
+                    }
                 }
             }
-            if (!isDebugTask) {
-                project.android.registerTransform(this)
-                project.afterEvaluate(new RobustApkHashAction())
-                logger.quiet "Register robust transform successful !!!"
+
+            @Override
+            void afterExecute(Task task, TaskState taskState) {
+
             }
-            if (null != robust.switch.turnOnRobust && !"true".equals(String.valueOf(robust.switch.turnOnRobust))) {
-                return;
-            }
-        } else {
-            project.android.registerTransform(this)
-            project.afterEvaluate(new RobustApkHashAction())
-        }
+        })
     }
 
     def initConfig() {
@@ -141,6 +139,22 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
     @Override
     void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+        logger.quiet "'================robust insertCode: $insertCode================"
+        if (!insertCode) {
+            inputs.each {
+                it.directoryInputs.each {
+                    def dest = outputProvider.getContentLocation(it.name, it.contentTypes, it.scopes, Format.DIRECTORY)
+                    FileUtils.copyDirectory(it.file, dest)
+                }
+
+                it.jarInputs.each {
+                    String name = HashUtil.createHash(it.file.absolutePath, "MD5").asHexString()
+                    def dest = outputProvider.getContentLocation(name, it.contentTypes, it.scopes, Format.JAR)
+                    FileUtils.copyFile(it.file, dest)
+                }
+            }
+            return
+        }
         logger.quiet '================robust start================'
         def startTime = System.currentTimeMillis()
         outputProvider.deleteAll()
@@ -202,4 +216,8 @@ class RobustTransform extends Transform implements Plugin<Project> {
 
     }
 
+    static boolean isInsertCode(String buildType) {
+        //isForceInsert 是true的话，则强制执行插入
+        return isForceInsert || !"debug".equalsIgnoreCase(buildType)
+    }
 }
