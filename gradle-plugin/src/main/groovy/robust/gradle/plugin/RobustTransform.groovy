@@ -59,7 +59,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
             }
             if (!isDebugTask) {
                 project.android.registerTransform(this)
-                project.afterEvaluate(new RobustApkHashAction())
+//                project.afterEvaluate(new RobustApkHashAction())
                 logger.quiet "Register robust transform successful !!!"
             }
             if (null != robust.switch.turnOnRobust && !"true".equals(String.valueOf(robust.switch.turnOnRobust))) {
