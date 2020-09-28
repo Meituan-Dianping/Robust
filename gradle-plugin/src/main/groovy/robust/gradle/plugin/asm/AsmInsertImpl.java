@@ -50,6 +50,13 @@ public class AsmInsertImpl extends InsertcodeStrategy {
         ZipOutputStream outStream = new JarOutputStream(new FileOutputStream(jarFile));
         //get every class in the box ,ready to insert code
         for (CtClass ctClass : box) {
+            /**
+             * 过滤掉javassis 从3.20.0-GA升级到3.22.0-GA产生的module-info.class
+             * 因为3.22.0-GA是使用java9编译的，会产生一个叫module-info.class的文件类
+             */
+            if ("META-INF.versions.9.module-info".equals(ctClass.getName())) {
+                continue;
+            }
             //change modifier to public ,so all the class in the apk will be public ,you will be able to access it in the patch
             ctClass.setModifiers(AccessFlag.setPublic(ctClass.getModifiers()));
             if (isNeedInsertClass(ctClass.getName()) && !(ctClass.isInterface() || ctClass.getDeclaredMethods().length < 1)) {
