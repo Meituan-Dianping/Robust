@@ -59,7 +59,7 @@ public class PatchesControlFactory {
             accessDispatchMethodBody.append("  android.util.Log.d(\"robust\",\"keyToValueRelation not contain\" );");
         }
         accessDispatchMethodBody.append("patch=new " + patchClass.getName() + "(paramArrayOfObject[paramArrayOfObject.length - 1]);\n");
-        accessDispatchMethodBody.append(" keyToValueRelation.put(paramArrayOfObject[paramArrayOfObject.length - 1], null);\n");
+        accessDispatchMethodBody.append(" keyToValueRelation.put(paramArrayOfObject[paramArrayOfObject.length - 1], patch);\n");
         accessDispatchMethodBody.append("}else{");
         accessDispatchMethodBody.append("patch=(" + patchClass.getName() + ") keyToValueRelation.get(paramArrayOfObject[paramArrayOfObject.length - 1]);\n");
         accessDispatchMethodBody.append("}");
