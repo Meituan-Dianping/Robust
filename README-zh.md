@@ -6,9 +6,9 @@
 
 
  Robust是新一代热更新系统，无差别兼容Android2.3-10版本；无需重启补丁实时生效，快速修复线上问题，补丁修补成功率高达99.9%。
- 
+
  [English Introduction](README.md)
- 
+
   关于如何自定义以及常见问题的解决，请参看 [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
 
 # 环境
@@ -18,7 +18,7 @@
  * Java 1.7 +
 
 # 使用方法
-  
+
  1. 在App的build.gradle，加入如下依赖
 
 	```java
@@ -32,7 +32,7 @@
 		
 	```
  2. 在整个项目的build.gradle加入classpath
- 
+
 	```java
 	 buildscript {
 	    repositories {
@@ -45,7 +45,7 @@
 	}
 	```
 3. 在项目的src同级目录下配置robust.xml文件，具体项请参考DEMO**app/robust.xml**
- 
+
 # 优势
 
 * 支持Android2.3-10版本
@@ -63,8 +63,8 @@
 }
 
 # AutoPatch
- 
- 
+
+
 Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交修改完bug后的代码，运行和线上apk打包同样的gradle命令即可，会在项目的app/build/outputs/robust目录下生成补丁。更多自动化补丁信息请参考：[Android热更新方案Robust开源，新增自动化补丁工具](http://tech.meituan.com/android_autopatch.html) 。
 
 # 使用方法
@@ -112,31 +112,72 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 5. 补丁制作成功后会停止构建apk，出现类似于如下的提示，表示补丁生成成功
 ![补丁制作成功图片](images/patchsuccess_cn.png)
 
-# 样例使用：
-1. 生成样例apk，执行gradle命令：
+# 样例使用
 
-	```java
-	./gradlew clean  assembleRelease --stacktrace --no-daemon
-	```
-2. 安装样例apk。保存mapping.txt文件以及app/build/outputs/robust/methodsMap.robust文件
-3. 修改代码之后，加上**@Modify**注解或者调用RobustModify.modify()方法
-4. 把保存的**mapping.txt**和**methodsMap.robust**放到app/robust目录下
-5. 执行与生成样式apk相同的gradle命令：
-	
-	```java
-	./gradlew clean  assembleRelease --stacktrace --no-daemon
-	```
-5. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
-![补丁制作成功图片](images/patchsuccess_cn.png)
-7. 将补丁文件copy到手机目录/sdcard/robust下
+## 预编译版本
 
-	```java
-	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
-	```
-	补丁的路径/sdcard/robust是`PatchManipulateImp`中指定的
-8. 打开App，点击Patch按钮就会加载补丁。
-9. 也可以加载app/robust的样例补丁，修改了Jump_second_Activity跳转Activity的显示文字。
-10. 在样例中我们给类```SecondActivity```的方法```getTextInfo(String meituan)```制作补丁，你可以自行定制。
+`app/robust` 目录下已经预先编译了 apk 和 `patch.jar`，可以预览效果。
+
+1. 安装 `app/robust` 目录下的 apk。
+
+2. 打开App，点击 Jump_second_Activity，可以看到显示 error occur。
+
+3. 推送 patch 到指定目录
+
+   ```java
+   adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+   ```
+
+4. 打开App，点击Patch按钮加载补丁。
+
+5. 再次点击 Jump_second_Activity，可以看到显示 error fixed。
+
+## 自行编译（以修改类 ```SecondActivity``` 为例子）
+
+1. 可以删除 `app/robust` 中的所有文件，其为预编译样例文件。 
+
+2. 生成样例apk，执行gradle命令：
+
+  ```java
+  ./gradlew clean assembleRelease --stacktrace --no-daemon
+  ```
+
+3. 安装编译完成的 apk `app/build/outputs/apk/app-release.apk`  。保存 `app/build/outputs/mapping/release/mapping.txt `文件以及 `app/build/outputs/robust/methodsMap.robust` 文件。
+
+4. 修改代码之后，加上**@Modify**注解或者调用RobustModify.modify()方法
+
+   * 这里可以修改类 ```SecondActivity ```的方法 ```getTextInfo()``` 的返回值，制作补丁。
+
+5. 修改 `app/build.gradle` 文件的头部，使用插件。
+
+   ```java
+   // 取消下面行的注释
+   apply plugin: 'auto-patch-plugin'
+   ```
+
+6. 把保存的**mapping.txt**和**methodsMap.robust**放到 `app/robust` 目录下，如果目录不存在，创建目录。
+
+7. 执行与生成样式apk相同的gradle命令：
+
+  ```java
+  ./gradlew clean assembleRelease --stacktrace --no-daemon
+  ```
+
+8. 补丁制作成功后会停止构建apk，出现类似于如下的提示,表示补丁生成成功
+    ![补丁制作成功图片](images/patchsuccess_cn.png)
+
+9. 将补丁文件copy到手机目录 /sdcard/robust 下
+
+  ```java
+  adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+  ```
+  补丁的路径/sdcard/robust是`PatchManipulateImp`中指定的
+
+10. 打开App，点击 Jump_second_Activity，可以预览修改前的Activity 的显示文字。
+
+11. 点击Patch按钮就会加载补丁。
+
+12. 点击 Jump_second_Activity，可以看到 Activity 的显示文字被修改了。
 
 # 注意事项
 
@@ -165,13 +206,13 @@ Robust补丁自动化，为Robust自动生成补丁，使用者只需要提交�
 ## License
 
     Copyright 2017 Meituan-Dianping
-
+    
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
        http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
