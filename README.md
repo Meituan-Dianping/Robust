@@ -1,33 +1,34 @@
 
 # Robust
- 
+
 [![Download](https://api.bintray.com/packages/meituan/maven/com.meituan.robust%3Apatch/images/download.svg?version=0.4.99) ](https://bintray.com/meituan/maven/com.meituan.robust%3Apatch/0.4.99/link)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/Meituan-Dianping/Robust/pulls)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://raw.githubusercontent.com/Meituan-Dianping/Robust/master/LICENSE)  
 
 Robust is an Android HotFix solution with high compatibility and high stability. Robust can fix bugs immediately without publishing apk.
- 
+
  [中文说明](README-zh.md)
- 
+
  More help on [Wiki](https://github.com/Meituan-Dianping/Robust/wiki)
- 
+
 # Environment
 
  * Mac Linux and Windows
  * Gradle 2.10+ , include 3.0
  * Java 1.7 +
- 
+
 # Usage
 
 1. Add below codes in the module's build.gradle.
 
-	```java
-	apply plugin: 'com.android.application'
-	//please uncomment fellow line before you build a patch
-	//apply plugin: 'auto-patch-plugin'
-	apply plugin: 'robust'
-
-	compile 'com.meituan.robust:robust:0.4.99'
+  ```java
+  apply plugin: 'com.android.application'
+  //please uncomment fellow line before you build a patch
+  //apply plugin: 'auto-patch-plugin'
+  apply plugin: 'robust'
+  
+  compile 'com.meituan.robust:robust:0.4.99'
+  ```
 
 2. Add below codes in the outest project's build.gradle file.
 
@@ -58,7 +59,7 @@ Robust is an Android HotFix solution with high compatibility and high stability.
 When you build APK,you may need to save "mapping.txt" and the files in directory "build/outputs/robust/".
 
 # AutoPatch
- 
+
 
 AutoPatch will generate patch for Robust automatically. You just need to fellow below steps to genrate patches. For more details please visit website http://tech.meituan.com/android_autopatch.html
 
@@ -108,30 +109,72 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 ![Success in generating patch](images/patchsuccess_en.png)
 
 # Demo Usage
-1. Excute fellow command to build apk：
 
-	```java
-	./gradlew clean  assembleRelease --stacktrace --no-daemon
-	```
-2. After install apk on your phone,you need to save **mapping.txt** and **app/build/outputs/robust/methodsMap.robust**
-3. Put mapping.txt and methodsMap.robust which are generated when you build the apks into diretory **app/robust/**,if directory not exists ,create it!
-4. After modifying the code ,please put annotation `@Modify` on the modified methods or invoke  `RobustModify.modify()` (designed for Lambda Expression )in the modified methods.
-5. Run the same gradle command as you build the apk:
+## Pre Compile
 
-	```java
-	./gradlew clean  assembleRelease --stacktrace --no-daemon
-	```
-6. Generating patches always end like this,which means patches is done
-![Success in generating patch](images/patchsuccess_en.png)
-7. Copy patch to your phone：
+The apk and patch.jar have been pre-compiled in the `app/robust` folder, and the patch effect can be previewed.
 
-	```java
-	adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
-	```
-	patch directory can be configured in ``PatchManipulateImp``.
-8. Open app,and click **Patch** button,patch is used.
-9. Also you can use our sample patch in **app/robust/sample_patch.jar** ,this dex change text after you click **Jump_second_Activity** Button.
-10. In the demo ,we change the text showed on the second activity which is configured in the method ```getTextInfo(String meituan)``` in class ```SecondActivity``` 
+1. Install the apk in the `app/robust`.
+
+2. Open the App, click `Jump_second_Activity`, you can see that `error occur` appears.
+
+3. Push the patch to the specified directory
+
+    ```java
+    adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+    ```
+
+4. Open the App and click the `Patch` button to load the patch.
+
+5. Click `Jump_second_Activity` again, you can see `error fixed` is displayed.
+
+## Compile by yourself (take Class ```SecondActivity``` as an example)
+
+1. You can delete all files in `app/robust`, which are pre-compiled sample files.
+
+2. Generate a sample apk and execute the gradle command:
+
+   ```java
+   ./gradlew clean assembleRelease --stacktrace --no-daemon
+   ```
+
+3. Install the compiled apk `app/build/outputs/apk/app-release.apk` . Save the `app/build/outputs/mapping/release/mapping.txt` file and the `app/build/outputs/robust/methodsMap.robust` file
+
+4. After modifying the code, add **@Modify** annotation or call RobustModify.modify() method
+
+   * Here you can modify the return value of the method ```getTextInfo()``` of the class ```SecondActivity ```, and make a patch.
+
+5. Modify the header of the `app/build.gradle` file to use plugins.
+
+   ```java
+   // Uncomment the following line
+   apply plugin:'auto-patch-plugin'
+   ```
+
+6. Put the saved **mapping.txt** and **methodsMap.robust** in the `app/robust` folder, create the folder if not exist.
+
+7. Execute the same gradle command as the generated the sample apk:
+
+   ```java
+   ./gradlew clean assembleRelease --stacktrace --no-daemon
+   ```
+
+8. After the patch is successfully made, the apk will stop building, and a prompt similar to the following appears, indicating that the patch is successfully generated
+   ![Picture of successful patch production](images/patchsuccess_en.png)
+
+9. Copy the patch file to the phone directory `/sdcard/robust`
+
+   ```java
+   adb push ~/Desktop/code/robust/app/build/outputs/robust/patch.jar /sdcard/robust/patch.jar
+   ```
+
+   The patch path `/sdcard/robust` is specified in `PatchManipulateImp`
+
+10. Open the App and click `Jump_second_Activity` to preview the display text of the Activity before modification.
+
+11. Click the `Patch` button to load the patch.
+
+12. Click ` Jump_second_Activity`, you can see that the display text of Activity has been modified.
 
 # Attentions
 
@@ -159,13 +202,13 @@ AutoPatch will generate patch for Robust automatically. You just need to fellow 
 ## License
 
     Copyright 2017 Meituan-Dianping
-
+    
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
        http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
