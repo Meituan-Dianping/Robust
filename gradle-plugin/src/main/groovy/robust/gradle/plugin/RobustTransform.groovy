@@ -153,12 +153,18 @@ class RobustTransform extends Transform implements Plugin<Project> {
             jarFile.delete();
         }
 
-        ClassPool classPool = new ClassPool()
+        ClassPool directoryClassPool = new ClassPool()
         project.android.bootClasspath.each {
-            classPool.appendClassPath((String) it.absolutePath)
+            directoryClassPool.appendClassPath((String) it.absolutePath)
         }
 
-        def box = ConvertUtils.toCtClasses(inputs, classPool)
+        ClassPool jarClassPool = new ClassPool()
+        project.android.bootClasspath.each {
+            jarClassPool.appendClassPath((String) it.absolutePath)
+        }
+
+        def box = ConvertUtils.toCtClasses(inputs, directoryClassPool, jarClassPool)
+
         def cost = (System.currentTimeMillis() - startTime) / 1000
 //        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
         if (useASM) {
