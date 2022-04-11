@@ -25,6 +25,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
     private static List<String> hotfixMethodList = new ArrayList<>();
     private static List<String> exceptPackageList = new ArrayList<>();
     private static List<String> exceptMethodList = new ArrayList<>();
+    private static List<String> exceptCtClassNameList = new ArrayList<>();
     private static boolean isHotfixMethodLevel = false;
     private static boolean isExceptMethodLevel = false;
 //    private static boolean isForceInsert = true;
@@ -76,6 +77,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         hotfixMethodList = new ArrayList<>()
         exceptPackageList = new ArrayList<>()
         exceptMethodList = new ArrayList<>()
+        exceptCtClassNameList = new ArrayList<>()
         isHotfixMethodLevel = false;
         isExceptMethodLevel = false;
         /*对文件进行解析*/
@@ -91,7 +93,9 @@ class RobustTransform extends Transform implements Plugin<Project> {
         for (name in robust.exceptMethod.name) {
             exceptMethodList.add(name.text());
         }
-
+        for(name in robust.exceptCtClassName.name) {
+            exceptCtClassNameList.add(name.text());
+        }
         if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnHotfixMethod.text()))) {
             isHotfixMethodLevel = true;
         }
@@ -163,7 +167,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
             jarClassPool.appendClassPath((String) it.absolutePath)
         }
 
-        def box = ConvertUtils.toCtClasses(inputs, directoryClassPool, jarClassPool)
+        def box = ConvertUtils.toCtClasses(exceptCtClassNameList, inputs, directoryClassPool, jarClassPool)
 
         def cost = (System.currentTimeMillis() - startTime) / 1000
 //        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
