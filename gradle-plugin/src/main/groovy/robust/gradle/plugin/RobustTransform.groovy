@@ -25,14 +25,13 @@ class RobustTransform extends Transform implements Plugin<Project> {
     private static List<String> hotfixMethodList = new ArrayList<>();
     private static List<String> exceptPackageList = new ArrayList<>();
     private static List<String> exceptMethodList = new ArrayList<>();
+    private static List<String> exceptCtClassNameList = new ArrayList<>();
     private static boolean isHotfixMethodLevel = false;
     private static boolean isExceptMethodLevel = false;
 //    private static boolean isForceInsert = true;
     private static boolean isForceInsert = false;
 //    private static boolean useASM = false;
     private static boolean useASM = true;
-    private static boolean isForceInsertLambda = false;
-
     def robust
     InsertcodeStrategy insertcodeStrategy;
 
@@ -76,6 +75,7 @@ class RobustTransform extends Transform implements Plugin<Project> {
         hotfixMethodList = new ArrayList<>()
         exceptPackageList = new ArrayList<>()
         exceptMethodList = new ArrayList<>()
+        exceptCtClassNameList = new ArrayList<>()
         isHotfixMethodLevel = false;
         isExceptMethodLevel = false;
         /*对文件进行解析*/
@@ -91,7 +91,9 @@ class RobustTransform extends Transform implements Plugin<Project> {
         for (name in robust.exceptMethod.name) {
             exceptMethodList.add(name.text());
         }
-
+        for(name in robust.exceptCtClassName.name) {
+            exceptCtClassNameList.add(name.text());
+        }
         if (null != robust.switch.filterMethod && "true".equals(String.valueOf(robust.switch.turnOnHotfixMethod.text()))) {
             isHotfixMethodLevel = true;
         }
@@ -112,10 +114,6 @@ class RobustTransform extends Transform implements Plugin<Project> {
         else
             isForceInsert = false
 
-        if (robust.switch.forceInsertLambda != null && "true".equals(String.valueOf(robust.switch.forceInsertLambda.text())))
-            isForceInsertLambda = true;
-        else
-            isForceInsertLambda = false;
     }
 
     @Override
@@ -163,14 +161,13 @@ class RobustTransform extends Transform implements Plugin<Project> {
             jarClassPool.appendClassPath((String) it.absolutePath)
         }
 
-        def box = ConvertUtils.toCtClasses(inputs, directoryClassPool, jarClassPool)
-
+        def box = ConvertUtils.toCtClasses(exceptCtClassNameList, inputs, directoryClassPool, jarClassPool)
         def cost = (System.currentTimeMillis() - startTime) / 1000
 //        logger.quiet "check all class cost $cost second, class count: ${box.size()}"
-        if (useASM) {
-            insertcodeStrategy = new AsmInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel, isForceInsertLambda);
-        } else {
-            insertcodeStrategy = new JavaAssistInsertImpl(hotfixPackageList, hotfixMethodList, exceptPackageList, exceptMethodList, isHotfixMethodLevel, isExceptMethodLevel, isForceInsertLambda);
+        if(useASM){
+            insertcodeStrategy=new AsmInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
+        }else {
+            insertcodeStrategy=new JavaAssistInsertImpl(hotfixPackageList,hotfixMethodList,exceptPackageList,exceptMethodList,isHotfixMethodLevel,isExceptMethodLevel);
         }
         insertcodeStrategy.insertCode(box, jarFile);
         writeMap2File(insertcodeStrategy.methodMap, Constants.METHOD_MAP_OUT_PATH)

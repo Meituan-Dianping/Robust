@@ -12,7 +12,7 @@ import java.util.regex.Matcher
  * Created by mivanzhang on 16/11/3.
  */
 class ConvertUtils {
-    static List<CtClass> toCtClasses(Collection<TransformInput> inputs, ClassPool directoryClassPool, ClassPool jarClassPool) {
+    static List<CtClass> toCtClasses(List<String> exceptCtClassNameList, Collection<TransformInput> inputs, ClassPool directoryClassPool, ClassPool jarClassPool) {
         List<String> directoryClassNames = new ArrayList<>()
         List<String> jarClassNames = new ArrayList<>()
         List<CtClass> allClass = new ArrayList<>();
@@ -24,10 +24,12 @@ class ConvertUtils {
                 org.apache.commons.io.FileUtils.listFiles(it.file, null, true).each {
                     if (it.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
                         def className = it.absolutePath.substring(dirPath.length() + 1, it.absolutePath.length() - SdkConstants.DOT_CLASS.length()).replaceAll(Matcher.quoteReplacement(File.separator), '.')
-                        if(directoryClassNames.contains(className)){
-                            throw new RuntimeException("You have duplicate classes with the same name : "+className+" please remove duplicate classes ")
+                        if(!isExceptClassNameClass(exceptCtClassNameList, className)) {
+                            if (directoryClassNames.contains(className)) {
+                                throw new RuntimeException("You have duplicate classes with the same name : " + className + " please remove duplicate classes ")
+                            }
+                            directoryClassNames.add(className)
                         }
-                        directoryClassNames.add(className)
                     }
                 }
             }
@@ -41,17 +43,18 @@ class ConvertUtils {
                     String className = libClass.getName();
                     if (className.endsWith(SdkConstants.DOT_CLASS)) {
                         className = className.substring(0, className.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
-                        if(jarClassNames.contains(className) || directoryClassNames.contains(className)){
-                            throw new RuntimeException("You have duplicate classes with the same name : "+className+" please remove duplicate classes ")
+                        if(!isExceptClassNameClass(exceptCtClassNameList, className)) {
+                            if (jarClassNames.contains(className) || directoryClassNames.contains(className)) {
+                                throw new RuntimeException("You have duplicate classes with the same name : " + className + " please remove duplicate classes ")
+                            }
+                            jarClassNames.add(className)
                         }
-                        jarClassNames.add(className)
                     }
                 }
             }
         }
         def cost = (System.currentTimeMillis() - startTime) / 1000
         println "read all class file cost $cost second"
-
         directoryClassNames.each {
             try {
                 allClass.add(directoryClassPool.get(it));
@@ -79,5 +82,15 @@ class ConvertUtils {
         return allClass;
     }
 
+    protected static boolean isExceptClassNameClass(List<String> exceptCtClassNameList, String className) {
+        if(exceptCtClassNameList != null) {
+            for (String exceptName : exceptCtClassNameList) {
+                if (className.startsWith(exceptName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 }
